@@ -40,10 +40,6 @@ visibility: visible;
 	
 <ul id="navbar">
       <li><a href="/">Главная</a></li>
-      <!--<li><a href="/ug">Кафе "Уголок победителя"</a></li>-->
-	  <li><a href="/tipograf">Типография</a></li>
-	  <li><a href="/system">Управление системой</a></li>
-	  <li><a href="/og">Огородный контроль</a></li>
-	  <li><a href="/printing">Сканер</a></li>
       <li><a href="/michome">Michom</a></li>
     </ul>
+<script type="text/javascript" src="/site/snow.js"></script>

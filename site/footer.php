@@ -10,6 +10,7 @@
         width: 100%; /* Ширина слоя */
       }
 </style>
+
 <footer id="footer">
 Низ сайта
 </footer>
