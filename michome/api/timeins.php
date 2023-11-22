@@ -1,15 +1,15 @@
 <?
 header('Access-Control-Allow-Origin: *');
-include_once("../../site/mysql.php");
+require_once("../../site/mysql.php");
+require_once("../lib/michom.php");
 
-if(!empty($_GET['device'])){
-    $device = "`ip`='".mysqli_real_escape_string($link, $_GET['device'])."'";
-}
-else{
-	$device = 1;
-}
+$API = new MichomeAPI('localhost', $link); 
+header("Michome-Page: API-Service");
+header("Michome-API: TimeIns");
 
-$type = $_GET['type'];
+
+$device = (isset($_GET['device'])) ? $_GET['device'] : 'localhost';
+$type = (isset($_GET['type'])) ? $_GET['type'] : 'curday';
 
 if($type == "oneday"){
 	$id = 0;
@@ -35,22 +35,13 @@ elseif($type == "selday"){
 	
 	$date1 = $_GET['date'];
     
-	$date = new DateTime($date1);
-    $date->add(new DateInterval('P1D'));
-    //echo $date->format('Y-m-d') . "\n";
+	$Timeins = $API->TimeIns($device, 'selday', $date1);
 	
-	$results = mysqli_query($link, "SELECT MAX(`id`), MIN(`id`) FROM michom WHERE ".$device." AND `date` >= '".mysqli_real_escape_string($link, $date1)."' AND `date` <= '".$date->format('Y-m-d')."' LIMIT 1");
-
-    while($row = $results->fetch_assoc()) {
-            $max = $row['MAX(`id`)'];
-            $min = $row['MIN(`id`)'];
-        }
-        
-        if(empty($max)){
-            exit ('nan'.";".'nan'.";".'nan');
-        }
-        else{
-            exit ($min.";".$max.";".($max-$min));
-        }
+	exit($Timeins);
+}
+elseif($type == "curday"){  
+	$Timeins = $API->TimeIns($device, 'selday', date("Y-m-d"));
+	
+	exit($Timeins);
 }
 ?>

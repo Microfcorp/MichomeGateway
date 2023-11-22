@@ -24,7 +24,8 @@ class Foreca
     }
     
     public function CurrentTemperature() {
-       return preg_replace("/[^-0-9.]/", '', $this->html->find('div[id=wrap]')[0]->find('div[id=pagewrapper]')[0]->find('div[class=content]')[0]->find('div[class=content_2col]')[0]->find('div[id=webslice_content]')[0]->find('div[class=entry-content]')[0]->find('div[class=table t_cond]')[0]->find('div[class=c1]')[0]->find('div[class=left]')[0]->find('span[class=warm txt-xxlarge]')[0]->find('strong')[0]);
+		//var_dump($this->html->find('div[id=obs-container]')[0]);
+       return preg_replace("/[^-0-9.]/", '', $this->html->find('div[id=obs-container]')[0]->find('div[class=header]')[0]->find('div[class=tf]')[0]->find('p[class=t]')[0]->find('span[class=value temp temp_c warm]')[0]);
     }   
     
     public function Feeling() {

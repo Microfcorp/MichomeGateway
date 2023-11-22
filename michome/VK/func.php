@@ -181,16 +181,16 @@ function AddNot($id){
     $res = mysqli_query($link, "SELECT `ID` FROM `UsersVK` WHERE `ID` = ".$id);
     $count = mysqli_num_rows($res);
     if($count <= 0)
-        mysqli_query($link, "INSERT INTO `UsersVK`(`ID`, `Type`, `Enable`) VALUES ('$id','all','1')");
+        mysqli_query($link, "INSERT INTO `UsersVK`(`ID`, `Type`, `Enable`, `Messanger`) VALUES ('$id','all','1','VK')");
 }
 function ChangeNot($id, $group){
     global $link;
     AddNot($id);    
-    mysqli_query($link, "UPDATE `UsersVK` SET `Type`='$group', `Enable`=1 WHERE `ID`=".$id);
+    mysqli_query($link, "UPDATE `UsersVK` SET `Type`='$group', `Enable`=1 WHERE `Messanger`='VK' AND `ID`=".$id);
 }
 function RemoveNot($id){
     global $link;
-    mysqli_query($link, "DELETE FROM `UsersVK` WHERE `ID`=".$id);
+    mysqli_query($link, "DELETE FROM `UsersVK` WHERE `Messanger`='VK' AND `ID`=".$id);
 }
 
 function mymisto(){

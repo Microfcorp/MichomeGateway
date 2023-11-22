@@ -10,7 +10,11 @@
 	
 	$moduleip = $API->GetIPModule($module);
 	$html = $API->SendCmd($moduleip, $path, 5000);
-	$html = preg_replace('/(href=)\"([^\"]+\")/is', 'href="proxy.php?module='.$module.'&path=$2', $html);
+	$html = preg_replace('/(href=)\"([^\"\#]+\")/is', 'href="proxy.php?module='.$module.'&path=$2', $html);
+	$html = preg_replace("/(href=)\'([^\'\#]+\')/is", 'href=\'proxy.php?module='.$module.'&path=$2', $html);
+	$html = preg_replace("/(URL=)/is", 'URL=proxy.php?module='.$module.'&path=$2', $html);
+	$html = preg_replace("/(postAjax\()\'([^\'\#]+\')/is", 'postAjax(\'proxy.php?module='.$module.'&path=$2', $html);
+	$html = preg_replace('/(postAjax\()\"([^\"\#]+\")/is', 'postAjax("proxy.php?module='.$module.'&path=$2', $html);
 	
 	exit($html);
 ?>

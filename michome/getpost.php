@@ -16,7 +16,7 @@ while($row = $results->fetch_assoc()) {
 if(isset($_GET['ischeckconnect']) && $_GET['ischeckconnect'] == "1")
 	exit("OK");
 
-$API = new MichomeAPI('192.168.1.42', $link);
+$API = new MichomeAPI('localhost', $link);
 
 $one = 1;
 
@@ -47,6 +47,8 @@ try{
     $type = $obj->{'type'};
     $secret = $obj->{'secretkey'};
     $sign = $obj->{'secret'};
+    $mac = $obj->{'mac'};
+    $firmware = $obj->{'firmware'};
 }
 catch (Exception $e){
     exit("Error");
@@ -55,6 +57,7 @@ catch (Exception $e){
 if(sha1(substr($sign, 0, 13)) != $secret){
     exit("Error");
     $API->AddLog($ip, 'LoginFailed', '', 'Failed Password. '.sha1(substr($sign, 0, 13)), $date);
+    $API->SendNotification("Была попытка неудачной авторизации модулем", "all");
 }
 
 //Получение rsid
@@ -68,6 +71,8 @@ else{
     $rsid = '';    
 }
 
+$data = "rsid=" . $rsid . ";";
+
 if($type == "msinfoo"){	//Модуль сбора информации
 	$temperdht = $obj->{'data'}->{'temper'}; //Температура DHT11
 	$temp = $obj->{'data'}->{'temperbmp'}; //Температура BMP180
@@ -76,64 +81,75 @@ if($type == "msinfoo"){	//Модуль сбора информации
 	$humm = $obj->{'data'}->{'humm'};//Влажность			
 	$davlen = $obj->{'data'}->{'davlen'};//Давление
 	$visot = $obj->{'data'}->{'visot'};//Высота
+	$data = $data . "temperdht=" . $temperdht . ";";
 	
 	if($temperdht != "nan"){
-        $guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `dawlen`, `visota`, `date`) VALUES ('$ip', 'msinfoo','$rsid','$temp','$humm','$davlen','$visot','$date')"; 
+        $guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `dawlen`, `visota`, `date`) VALUES ('$ip', 'msinfoo','$data','$temp','$humm','$davlen','$visot','$date')"; 
         $result = mysqli_query($link, $guery);
 	}
 	else{      
-        $API->AddLog($ip, 'msinfoo', $rsid, 'MsinfooNAN', $date);
+        $API->AddLog($ip, 'msinfoo', $rsid, 'Text=MsinfooNAN;', $date);
 
         $data1 = $API->GetPosledData('192.168.1.10')->Humm;
 
-        $guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `dawlen`, `visota`, `date`) VALUES ('$ip', 'msinfoo','$rsid','$temp','$data1','$davlen','$visot','$date')"; 
+        $guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `dawlen`, `visota`, `date`) VALUES ('$ip', 'msinfoo','$data','$temp','$data1','$davlen','$visot','$date')"; 
         $result = mysqli_query($link, $guery);
 	}
 }
 elseif($type == "termometr"){	//Термометр
 	$temper = $obj->{'data'}->{'temper'}; //Температура
-	
-	/*if(intval($temper) < 10 & $ip == "192.168.1.11"){
-		curl_setopt_array($ch = curl_init(), array(
-		  CURLOPT_URL => "https://api.pushover.net/1/messages.json",
-		  CURLOPT_POSTFIELDS => array(
-			"token" => "a3oe1bpbbcj4duooajrm98zx3kw5zi",
-			"user" => "u5oywewtr3ant69yq1u758czivz877",
-			"message" => "Внимание! На улице слишком низкая температура (".$temper.")",
-		  ),
-		  CURLOPT_SAFE_UPLOAD => true,
-		  CURLOPT_RETURNTRANSFER => true,
-		));
-		curl_exec($ch);
-		curl_close($ch);
-	}*/
-	
-	$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `date`) VALUES ('$ip', 'termometr','$rsid','$temper','$date')"; 
+	if(is_array($temper)){
+		for($i = 0; $i < count($temper); $i++){
+			$data = $data . "Temp".$i."=".$temper[$i].";";
+		}
+		$tempmain = $temper[0];
+		$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `date`) VALUES ('$ip', 'termometr', '$data','$tempmain','$date')";
+	}
+	else{
+		$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `date`) VALUES ('$ip', 'termometr', '$data','$temper','$date')"; 
+	}
 	$result = mysqli_query($link, $guery);
+}
+elseif($type == "meteostation"){//Метеостация
+	$meteo = $obj->{'data'}->{'meteo'}; //Метео
+	$tempmain = -1;
+	$hummmain = -1;
+	$dawlenmain = -1;
+	for($i = 0; $i < count($meteo); $i++){		
+		if(intval($meteo[$i][0]) > 1024 || intval($meteo[$i][1]) > 1024) continue;	
+		$data = $data . "Temp".$i."=".$meteo[$i][0].((isset($meteo[$i][1]) && intval($meteo[$i][1]) != 0) ? (";Humm".$i."=".$meteo[$i][1]) : "").((isset($meteo[$i][2]) && intval($meteo[$i][2]) != 0) ? (";Dawlen".$i."=".$meteo[$i][2]) : "").";";
+
+		if($tempmain == -1 && $hummmain == -1){
+			$tempmain = $meteo[$i][0];
+			$hummmain = $meteo[$i][1];
+		}
+		if($dawlenmain == -1 && isset($meteo[$i][2]) && intval($meteo[$i][2]) != 0){
+			$dawlenmain = $meteo[$i][2];
+		}
+	}
+	if($tempmain == -1 && $hummmain == -1){
+		$API->AddLog($ip, $type, $rsid, "Text=None valid MeteoStation data;", $date);
+	}
+	else{
+		$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `dawlen`, `date`) VALUES ('$ip', '$type', '$data', '$tempmain', '$hummmain', '$dawlenmain', '$date')";
+		$result = mysqli_query($link, $guery);
+	}	
 }
 elseif($type == "Informetr"){	//Информетр
 	$type = $obj->{'data'}->{'data'};
-    $message = "Informetr: ".$type;
+    $message = "Text=Informetr: ".$type.";";
     
     $API->AddLog($ip, 'Informetr', $rsid, $message, $date);
     
     if($type == "GetData"){
-       /*$ch = curl_init();
-       curl_setopt($ch, CURLOPT_URL, "http://".$_SERVER['HTTP_HOST']."/michome/api/getprognoz.php?type=1");
-       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-       //curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT_MS, 300);
-       //curl_setopt ($ch, CURLOPT_TIMEOUT_MS, 300);
-       $pr = curl_exec($ch);
-	   curl_close($ch);
 
-       file_get_contents("http://".$ip."/setdata?param=".$pr);*/
     }
 }
 elseif($type == "hdc1080" || $type == "hdc1080mx"){ //HDC1080	
 	$temper = $obj->{'data'}->{'temper'};
 	$humm = $obj->{'data'}->{'humm'};
 
-	$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `date`) VALUES ('$ip', 'hdc1080','$rsid','$temper','$humm','$date')"; 
+	$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `date`) VALUES ('$ip', 'hdc1080','$data','$temper','$humm','$date')"; 
 	$result = mysqli_query($link, $guery);
 }
 elseif($type == "hdc1080andAlarm"){	//HDC1080 и сигнализация
@@ -158,15 +174,15 @@ elseif($type == "get_button_press"){//Событие нажатия кнопки
     $results = mysqli_query($link, "SELECT * FROM `scenes` WHERE `Enable`=1 AND `Name` LIKE '%^bt%%".$ip."%'");//Жестко качаем все из БД
     while($row = $results->fetch_assoc()) {
         $na = $row['Name'];
-        $na = str_replace("^cbp", $count, $na);
-        $na = str_replace("^pbp", $pin, $na);
+        $na = str_replace("^cbp;", $count, $na);
+        $na = str_replace("^pbp;", $pin, $na);
         
-        $N = $API->GetIFs($API->GetButton($API->GetConstant($na), $ip, $pin, $count), $row['Enable']);
+        $N = $API->GetIFs($API->GetButton($API->GetConstant($na), $ip, $pin, $count), $row['Enable'], $row['ID']);
         $Name = $N[0];
         if($N[1] != "0"){
             $data = $API->GetConstant($row['Data']);
-            $data = str_replace("^cbp", $count, $data);
-            $data = str_replace("^pbp", $pin, $data);
+            $data = str_replace("^cbp;", $count, $data);
+            $data = str_replace("^pbp;", $pin, $data);
             
             $API->GetNotification($data);
             if($API->SendCmd($row['Module'], $data) != "Ошибка соеденения с модулем" || IsStr($Name, "^nos")){ //Отправляем команду
@@ -181,10 +197,15 @@ elseif($type == "get_button_press"){//Событие нажатия кнопки
 elseif($type == "StudioLight"){	//Модуль освещения
 	$status = $obj->{'data'}->{'status'};
     
-    $API->AddLog($ip, 'StudioLight', $rsid, 'OK', $date);
+    $API->AddLog($ip, 'StudioLight', $rsid, 'Text=OK;', $date);
+}
+elseif($type == "OLED"){	//Модуль освещения
+	//$status = $obj->{'data'}->{'status'};
+    
+    //$API->AddLog($ip, 'StudioLight', $rsid, 'Text=OK;', $date);
 }
 elseif($type == "Log"){	//Лог
-	$status = $obj->{'data'}->{'log'};
+	$status = "Text=" . $obj->{'data'}->{'log'} . ";";
     
     $API->AddLog($ip, 'Log', $rsid, $status, $date);
 }
@@ -192,15 +213,15 @@ elseif($type == "init"){ //Инициализация модуля
 	$moduletype = $obj->{'data'}->{'type'};
     $moduleid = $obj->{'data'}->{'id'};
 
-    $res = mysqli_query($link, "SELECT `id` FROM modules WHERE mID = \"".$moduleid."\" limit 1");
+    $res = mysqli_query($link, "SELECT `id` FROM modules WHERE `mID` = \"".$moduleid."\" OR `mac`='$mac' limit 1");
     $count = mysqli_num_rows($res);
     if( $count > 0 ) {
 		$bdid = $res->fetch_assoc()['id'];
-		$res = mysqli_query($link, "UPDATE `michome`.`modules` SET `ip`='$ip' WHERE `id`='$bdid';");
+		$res = mysqli_query($link, "UPDATE `michome`.`modules` SET `ip`='$ip', `type`='$moduletype', `mac`='$mac', `laststart`=CURTIME() WHERE `id`='$bdid';");
 	} //Обновляем IP...
     else { //Добавляем в базу модулей
         $setting = $API->GetSettingsFromType($moduletype);
-        $guery = "INSERT INTO `modules`(`ip`, `type`, `mID`, `urls`, `setting`) VALUES ('$ip','$moduletype','$moduleid','refresh=Обновить данные;restart=Перезагрузить;clearlogs=Отчистить логи;cleardatalogs=Отчистить логи данных', '$setting')";       
+        $guery = "INSERT INTO `modules`(`mac`, `ip`, `type`, `mID`, `urls`, `setting`) VALUES ('$mac', '$ip','$moduletype','$moduleid','refresh=Обновить данные;restart=Перезагрузить;clearlogs=Отчистить логи;cleardatalogs=Отчистить логи данных', '$setting')";       
         $result = mysqli_query($link, $guery);
     }    
     $ch = curl_init();
@@ -208,13 +229,13 @@ elseif($type == "init"){ //Инициализация модуля
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 10);
     curl_setopt ($ch, CURLOPT_TIMEOUT, 10);
-   $pr = curl_exec($ch);
+    $pr = curl_exec($ch);
 	curl_close($ch);
     
-    $API->AddLog($ip, 'StartingModule', $rsid, "Module ".$moduleid." Starting", $date);
+    $API->AddLog($ip, 'StartingModule', $rsid, "Text=Module ".$moduleid." Starting;", $date);
 }
 else{//Произвольное событие
-	$data = $obj->{'data'};
+	$data = $data . $obj->{'data'};
 	$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `date`) VALUES ('$ip', '$type','$data','$date')"; 
 	$result = mysqli_query($link, $guery);
 }

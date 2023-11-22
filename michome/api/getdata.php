@@ -3,16 +3,19 @@ header('Access-Control-Allow-Origin: *');
 include_once("../../site/mysql.php");
 include_once("../lib/michom.php");
 
-$API = new MichomeAPI('127.0.0.1', $link); 
-header("Michome-Page: API-Page");
+$API = new MichomeAPI('localhost', $link); 
+header("Michome-Page: API-Service");
 header("Michome-API: GETData");
+
+//Метод API для получения данных из базы данных с отбором по дням
 
 //Структура запросов:
 //device=192.168.1.11 ИЛИ device=termometr_okno - Устройтсво, по которому вести выборку. Поддержка и ip и имени устройства
 //type=termometr - Тип данных, по которому вести выборку
-//cmd=temp - Тип данных из базы данных
+//cmd=temp ИЛИ cmd=unique - Тип данных из базы данных ИЛИ список всех доступных типов для выборки
 //view=text ИЛИ view=json - Тип представления данных (json по умолчанию), при тексте возвращается только последняя строка выборки
 //date=2022-10-14 - За какой день вести выборку данных, если не указано, то за текущий
+//filter=nonenull - Применяет фильтр к значениям (nonenull удаляет пустые элементы)
 
 $num = 0;
 
@@ -41,14 +44,20 @@ $cmd = $_GET['cmd']; //Комманда на получение типа дан�
 $JSONData = Array("name"=>"getdata", "type"=>$cmd, "col"=>0, "device"=>$device, "data"=>Array(), "date"=>Array()); //Основная структура данных
 
 $reqs = $API->GetDataForDay($device, $selDate)->SortType($type);
-$JSONData['col'] = count($reqs->BDDatas());
-$JSONData['data'] = $reqs->Select($cmd);
-$JSONData['date'] = $reqs->Select("date");
+if($cmd == "unique"){
+	$filter = isset($_GET['filter']) ? $_GET['filter'] : "none";
+	$JSONData['data'] = $reqs->GetTypes($filter);
+}
+else{
+	$JSONData['data'] = $reqs->Select($cmd);
+	$JSONData['date'] = $reqs->Select("date");
+}
+$JSONData['col'] = count($JSONData['data']);
 
 if($viewType == "text")
-	echo($JSONData['data'][array_key_last($JSONData['data'])]);
+	exit($JSONData['data'][array_key_last($JSONData['data'])]);
 else
-	echo json_encode($JSONData);
+	exit(json_encode($JSONData));
 
 /*$data[] = "";
 $date[] = "";

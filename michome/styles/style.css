@@ -32,6 +32,15 @@ p{
     padding-left: 10px;
 }
 
+.SendCmdButton{
+	margin-bottom: 5px;
+	border-radius: 4px;
+    border-style: inherit;
+    color: brown;
+    width: 50%;
+    height: 20px;
+}
+
 .DataV{
     
 }
@@ -83,7 +92,8 @@ visibility: visible;
 
 .menu{
 	width: 100%;
-	height: 7.5%;
+	/*height: 7.5%;*/
+	height: max-content;
 	top: 0;
 	position: absolute;
 	background: rgba(15, 15, 15, 1);
@@ -257,4 +267,80 @@ dialog{
 	background-color: bisque;
     border-color: gray;
     border-style: dotted;
+}
+.linkMain{
+	font-size: 12pt; 
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+.roomspan{
+	font-size: 12pt; 
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+.temphis{
+	padding-left: 5px;
+	#box-shadow: inset 10px 4px 20px 1px #1ea52e;
+	color: aquamarine;
+	font-size: 12pt; 
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+.temphis:hover{
+	#box-shadow: inset 1px 4px 20px 1px #1ea52e;
+	color: chartreuse;
+}
+.graphics{
+	user-select: none;
+}
+
+tr.isev > * > input:not([type=checkbox], [type=button]), tr.isev > * > textarea{
+	background: #cecece;	
+}
+
+td.scenesT > input:not([type=checkbox], [type=button]), td.scenesT > textarea{
+	border-radius: 3px;
+    border-color: #0000ff75;
+}
+td.scenesT > input:not([type=checkbox], [type=button]){
+	height: 35px;
+}
+td.scenesT > input[type=checkbox]{
+	height: 15px;
+}
+td.scenesT > input[type=button]{
+	border-radius: 6px;
+    border-color: transparent;
+    height: 26px;
+	background-color: aliceblue;
+}
+
+td.scenesT > input[type=button]:hover{
+	background-color: #80c5f3;
+}
+
+td.scenesT > input[type=button]:active{
+	background-color: #ff8c8c;;
+}
+
+td.scenesT > textarea{
+	height: 35px;
+	min-height: 35px;
+	max-width: 400px;
+	max-height: 400px;
+	/*width: 280px;*/
+	display: list-item;
+}
+
+td.scenesT > .da, td.scenesT > .nt{
+	width: 170px;
+	min-width: 170px;
+}
+td.scenesT > .na{
+	width: 280px;
+	min-width: 280px;
+}
+td.scenesT{
+	padding-left: 4px;
+}
+
+tr.scenesH > td > *{
+	text-decoration: underline;
 }

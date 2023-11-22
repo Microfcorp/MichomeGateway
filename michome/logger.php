@@ -1,19 +1,20 @@
 <?php include_once(__DIR__."//../site/mysql.php"); ?>
 <?php include_once(__DIR__."//../site/secur.php"); ?>
+<?php require_once("lib/michom.php"); ?>
 <?
+$API = new MichomeAPI('localhost', $link);
+header("Michome-Page: Logger-Page");
 $countfrompage = 35;
 
-$page = !empty($_GET['p']) ? $_GET['p'] * $countfrompage : 0;
+$resultsall = mysqli_query($link, "SELECT COUNT(`id`) FROM logging WHERE 1")->fetch_assoc()['COUNT(`id`)'];
+
+$page = !empty($_GET['p']) ? ($_GET['p'] * $countfrompage) : $resultsall;
 
 $results = mysqli_query($link, "SELECT * FROM logging WHERE `id` > ".$page . " AND `id` < " . ($page + $countfrompage));
-
 $serv = [];
-
 while($row = $results->fetch_assoc()) {
     $serv[] = Array($row['id'],$row['ip'],$row['type'],$row['rssi'],$row['log'],$row['date']);
 }
-
-$resultsall = mysqli_query($link, "SELECT COUNT(`id`) FROM logging WHERE 1")->fetch_assoc()['COUNT(`id`)'];
 
 //$serv = array_reverse($serv);
 
@@ -68,7 +69,7 @@ function GetIPName($ip){
                                         <td class='logcell'><b>Дата</b></td>
                                     </tr>
                                     <?
-                                        for($i = 0; $i < $countfrompage & $i < count($serv); $i++){
+                                        for($i = 0; $i < $countfrompage && $i < count($serv); $i++){
                                             echo "<tr>";
                                             echo "<td class='logcell'><b>".$serv[$i][0]."</b></td>";
                                             echo "<td class='logcell' title='".GetIPName($serv[$i][1])."'>".$serv[$i][1]."</td>";
@@ -81,8 +82,8 @@ function GetIPName($ip){
                                     ?>
                                 </tbody>
                             </table>
-                            <a href="logger.php?p=<? echo ($page/$countfrompage - 1); ?>"><<</a>
-                            <a href="logger.php?p=<? echo ($page/$countfrompage + 1); ?>">>></a>
+                            <a href="logger.php?p=<? echo floor($page/$countfrompage - 1); ?>"><<</a>
+                            <a href="logger.php?p=<? echo floor($page/$countfrompage + 1); ?>">>></a>
                             <br />
                             <a href="logger.php?p=<? echo floor($resultsall/$countfrompage); ?>">Последняя</a>
                             <a href="logger.php?p=<? echo (0); ?>">Первая</a>

@@ -9,6 +9,37 @@ function _GetWebPagesFromType($link, $typePage){
 	return new WebPageCollection($datas);
 }
 
+function _AddWebPage($link, $typePage){
+	$results = mysqli_query($link, "INSERT INTO `WebPages` (`Type`) VALUES ('$typePage');");
+}
+
+function _RemoveWebPage($link, $id){
+	$results = mysqli_query($link, "DELETE FROM `WebPages` WHERE  `ID` = '$id'");
+}
+
+function _SetWebPage($link, $id, $subtype, $name, $value, $newid){
+	$newid = (($newid == -1) ? $id : $newid);
+	$id = intval($id);
+	$newid = $newid;
+	$name = mysqli_real_escape_string($link, $name);
+	$value = mysqli_real_escape_string($link, $value);
+	return mysqli_query($link, "UPDATE `WebPages` SET `SubType`='$subtype', `Name`='$name', `Value`='$value', `ID`='$newid' WHERE `ID` = '$id'");	
+}
+
+function _GenerateHTMLPrognoz($modD, $modT){
+	return '<script>
+			function autoloadPROGNOZ(){
+			   postAjax("prognoz.php?modD='.$modD.'&modT='.$modT.'", "GET", "", function(d){document.getElementById("prognozWeather").innerHTML = d;});
+			}
+			window.setTimeout("autoloadPROGNOZ()",1);
+			</script>
+			<p id="prognozWeather">Направление ветра: Загрузка...<br />
+							Скорость ветра: Загрузка...<br />
+							Тенденция давления: Загрузка...<br />
+							Прогноз: Загрузка...
+			</p>';
+}
+
 class WebPage
 {
 	public $ID;

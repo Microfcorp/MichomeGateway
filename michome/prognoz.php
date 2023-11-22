@@ -13,7 +13,7 @@ require_once("lib/michom.php");
 // $z_wind текущее направление ветра в английской системе координат типа N, NNW, NW и т.д.
 // $z_trend изменения в атмосферном давлении: 0 = не меняется, 1 = растет, 2 = снижается
 
-$API = new MichomeAPI('192.168.1.42', $link);
+$API = new MichomeAPI('localhost', $link);
 
 function betel_cast( $z_hpa = 740, $z_month = 4, $z_wind = "W", $z_trend = 2, $z_where = 1, $z_baro_top = 1050, $z_baro_bottom = 950, $wh_temp_out = 9)
 {
@@ -192,12 +192,20 @@ $wind_dir_text_uk = array("N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S",
 // Процесс заполнения базы и выборки из нее подробно рассмотрен в предыдущей статье,
 // поэтому здесь опускаем эту часть кода
 
+$moduleDawlen = isset($_GET["modD"]) ? $_GET["modD"] : "";
+$moduleTemp = isset($_GET["modT"]) ? $_GET["modT"] : "";
 
-$abs_pressure = $API->GetPosledData('sborinfo_tv')->Dawlen * 1.333;
-$abs_pressure_1h = $API->GetFromEndData('sborinfo_tv', 7)->BDDatas()[6]->Dawlen * 1.333;
-$ul_temp = $API->GetPosledData('termometr_okno')->Temp;
+$pres = $API->GetPosledData($moduleDawlen, '1h');
 
-$foreca = new Foreca('Russia', 'Ostrogozhsk');
+if($press->CountBD() < 2 || $API->GetPosledData($moduleTemp)->IsNull){
+	exit("Недостаточно данных для рассчета прогноза погоды");
+}
+
+$abs_pressure = $pres->First()->Dawlen * 1.333;
+$abs_pressure_1h = $pres->Last()->Dawlen * 1.333;
+$ul_temp = $API->GetPosledData($moduleTemp)->Temp;
+
+$foreca = new Foreca($API->GetSettingORCreate('Country', 'Russia', 'Страна проживания (на английском)')->Value, $API->GetSettingORCreate('Sity', 'Ostrogozhsk', 'Город проживания (на английском)')->Value);
 
 // Бесхитростное определение тенденции в изменении давления
 // Здесь и в основной функции значения переведены из мм.рт.ст в гПа

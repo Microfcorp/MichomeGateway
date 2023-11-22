@@ -1,6 +1,8 @@
 <?php include_once(__DIR__."//../site/mysql.php"); ?>
 <?php include_once(__DIR__."//../site/secur.php"); ?>
-
+<?
+	$module = isset($_GET['module']) ? $_GET['module'] : 'localhost';
+?>
 <?php if($_GET['type'] == "sab"){?>
 <html>
 <head>
@@ -10,9 +12,9 @@
 
 <script>	
 function SensToIR(q){
-	var host = '<?echo $_SERVER['HTTP_HOST'];?>';
+	//var host = '<?echo $_SERVER['HTTP_HOST'];?>';
 	
-    postAjax('http://<?echo $_SERVER['HTTP_HOST'];?>/michome/api/setcmd.php?device='+ '192.168.1.34' +'&cmd='+ 'ir?code='+q, "POST", "", function(){});
+    postAjax('api/setcmd.php?device='+ '<? echo $module; ?>' +'&cmd='+ 'ir?code='+q, "POST", "", function(){});
 }
 </script>
 </head>

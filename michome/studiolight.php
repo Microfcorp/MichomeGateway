@@ -99,7 +99,7 @@ function postAjax(url, oForm, callback) {
 		b1.value = "Включить";
 		if((pinCMD == 1 && pinType == "Relay") || (pinCMD == 1023 && pinType == "PWM"))
 			b1.className = "selButton";
-		b1.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'setlight?p='+pinID+'%26s=1023', "", function(){if(pinType == "PWM"){Ranger.value = 1023;} b2.className = ""; b1.className = "selButton";});;};
+		b1.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'setlight?p='+pinID+'%26s='+(pinType == "Relay" ? '1' : '1023'), "", function(){if(pinType == "PWM"){Ranger.value = 1023;} b2.className = ""; b1.className = "selButton";});;};
 		b2.type = "button";
 		b2.value = "Выключить";
 		if(pinCMD == 0)

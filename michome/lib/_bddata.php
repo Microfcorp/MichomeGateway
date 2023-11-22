@@ -29,14 +29,32 @@ function _GetPosledData($link, $ip){
     
     return new BDLogData('0','','','','','', $link);
 }
-//Данные с конца по количеству
+//Данные с конца по количеству или минутам с приставкой m
 function _GetFromEndData($link, $ip, $count){
+	if(is_numeric($count)){ //Если по количеству измерений
+		$sortBD = "ORDER BY `id` DESC LIMIT ".intval($count);
+	}
+	else{ //Если по времени
+		if(substr($count, -1) == "m")
+			$p = "MINUTE";
+		elseif(substr($count, -1) == "h")
+			$p = "HOUR";
+		elseif(substr($count, -1) == "d")
+			$p = "DAY";
+		elseif(substr($count, -1) == "s")
+			$p = "SECOND";
+		else
+			$p = "MINUTE";
+		
+		$sortBD = "AND `date` >= DATE_SUB(NOW(), INTERVAL ".intval($count)." ".$p.")";
+	}
+	
     if(is_valid_ip($ip))
-        $results = mysqli_query($link, "SELECT * FROM michom WHERE `ip` = '$ip' ORDER BY `id` DESC LIMIT ".$count);
+        $results = mysqli_query($link, "SELECT * FROM michom WHERE `ip` = '$ip' ".$sortBD);
     else if($ip == '1')
-		$results = mysqli_query($link, "SELECT * FROM michom WHERE 1 ORDER BY `id` DESC LIMIT ".$count);
+		$results = mysqli_query($link, "SELECT * FROM michom WHERE 1 ".$sortBD);
 	else
-        $results = mysqli_query($link, "SELECT * FROM michom WHERE michom.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) ORDER BY michom.`id` DESC LIMIT ".$count);
+        $results = mysqli_query($link, "SELECT * FROM michom WHERE michom.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) ".$sortBD);
     
     $ret =[];
     
@@ -63,7 +81,7 @@ function _GetFromEndData($link, $ip, $count){
     return new BDDataCollection($ret);
 }
 //Данные за определенный день
-function _GetDataForDay($link, $ip, $day){
+function _GetDataForDay($link, $ip, $day, $IsLog){
     if(is_valid_ip($ip))
         $results = mysqli_query($link, "SELECT * FROM michom WHERE `ip` = '$ip' AND `date` >= '$day' AND `date` < ADDDATE('$day', 1)");
     else if($ip == '1')
@@ -78,7 +96,7 @@ function _GetDataForDay($link, $ip, $day){
             $ret[] = new BDData($row['id'], $row['ip'], $row['type'], $row['data'], $row['temp'], $row['humm'], $row['dawlen'], $row['visota'], $row['date'], $link);
     }
     
-	if(count($ret) > 0)
+	if(count($ret) > 0 || !$IsLog)
 		return new BDDataCollection($ret);
     
     if(is_valid_ip($ip))
@@ -95,25 +113,62 @@ function _GetDataForDay($link, $ip, $day){
     
     return new BDDataCollection($ret);
 }
+//Данные с начала id по конец id
+function _GetDataRange($link, $ip, $startID, $endID, $IsLog = false){
+	$ret =[];
+	if(!$IsLog){
+		if(is_valid_ip($ip))
+			$results = mysqli_query($link, "SELECT * FROM michom WHERE `ip` = '$ip' AND `id` >= '$startID' AND `id` < '$endID'");
+		else if($ip == '1')
+			$results = mysqli_query($link, "SELECT * FROM michom WHERE `id` >= '$startID' AND `id` < '$endID'");
+		else
+			$results = mysqli_query($link, "SELECT * FROM michom WHERE michom.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `id` >= '$startID' AND `id` < '$endID'");
+			
+		while($row = $results->fetch_assoc()) {
+			if($row['id'] != "")
+				$ret[] = new BDData($row['id'], $row['ip'], $row['type'], $row['data'], $row['temp'], $row['humm'], $row['dawlen'], $row['visota'], $row['date'], $link);
+		}
+		
+		return new BDDataCollection($ret);
+	}
+    else{
+		if(is_valid_ip($ip))
+			$results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = '$ip' AND `id` >= '$startID' AND `id` < '$endID'");
+		else if($ip == '1')
+			$results = mysqli_query($link, "SELECT * FROM logging WHERE `id` >= '$startID' AND `id` < '$endID'");
+		else
+			$results = mysqli_query($link, "SELECT * FROM logging WHERE logging.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `id` >= '$startID' AND `id` < '$endID' ");
+		
+		while($row = $results->fetch_assoc()) {
+			if($row['id'] != "")
+				$ret[] = new BDLogData($row['id'], $row['ip'], $row['type'], $row['rssi'], $row['log'], $row['date'], $link);
+		}
+		
+		return new BDDataCollection($ret);
+	}
+}
 //Добавить лог
 function _AddLog($link, $ip, $type, $rssi, $log, $date){
     $guery = "INSERT INTO `logging`(`ip`, `type`, `rssi`, `log`, `date`) VALUES ('$ip', '$type','$rssi','$log','$date')";
     $result = mysqli_query($link, $guery);
 }
 
-function _MaxMinTemper($link, $ip, $date = 1){
+function _MaxMinValue($link, $ip, $datetype, $date = 1){
     if(is_valid_ip($ip))
-        $results = mysqli_query($link, "SELECT MAX(`temp`), MIN(`temp`) FROM michom WHERE `ip` = '$ip' AND `date` >= '$date'");
+        $results = mysqli_query($link, "SELECT * FROM michom WHERE `ip` = '$ip' AND `date` >= '$date'");
     else if($ip == '1')
-		$results = mysqli_query($link, "SELECT MAX(`temp`), MIN(`temp`) FROM michom WHERE `date` >= '$date'");
+		$results = mysqli_query($link, "SELECT * FROM michom WHERE `date` >= '$date'");
 	else
-        $results = mysqli_query($link, "SELECT MAX(`temp`), MIN(`temp`) FROM michom WHERE michom.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `date` >= '$date'");
+        $results = mysqli_query($link, "SELECT * FROM michom WHERE michom.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `date` >= '$date'");
 
+	$ret = [];
     while($row = $results->fetch_assoc()) {
-        $data[] = $row['MAX(`temp`)'];
-        $data[] = $row['MIN(`temp`)'];
+        $ret[] = new BDData($row['id'], $row['ip'], $row['type'], $row['data'], $row['temp'], $row['humm'], $row['dawlen'], $row['visota'], $row['date'], $link);		
     }
-    return $data;
+	
+	$values = (new BDDataCollection($ret))->SelectFloat($datetype);
+	
+    return [max($values), min($values)];
 }
 
 class BDData
@@ -127,6 +182,7 @@ class BDData
     public $Dawlen;
     public $Visota;
     public $Date;
+    public $IsNull;
     
     public $link;
     
@@ -141,6 +197,7 @@ class BDData
        $this->Visota = $Visota;
        $this->Date = $Date;
        $this->link = $link;
+       $this->IsNull = ($ID == '0' && $IP == "");
     }
     
     public function GetFromName($name){
@@ -154,7 +211,18 @@ class BDData
         elseif($name == "dawlen" || $name == "press") return $this->Dawlen;
         elseif($name == "visota" || $name == "alt") return $this->Visota;
         elseif($name == "date") return $this->Date;
-        else return "";
+        else{
+			$arr = explode(";", $this->Data);
+			foreach($arr as $tmp){
+				if($tmp == "") continue;
+				$na = explode("=", $tmp)[0];
+				$va = explode("=", $tmp)[1];
+				if(mb_strtolower($na) == $name){
+					return $va;
+				}
+			}
+			return "";
+		}
     }
     
     public function Update($key, $data){
@@ -177,12 +245,65 @@ class BDDataCollection
 			return $v->Type == $type || $type == '1';
 		}, ARRAY_FILTER_USE_BOTH)));
 	}
+	public function SortByID(){
+		usort($this->BDData, function($a, $b) {
+			return $a->ID - $b->ID;
+		});
+		return $this;
+	}
 	public function Select($skey){
 		$tmp = $this->BDDatas();
 		array_walk($tmp, function (&$value, $key) use($skey) {
 			$value = $value->GetFromName($skey);
 		});
 		return $tmp;
+	}
+	public function SelectFloat($skey){
+		$tmp = $this->BDDatas();
+		array_walk($tmp, function (&$value, $key) use($skey) {
+			$value = floatval($value->GetFromName($skey));
+		});
+		return $tmp;
+	}
+	public function SelectInt($skey){
+		$tmp = $this->BDDatas();
+		array_walk($tmp, function (&$value, $key) use($skey) {
+			$value = intval($value->GetFromName($skey));
+		});
+		return $tmp;
+	}
+	public function GetTypes($filter = "none"){
+		$rt = ['id', 'ip', 'type', 'data', 'temp', 'humm', 'dawlen', 'visota', 'date'];
+		foreach($this->Select('data') as $tmp){
+			$arr = explode(";", $tmp);
+			foreach($arr as $tmp1){
+				if($tmp1 == "") continue;
+				$na = explode("=", $tmp1)[0];
+				if(!in_array(mb_strtolower($na), $rt))
+					$rt[] = mb_strtolower($na);
+			}
+		}
+		if($filter != "none"){
+			foreach($rt as $tmp){
+				$lineData = $this->Select($tmp);
+				if($filter == "nonenull" && count(array_filter($lineData)) < 1)
+					unset($rt[array_search($tmp, $rt)]);
+			}
+		}
+		sort($rt);
+		return $rt;
+	}
+	public function First(){
+		return $this->BDData[0];
+	}
+	public function Last(){
+		return $this->BDData[count($this->BDData) - 1];
+	}
+	public function CountBD(){
+		return count($this->BDData);
+	}
+	public function IsNull(){
+		return $this->CountBD() == 0;
 	}
 }
 
@@ -194,6 +315,7 @@ class BDLogData
     public $RSSI;
     public $Log;
     public $Date;
+	public $IsNull;
     
     public $link;
     
@@ -205,6 +327,7 @@ class BDLogData
        $this->Log = $Log;
        $this->Date = $Date;
        $this->link = $link;       
+	   $this->IsNull = ($ID == '0' && $IP == "");
     }
 	
 	public function GetFromName($name){
@@ -213,9 +336,20 @@ class BDLogData
         elseif($name == "ip") return $this->IP;
         elseif($name == "type") return $this->Type;
         elseif($name == "rssi") return $this->RSSI;
-        elseif($name == "log") return $this->Log;
+        elseif($name == "log" || $name == "data") return $this->Log;
         elseif($name == "date") return $this->Date;
-        else return "";
+        else{
+			$arr = explode(";", $this->Log);
+			foreach($arr as $tmp){
+				if($tmp == "") continue;
+				$na = explode("=", $tmp)[0];
+				$va = explode("=", $tmp)[1];
+				if(mb_strtolower($na) == $name){
+					return $va;
+				}
+			}
+			return "";
+		}
     }
     
     public function Update($key, $data){
