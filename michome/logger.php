@@ -8,7 +8,7 @@ $countfrompage = 35;
 
 $resultsall = mysqli_query($link, "SELECT COUNT(`id`) FROM logging WHERE 1")->fetch_assoc()['COUNT(`id`)'];
 
-$page = !empty($_GET['p']) ? ($_GET['p'] * $countfrompage) : $resultsall;
+$page = !empty($_GET['p']) ? ($_GET['p'] * $countfrompage) : floor($resultsall/$countfrompage) * $countfrompage;
 
 $results = mysqli_query($link, "SELECT * FROM logging WHERE `id` > ".$page . " AND `id` < " . ($page + $countfrompage));
 $serv = [];

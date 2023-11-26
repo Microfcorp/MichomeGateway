@@ -32,8 +32,8 @@ elseif($type=="Select"){
 	
 	$sun_info = date_sun_info(time(), floatval($API->GetSettingORCreate("latitude", "50.860145", "Широта в градусах")->Value), floatval($API->GetSettingORCreate("longitude", "39.082347", "Долгота в градусах")->Value));
 
-    $data['times']['start'] = $sun_info['sunrise'];
-    $data['times']['end'] = $sun_info['sunset'];
+    $data['times']['start'] = date("H:i", $sun_info['sunrise']);
+    $data['times']['end'] = date("H:i", $sun_info['sunset']);
     
     while($row = $results->fetch_assoc()) {
         $data['data'][] = array(
