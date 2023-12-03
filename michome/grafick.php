@@ -79,7 +79,7 @@ $data = $dataBD->SelectFloat($_GET['type']); //Получаем данные п�
 //Определяем, целочисленные ли значения у нас
 $isNoneFloat = true;
 foreach($data as $tmp)
-	if (!preg_match('/^\+?\d+$/', abs($tmp)))
+	if (is_float($tmp))
 		$isNoneFloat = false;
 	
 //Фильтруем данные
@@ -160,6 +160,7 @@ $max = ceil($max/$step) * $step;
 //рисуем сетку значений
 for($i = $min; $i < $max + $step; $i += $step)
 {
+  $i = round($i, 1);
   $y = $gheight - ($i - $min) * ($gheight) / ($max - $min) + $padding;
   if($mode == "png" || $mode == "jpg" || $mode == "gif"){
 	  ImageLine($im, $padding, $y, $gwidth + 1.5 * $padding, $y, $gray);
@@ -196,6 +197,7 @@ for($i = 0; $i < $cnt; $i++)
 }
 
 if($mode == "map"){
+	header("Content-type: application/json");	
 	$arr["responce"] = "OK";
 	exit(json_encode($arr));
 }
