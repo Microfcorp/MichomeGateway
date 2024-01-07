@@ -71,13 +71,12 @@ elseif(isset($_GET['remove'])){
 				<div style="width: 100%; padding-left: 15px; padding-top: 8px;" class = "components_title">Общие настройки</div>
 				<div style="height: 100%; padding-left: 15px; padding-top: 0px;" class = "components_text">
 					<? if($modClass->Type == MichomeModuleType::ModuleCore){?>
-						<p><i>Данные мод добавляет поддержку нового утройства в среду Michome</i></p>
-						<p>Настройки модуля производятся на странице модуля</p>
+						<p><i>Данный модуль добавляет поддержку нового утройства в среду Michome</i></p>
 						<p></p>
 						<p><? echo $modClass->BaseClass->DescModule ?></p>
 					<? }?>
 					<? if($modClass->Type == MichomeModuleType::Extension){?>
-						<p><i>Данные мод добавляет поддержку корневого расширения Michome</i></p>
+						<p><i>Данный модуль добавляет поддержку корневого расширения Michome</i></p>
 						<br />
 						<p><? echo $modClass->BaseClass->DescModule ?></p>
 						<?
@@ -94,7 +93,7 @@ elseif(isset($_GET['remove'])){
 						<table><tbody>
 						<?
 							foreach($modClass->GetAllSettings($API) as $tmp){
-								echo "<tr><td><b>".$tmp->Name."</b></td><td> - </td><td>".$tmp->Desc."</td><td> - </td><td><input name='".$tmp->Name."' id='settingValue".$tmp->ID."' type='text' value='".$tmp->Value."' /></td><td> <input value='Сохранить' type='button' onclick='saveSetting(".$tmp->ID.")' /></td></tr>";
+								echo "<tr><td class='scenesT'><b>".$tmp->Name."</b></td><td class='scenesT'> - </td><td class='scenesT'>".$tmp->Desc."</td><td class='scenesT'> - </td><td><input name='".$tmp->Name."' id='settingValue".$tmp->ID."' type='text' value='".$tmp->Value."' /></td><td class='scenesT'> <input value='Сохранить' type='button' onclick='saveSetting(".$tmp->ID.")' /></td></tr>";
 							}
 						?>
 						</table></tbody>

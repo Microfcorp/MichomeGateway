@@ -16,6 +16,8 @@ header("Michome-Page: Graphic-Service");
 //start=157894 - Стартовый id данных
 //period=144 - Количество данных для выборки
 //filter=median - Фильтр для сглаживания данных
+//file=tmp.jpg - Сохранить изображение в указанный файл (если есть параметр)
+//timestamp=1 - Включает написание параметра "Дата построения графика"
 
 //параметры изображения  
 $width   = isset($_GET['width']) ? intval($_GET['width']) : 540; //ширина
@@ -25,15 +27,21 @@ $step = 0.5;      //шаг координатной сетки, считаетс
 $minstep = 0.5;
 $maxstep = 5;
 $filter = isset($_GET['filter']) ? $_GET['filter'] : "none";
+$timestamp = isset($_GET['timestamp']) ? $_GET['timestamp'] == 1 : false;
+$file = isset($_GET['file']) ? $_GET['file'] : NULL;
+$fontSize = 10;
+if($width > 800)
+	$fontSize = 11;
 
 //вспомогательная функция для определения цвета
 function ImageColor($im, $color_array)
 {
-  return ImageColorAllocate(
+  return imagecolorallocatealpha(
   $im,
   isset($color_array['r']) ? $color_array['r'] : 0, 
   isset($color_array['g']) ? $color_array['g'] : 0, 
-  isset($color_array['b']) ? $color_array['b'] : 0 
+  isset($color_array['b']) ? $color_array['b'] : 0, 
+  isset($color_array['a']) ? $color_array['a'] : 0 
   );
 }
 //вспомогательная функция для определения единицы измерения
@@ -107,15 +115,15 @@ if(count(array_filter($data)) < 1){
 		ImageTTFText($im, 14, 0, 10, $height/2, ImageColor($im, array('r'=>255)), __DIR__."//../site/Verdana.ttf", "Ошибка формирования графика. Данные отсутствуют");     
 		if($mode == "png"){
 			header("Content-type: image/png");	
-			ImagePng($im);
+			ImagePng($im, $file);
 		}
 		elseif($mode == "jpg"){
 			header("Content-type: image/jpeg");	
-			imagejpeg($im);
+			imagejpeg($im, $file);
 		}
 		elseif($mode == "gif"){
 			header("Content-type: image/gif");	
-			imagegif($im);
+			imagegif($im, $file);
 		}
 		imagedestroy($im);
 	}
@@ -132,7 +140,8 @@ if($mode == "png" || $mode == "jpg" || $mode == "gif"){
 	$color = ImageColor($im, array('b'=>175)); 
 	$green = ImageColor($im, array('g'=>175)); 
 	$gray = ImageColor($im, array('r'=>175, 'g'=>175, 'b'=>175));
-	$maxmin = ImageColor($im, array('r'=>3, 'g'=>104, 'b'=>58));	   
+	$maxminColor = ImageColor($im, array('r'=>3, 'g'=>104, 'b'=>58));	   
+	$timestampColor = ImageColor($im, array('r'=>3, 'g'=>98, 'b'=>174, 'a'=>50));	   
 }
 
 //определяем область отображения графика
@@ -203,19 +212,24 @@ if($mode == "map"){
 }
 else{   
 	$SrAr = array_sum($data)/count($data);       
-	ImageTTFText($im, 10, 0, 10, $height - 21, $maxmin, __DIR__."//../site/Verdana.ttf", "Максимальное значение на графике " . max($data) . $par.". Минимальное " . min($data) . $par.".\nАмплитуда равна " . substr((max($data) - min($data)),0,4) . $par.". Среднее значение равно ".substr($SrAr,0,5). $par.".");     
-	//Отдаем полученный график браузеру, меняя заголовок файла
+	$text = "Максимальное значение на графике ".max($data).$par.". Минимальное ".min($data).$par.". Амплитуда равна ".substr((max($data) - min($data)),0,4).$par.". Среднее значение равно ".substr($SrAr,0,5).$par.".";
+	$text = AutoNewLine($text, $fontSize, $width - 20); //Автоматичекий перенос строк
+	ImageTTFText($im, $fontSize, 0, 10, $height - 20, $maxminColor, __DIR__."//../site/Verdana.ttf", $text);  
+	//Написание времени актуальности
+	if($timestamp)
+		ImageTTFText($im, 10, 0, $width - 282, 14, $timestampColor, __DIR__."//../site/NotoSans.ttf", "Данные актуальны на " . $dataBD->Last()->GetFromName('date'));
+	//Отдаем полученный график браузеру, меняя заголовок файла и если надо, то сохраняем в файл
 	if($mode == "png"){
 		header("Content-type: image/png");	
-		ImagePng($im);
+		ImagePng($im, $file);
 	}
 	elseif($mode == "jpg"){
 		header("Content-type: image/jpeg");	
-		imagejpeg($im);
+		imagejpeg($im, $file);
 	}
 	elseif($mode == "gif"){
 		header("Content-type: image/gif");	
-		imagegif($im);
+		imagegif($im, $file);
 	}
 	imagedestroy($im);
 }

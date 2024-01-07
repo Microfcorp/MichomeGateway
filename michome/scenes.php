@@ -46,12 +46,29 @@
                 var en = datas[8].checked;
                 var nu = datas[0].value;
 				
+				postAjax('api/constants.php?type=validate&view=json&cmd='+na, "GET", "", function(d){
+					var j = JSON.parse(d);
+					if(j['isvalid'] != true){
+						alert("Ошибка валидации констант в поле \"Наименование\"");
+					}
+				});
 				postAjax('api/constants.php?type=validate&view=json&cmd='+dt, "GET", "", function(d){
 					var j = JSON.parse(d);
 					if(j['isvalid'] != true){
-						alert("Ошибка валидации констант");
+						alert("Ошибка валидации констант в поле \"Данные в периоде\"");
 					}
 				});
+				postAjax('api/constants.php?type=validate&view=json&cmd='+nt, "GET", "", function(d){
+					var j = JSON.parse(d);
+					if(j['isvalid'] != true){
+						alert("Ошибка валидации констант в поле \"Данные за периодом\"");
+					}
+				});
+				
+				if(te == "00:00"){
+					datas[3].value = "23:59";
+					te = "23:59";
+				}
                 
                 postAjax('api/scenes.php?type='+'Edit'+'&id='+id+'&name='+na+'&ts='+ts+'&td='+te+'&module='+md+'&data='+dt+'&ndata='+nt+'&number='+nu+'&timeout='+tm+'&enable='+en, "POST", "", function(d){if(d != "OK")alert(d); if(nu!=id){document.location = document.location;}});
             }
@@ -131,7 +148,7 @@
                             <table style="width: 100%; text-align: center; display: inline-block; table-layout: fixed;">
                                 <tr class='scenesH'>
                                     <td><b>№.</b></td>
-                                    <td><b>Название</b></td>
+                                    <td><b>Наименование</b></td>
                                     <td><b>Старт</b></td>
                                     <td><b>Конец</b></td>
                                     <td><b>Модуль</b></td>
@@ -153,7 +170,7 @@
                                         echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' style='width: 100px' class='i_".$v['ID']." se' list='colorslist' name='module' value='".$v['Module']."'></input></td>";
                                         echo "<td class='scenesT'><textarea onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." da' name='data' list='datas' placeholder=\"Данные во время периода\" value=\"".$v['Data']."\">".$v['Data']."</textarea></td>";
                                         echo "<td class='scenesT'><textarea onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." nt' name='ndata' list='datas' placeholder=\"Данные за периодом\" value=\"".$v['NData']."\">".$v['NData']."</textarea></td>";
-                                        echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' style='width: 30px' class='i_".$v['ID']." tm' name='timeout' value='".$v['Timeout']."' type='number'></input></td>";
+                                        echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' style='width: 40px' class='i_".$v['ID']." tm' name='timeout' value='".$v['Timeout']."' type='number'></input></td>";
                                         echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' style='width: 30px' class='i_".$v['ID']." en' name='enable'" . ($v['Enable']=="1" ? "checked" : "") . " type='checkbox'></input></td>";
                                         echo "<td class='scenesT'><input type=\"button\" onclick='Delet(".$v['ID'].");' value=\"Удалить\" /> <input type=\"button\" onclick='Check(".$v['ID'].");' value=\"Проверить\" /> <input type=\"button\" onclick='Run(".$v['ID'].");' value=\"Выполнить\" /></td>";
                                         echo "</tr>";
@@ -164,7 +181,7 @@
                                             $results = mysqli_query($link, "SELECT ip FROM modules");
                                             while($row = $results->fetch_assoc()) {
                                                 if($row['ip'] != "" & $row['ip'] != "localhost"){
-                                                    echo "<option value=".$row['ip'].">".$row['ip']."</option>";
+                                                    echo "<option value=".$row['ip'].">".$row['mID']."</option>";
                                                 }
                                             }
                                           ?>

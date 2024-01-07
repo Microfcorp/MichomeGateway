@@ -1,8 +1,10 @@
 <?php require_once("lib/michom.php"); ?>
 <?php include_once(__DIR__."//../site/mysql.php"); ?>
 <?php
-$API = new MichomeAPI('localhost', $link);
+$API = new MichomeAPI('127.0.0.1', $link);
 $API->ResetScenesTimer();
+
+set_time_limit(50);
 
 if((isset($argc) && $argc > 1) || isset($_GET['interval']))
 	$interval = (isset($argc) && $argc > 1) ? intval($argv[1]) : intval($_GET['interval']); //Интервал выполнения в кроне

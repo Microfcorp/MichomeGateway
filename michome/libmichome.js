@@ -1,4 +1,4 @@
-const ActualMichomeVersion = 2.21;
+const ActualMichomeVersion = 2.22;
 
 function IsModuleInNetwork(mID){
 	return postAjax('api/setcmd.php?device='+ mID +'&cmd='+ 'getmoduleinfo', "GET", "", function(d){

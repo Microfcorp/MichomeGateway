@@ -118,11 +118,11 @@ function _GetDataRange($link, $ip, $startID, $endID, $IsLog = false){
 	$ret =[];
 	if(!$IsLog){
 		if(is_valid_ip($ip))
-			$results = mysqli_query($link, "SELECT * FROM michom WHERE `ip` = '$ip' AND `id` >= '$startID' AND `id` < '$endID'");
+			$results = mysqli_query($link, "SELECT * FROM michom WHERE `ip` = '$ip' AND `id` >= '$startID' AND `id` <= '$endID'");
 		else if($ip == '1')
-			$results = mysqli_query($link, "SELECT * FROM michom WHERE `id` >= '$startID' AND `id` < '$endID'");
+			$results = mysqli_query($link, "SELECT * FROM michom WHERE `id` >= '$startID' AND `id` <= '$endID'");
 		else
-			$results = mysqli_query($link, "SELECT * FROM michom WHERE michom.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `id` >= '$startID' AND `id` < '$endID'");
+			$results = mysqli_query($link, "SELECT * FROM michom WHERE michom.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `id` >= '$startID' AND `id` <= '$endID'");
 			
 		while($row = $results->fetch_assoc()) {
 			if($row['id'] != "")
@@ -133,11 +133,11 @@ function _GetDataRange($link, $ip, $startID, $endID, $IsLog = false){
 	}
     else{
 		if(is_valid_ip($ip))
-			$results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = '$ip' AND `id` >= '$startID' AND `id` < '$endID'");
+			$results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = '$ip' AND `id` >= '$startID' AND `id` <= '$endID'");
 		else if($ip == '1')
-			$results = mysqli_query($link, "SELECT * FROM logging WHERE `id` >= '$startID' AND `id` < '$endID'");
+			$results = mysqli_query($link, "SELECT * FROM logging WHERE `id` >= '$startID' AND `id` <= '$endID'");
 		else
-			$results = mysqli_query($link, "SELECT * FROM logging WHERE logging.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `id` >= '$startID' AND `id` < '$endID' ");
+			$results = mysqli_query($link, "SELECT * FROM logging WHERE logging.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `id` >= '$startID' AND `id` <= '$endID' ");
 		
 		while($row = $results->fetch_assoc()) {
 			if($row['id'] != "")

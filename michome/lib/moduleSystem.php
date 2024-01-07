@@ -79,7 +79,8 @@ class MichomeModuleCore
 	public $PathModule;
 	
 	public $InstallFunction; //function($mod) //Выполняется при установке (Расширение - 1 раз)
-	public $SettingsFunction; //function($mod) //Выполняется каждый раз на странице настроек
+	public $SettingsFunction; //function($mod) //Выполняется каждый раз на странице настроек, this - микхом
+	public $InitialFunction; //function($mod) //Выполняется каждый раз при подключении библиотеки микхома
 	
 	public $CronFunction; //function($mod) //Выполняется каждую минуту
 	public $CronFunction5min; //function($mod) //Выполняется каждые 5 минут

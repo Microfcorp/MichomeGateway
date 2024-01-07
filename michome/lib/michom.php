@@ -1,5 +1,5 @@
 <?php
-set_time_limit(3);
+set_time_limit(5);
 define("ServerPath", __DIR__."/../");
 $MODs = array();
 //require_once("/var/www/html/site/mysql.php");
@@ -19,11 +19,19 @@ class MichomeAPI
     public $Gateway = 'localhost';    
     public $link;
 	public $constantAction = array();
+	public $portServer = 80;
     
     // объявление метода
     public function __construct($Gateway, $link) {
+	   global $MODs;
        $this->Gateway = $Gateway;
        $this->link = $link;
+	   $this->portServer = $this->GetSettingORCreate('ServerPort', '80', 'Порт сервера Michome')->Value;
+	   
+	   foreach($MODs as $tmp){
+		   if($tmp->BaseClass->InitialFunction)
+			   $tmp->BaseClass->InitialFunction->call($this, $tmp);
+	   }
 	   
 	   $this->ConstantON("Временные", "unix", "^unix_2023-05-12 11:01:12; - преобразует время в UNIXTime", function($expl): string {return strtotime($expl[0]);}, 1);
 	   $this->ConstantON("Временные", "cd", "^cd; - Возвращает текущее время в виде 2023-05-12 11:01:12", function($expl): string {return date("Y-m-d H:i:s");}, 0);
@@ -42,11 +50,91 @@ class MichomeAPI
 		   $rd = $this->GetFromEndData(str_ireplace("-", "_", $expl[0]), $expl[2])->SelectFloat($expl[1]);
 		   return min($rd);
 	   }, 3);
+	   $this->ConstantON("Данные из БД", "grurl", "^grurl_192.168.1.11_Temp_curday; - Получает ссылку на график", function($expl): string 
+	   {		   
+		   $module = str_ireplace("-", "_", $expl[0]);
+		   $typedata = $expl[1];
+		   $period = $expl[2];
+			
+		   $Timeins = $this->GraphicTimeInt($module, $period);
+		   
+		   $host = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $this->Gateway);
+			
+		   $rd = "http://".$host.(!IsStr($host, ":") ? ":".$this->portServer : "")."/michome/grafick.php?ip=".$expl[0]."&type=".$typedata."&start=".$Timeins[0]."&period=".$Timeins[2]."&mode=jpg&width=1080&height=620&timestamp=1";
+		   		   		   
+		   return $rd;
+	   }, 4);
+	   $this->ConstantON("Уведомления", "sg", "^sg_all_Привет, мир_192.168.1.11_Temp_curday; - Отправляет всем уведомление с графиками", function($expl): string 
+	   {
+		   $group = $expl[0];		   		   
+		   $countG = floor((count($expl) - 2) / 3);
+		   
+		   $files = [];
+		   $txt = [];
+		   
+		   for($i = 1; $i <= $countG * 3; $i += 4){
+			   $text = $expl[$i];
+			   $text = str_replace("--", "_", $text);
+			   
+			   $module = str_ireplace("-", "_", $expl[$i + 1]);
+			   $typedata = $expl[$i + 2];
+			   $period = $expl[$i + 3];
+				
+			   $Timeins = $this->GraphicTimeInt($module, $period);
+			
+				$host = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $this->Gateway);
+			
+			   $rd = "http://".$host.(!IsStr($host, ":") ? ":".$this->portServer : "")."/michome/grafick.php?ip=".$module."&type=".$typedata."&start=".$Timeins[0]."&period=".$Timeins[2]."&mode=jpg&width=1080&height=620&timestamp=1&file=styles/sgr".($i-2).".jpg";
+			   file_get_contents($rd);			 			 
+			   
+			   $files[] = "styles/sgr".($i-2).".jpg";
+			   $txt[] = $text;
+		   }
+		   
+		   if(count($files) > 1)
+               $this->SendImageNotification($txt, $group, $files);
+		   else
+			   $this->SendImageNotification($txt[0], $group, $files[0]);
+		   
+		   foreach($files as $tmp){
+			   unlink(__DIR__."/../".$tmp);
+		   }
+		   
+		   return "";
+	   }, 4);
+	   
+	   $this->ConstantON("Уведомления", "si", "^si_all_Привет, мир_http://localhost/michome/styles/button.png; - Отправляет всем уведомление с изображением(-ями)", function($expl): string 
+	   {
+		   $group = $expl[0];		   		   
+		   $countG = floor((count($expl) - 1) / 2);
+		   
+		   $files = [];
+		   $txt = [];		   
+		   
+		   for($i = 1; $i <= $countG * 2; $i += 2){
+			   $txt[] = str_ireplace("--", "_", $expl[$i]);			   
+			   $files[] = str_ireplace("--", "_", $expl[$i + 1]);						
+		   }
+		   
+		   if(count($files) > 1)
+               $this->SendImageNotification($txt, $group, $files);
+		   else
+			   $this->SendImageNotification($txt[0], $group, $files[0]);		  		   
+		   return "";
+	   }, 3);
     }
     
 	//Возвращает объект с диапазоном id записей по устройству, типу и дате
     public function TimeIns($device = 1, $type = FALSE, $datee = "", $IsArray = FALSE) {
        return _TimeIns($this->link, $device, $type, $datee, $IsArray);
+    }
+	
+	//Возвращает объект с диапазоном id записей по устройству, типу и дате
+    public function GraphicTimeInt($module, $period = 'curday') {
+       $Timeins = NULL;
+	   if($period == "curday")
+		   $Timeins = $this->TimeIns($module, 'selday', date("Y-m-d"), true);
+	   return $Timeins;
     }
     
 	//Отправляет комманду на модуль
@@ -167,13 +255,34 @@ class MichomeAPI
             MessageSendTG($row['ID'], $text);
        } 
     }
+	//Отпраляет уведомление с картинкой пользователям с указанной группой (несколькими группами через ,)
+    public function SendImageNotification($text, $group, $file){
+       global $token;
+	   $gr = "";
+	   if(is_numeric($group)){ //Если id
+		   $gr = " AND `ID` = '".$group."'";
+	   }
+	   else{ //Если группа
+		   foreach(explode(',', $group) as $tmp)
+				$gr = $gr." AND `Type` = '".$group."'";
+	   }
+			
+       /*$results = mysqli_query($this->link, "SELECT `ID` FROM `UsersVK` WHERE `Enable`=1 AND `Messanger` = 'VK'".$gr);
+       while($row = $results->fetch_assoc()) {
+            MessSend($row['ID'], $text, $token);
+       }*/
+	   $results = mysqli_query($this->link, "SELECT `ID` FROM `UsersVK` WHERE `Enable`=1 AND `Messanger` = 'TG'".$gr);
+       while($row = $results->fetch_assoc()) {
+            ImageSendTG($row['ID'], $text, $file);
+       } 
+    }
 	
 	//Возвращает массив с коммандами для бота
 	public function GetBotCmd(){
 	   $arr = array();
 	   $results = mysqli_query($this->link, "SELECT * FROM `botcmd` WHERE 1");
        while($row = $results->fetch_assoc()) {
-            $arr[] = array("ID"=>$row['ID'], "Name"=>$row['Name'], "Desc"=>$row['Desc'], "Cmd"=>$row['Cmd']);
+            $arr[] = array("ID"=>$row['ID'], "Name"=>$row['Name'], "Desc"=>$row['Desc'], "Cmd"=>$row['Cmd'], "Enabled"=>$row['Enabled']);
        }
 	   return $arr;
 	}
@@ -307,6 +416,7 @@ class MichomeAPI
         //^gr_192.168.1.11_Temp_curday_median;
         //^gr_192.168.1.11_Temp_curday_median_540_325;
         //^gr_192.168.1.11_Temp_curday_median_540_325_auto_png;
+        //^gr_192.168.1.11_Temp_curday_median_540_325_auto_png_timestamp;
         while(IsStr($str, "^gr_")){
             $expl = substr($str, stripos($str, "^gr_")+4, (stripos($str, ";", stripos($str, "^gr_")) - (stripos($str, "^gr_")+4)));     
             $module = str_ireplace("-", "_", explode('_', $expl)[0]);
@@ -317,12 +427,11 @@ class MichomeAPI
 			$heigth = isset(explode('_', $expl)[5]) ? explode('_', $expl)[5] : false;
 			$parametr = isset(explode('_', $expl)[6]) ? explode('_', $expl)[6] : false;
 			$imagetype = isset(explode('_', $expl)[7]) ? explode('_', $expl)[7] : false;
+			$timestamp = isset(explode('_', $expl)[8]) ? explode('_', $expl)[8] == 'timestamp' : false;
 			
-			$Timeins = NULL;
-			if($period == "curday")
-				$Timeins = $this->TimeIns($module, 'selday', date("Y-m-d"), true);
+			$Timeins = $Timeins = $this->GraphicTimeInt($module, $period);
 			
-            $rd = "<span><img class=\"graphics\" src=\"grafick.php?ip=".$module."&type=".$typedata."&start=".$Timeins[0]."&period=".$Timeins[2].(!$width ? "" : "&width=".$width).(!$heigth ? "" : "&height=".$heigth).(!$parametr ? "" : "&par=".$parametr).(!$imagetype ? "" : "&mode=".$imagetype).(!$filter ? "" : "&filter=".$filter)."\"/></span>";
+            $rd = "<span><img class=\"graphics\" src=\"grafick.php?ip=".$module."&type=".$typedata."&start=".$Timeins[0]."&period=".$Timeins[2].(!$width ? "" : "&width=".$width).(!$heigth ? "" : "&height=".$heigth).(!$parametr ? "" : "&par=".$parametr).(!$imagetype ? "" : "&mode=".$imagetype).(!$filter ? "" : "&filter=".$filter).(!$timestamp ? "" : "&timestamp=1")."\"/></span>";
             $str = str_ireplace("^gr_".$expl.";", $rd, $str);      
         }
 		//^lk_ircontrol.php?type=sab_Управление сабвуфером;
@@ -436,7 +545,7 @@ class MichomeAPI
             $time = explode('_', $expl)[0];
             $rd = strtotime($time);
             $str = str_ireplace("^unix_".$expl.";", $rd, $str);      
-        }*/		
+        }*/	
 		
 		$at = 0;
 		$tmparr = $this->constantAction;
@@ -565,7 +674,7 @@ class MichomeAPI
             $this->SendNotification($text, $group);
             $str = str_replace("^sn_".$expl.";", "", $str);
             //echo "SendNotification ";
-        }
+        }		
         return $str;
     }
 	public function ResetScenesTimer(){
@@ -632,5 +741,28 @@ function even($var)
 {
     // является ли переданное число четным
     return !($var & 1);
+}
+function AutoNewLine($text, $fontsize, $width){
+	$onesym = $fontsize / 2.2;
+	$countsym = strlen($text);
+	if($countsym * $onesym <= $width)
+		return $text;
+	
+	$sl = explode(' ', $text);
+	
+	$t = "";
+	$lastl = '';
+	foreach($sl as $tmp){
+		if(strlen($lastl.$tmp) * $onesym <= $width){
+			$t = $t.$tmp.' ';
+			$lastl = $lastl.$tmp.' ';
+		}
+		else{
+			$t = $t."\n".$tmp.' ';
+			$lastl = '';
+		}
+	}
+	
+	return $t;
 }
 ?>
