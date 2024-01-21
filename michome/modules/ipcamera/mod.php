@@ -38,22 +38,26 @@ $IPCameraModule->BaseClass->InitialFunction = function($modClass) {
 	   $camera = getCamera($this, $modClass, $expl[0]);	   
 	   $stream = isset($expl[1]) ? $expl[1] : "0";
 	   
-	   if($camera[1] == "onvif"){
-	    $onvif = new Ponvif();
-		$onvif->setUsername($camera[2]);
-		$onvif->setPassword($camera[3]);
-		$onvif->setIPAddress($camera[0]);
+	   try{
+		   if($camera[1] == "onvif"){
+			$onvif = new Ponvif();
+			$onvif->setUsername($camera[2]);
+			$onvif->setPassword($camera[3]);
+			$onvif->setIPAddress($camera[0]);
+			
+			$onvif->initialize();
 		
-		$onvif->initialize();
-	
-		$sources = $onvif->getSources();
-		$profileToken = $sources[0][$stream]['profiletoken'];
-		$mediaUri = $onvif->media_GetSnapshotUri($profileToken);
-		return $mediaUri;		
+			$sources = $onvif->getSources();
+			$profileToken = $sources[0][$stream]['profiletoken'];
+			$mediaUri = $onvif->media_GetSnapshotUri($profileToken);
+			return $mediaUri;		
+		   }
+		   elseif($camera[1] == "foscam"){	    
+			return "http://".(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $this->Gateway).(!IsStr($_SERVER['HTTP_HOST'], ":") ? ":".$this->portServer : "")."/michome/modules/ipcamera/foscamproxy.php?cmd=".$camera[0]."/tmpfs/snap.jpg&login=".$camera[2]."&password=".$camera[3];		
+		   }
 	   }
-	   elseif($camera[1] == "foscam"){
-	    
-		return "http://".(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $this->Gateway).(!IsStr($_SERVER['HTTP_HOST'], ":") ? ":".$this->portServer : "")."/michome/modules/ipcamera/foscamproxy.php?cmd=".$camera[0]."/tmpfs/snap.jpg&login=".$camera[2]."&password=".$camera[3];		
+	   catch(Exception $e){
+		   return "http://".(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $this->Gateway).(!IsStr($_SERVER['HTTP_HOST'], ":") ? ":".$this->portServer : "")."/michome/styles/nosignal.jpg";
 	   }
 	   
 	   return "";

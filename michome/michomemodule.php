@@ -74,6 +74,11 @@ elseif(isset($_GET['remove'])){
 						<p><i>Данный модуль добавляет поддержку нового утройства в среду Michome</i></p>
 						<p></p>
 						<p><? echo $modClass->BaseClass->DescModule ?></p>
+						<br />
+						<?
+							if($modClass->BaseClass->SettingsFunction)
+								$modClass->BaseClass->SettingsFunction->call($API, $modClass);
+						?>
 					<? }?>
 					<? if($modClass->Type == MichomeModuleType::Extension){?>
 						<p><i>Данный модуль добавляет поддержку корневого расширения Michome</i></p>

@@ -85,7 +85,7 @@ function _GetSettingsFromType($link, $type){
     elseif($type == "Informetr") return "update=300000;timeupdate=10000;running=1";
     elseif($type == "hdc1080") return "update=604000";
     elseif($type == "StudioLight") return "update=606000;logging=0;adcread=100;clicktimeout=500";
-    else return "";
+    else return "update=600000";
 }
 
 function _SendGET($url, $timeout=2000){

@@ -81,6 +81,7 @@ class MichomeModuleCore
 	public $InstallFunction; //function($mod) //Выполняется при установке (Расширение - 1 раз)
 	public $SettingsFunction; //function($mod) //Выполняется каждый раз на странице настроек, this - микхом
 	public $InitialFunction; //function($mod) //Выполняется каждый раз при подключении библиотеки микхома
+	public $POSTFunction; //function($mod) //Выполняется каждый раз при обработке события получения данных. Должен возвращать класс POSTData 
 	
 	public $CronFunction; //function($mod) //Выполняется каждую минуту
 	public $CronFunction5min; //function($mod) //Выполняется каждые 5 минут
@@ -145,12 +146,29 @@ enum MichomeModuleType
 	
 	public function web(): string {
 		return match($this) {
-		  MichomeModuleType::ModuleExtension => 'Поддержка модуля',
-		  MichomeModuleType::ModuleCore => 'Добавление команд модуля',
+		  MichomeModuleType::ModuleExtension => 'Добавление функций стандартному модулю',
+		  MichomeModuleType::ModuleCore => 'Добавление поддержки модуля',
 		  MichomeModuleType::Extension => 'Расширение Michome',
 		  MichomeModuleType::Web => 'Веб-интерфейс',
 		};
 	}
+}
+
+class POSTData
+{
+	public $data;
+	public $temp;
+	public $humm;
+	public $dawlen;
+	public $visota;
+	
+	public function __construct($data = "", $temp = 0, $humm = 0, $dawlen = 0, $visota = 0) {
+       $this->data = $data;
+       $this->temp = $temp;
+       $this->humm = $humm;
+       $this->dawlen = $dawlen;
+       $this->visota = $visota;
+    }
 }
 
 function parseMichomURI($uri, $baseclass){
