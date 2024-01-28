@@ -26,12 +26,7 @@ class MichomeAPI
 	   global $MODs;
        $this->Gateway = $Gateway;
        $this->link = $link;
-	   $this->portServer = $this->GetSettingORCreate('ServerPort', '80', 'Порт сервера Michome')->Value;
-	   
-	   foreach($MODs as $tmp){
-		   if($tmp->BaseClass->InitialFunction)
-			   $tmp->BaseClass->InitialFunction->call($this, $tmp);
-	   }
+	   $this->portServer = $this->GetSettingORCreate('ServerPort', '80', 'Порт сервера Michome')->Value;	  
 	   
 	   $this->ConstantON("Временные", "unix", "^unix_2023-05-12 11:01:12; - преобразует время в UNIXTime", function($expl): string {return strtotime($expl[0]);}, 1);
 	   $this->ConstantON("Временные", "cd", "^cd; - Возвращает текущее время в виде 2023-05-12 11:01:12", function($expl): string {return date("Y-m-d H:i:s");}, 0);
@@ -49,6 +44,11 @@ class MichomeAPI
 	   {
 		   $rd = $this->GetFromEndData(str_ireplace("-", "_", $expl[0]), $expl[2])->SelectFloat($expl[1]);
 		   return min($rd);
+	   }, 3);
+	   $this->ConstantON("Данные из БД", "rmup", "^rmup_192.168.1.11_Temp; - Запрашивает данные данные с модуля", function($expl): string 
+	   {
+		   $rd = $this->SendCmdUpdate(str_ireplace("-", "_", $expl[0]));
+		   return "";
 	   }, 3);
 	   $this->ConstantON("Данные из БД", "grurl", "^grurl_192.168.1.11_Temp_curday; - Получает ссылку на график", function($expl): string 
 	   {		   
@@ -122,6 +122,11 @@ class MichomeAPI
 			   $this->SendImageNotification($txt[0], $group, $files[0]);		  		   
 		   return "";
 	   }, 3);
+	   
+	   foreach($MODs as $tmp){
+		   if($tmp->BaseClass->InitialFunction)
+			   $tmp->BaseClass->InitialFunction->call($this, $tmp);
+	   }
     }
     
 	//Возвращает объект с диапазоном id записей по устройству, типу и дате
@@ -136,6 +141,10 @@ class MichomeAPI
 		   $Timeins = $this->TimeIns($module, 'selday', date("Y-m-d"), true);
 	   return $Timeins;
     }
+	
+	public function SendCmdUpdate($device, $timeout=2000, $isOOP = false){
+		return $this->SendCmd($device, "update", $timeout, $isOOP);
+	}
     
 	//Отправляет комманду на модуль
     public function SendCmd($device, $cmd, $timeout=2000, $isOOP = false) {
@@ -453,7 +462,7 @@ class MichomeAPI
         }*/
 		//^tx_Элемент_Подсказка;
 		while(IsStr($str, "^tx_")){
-            $expl = substr($str, stripos($str, "^tx_")+4, (stripos($str, ";", stripos($str, "^tx+")) - (stripos($str, "^tx_")+4)));     
+            $expl = substr($str, stripos($str, "^tx_")+4, (stripos($str, ";", stripos($str, "^tx_")) - (stripos($str, "^tx_")+4)));     
             $dat = explode('_', $expl)[0];
             $hov = explode('_', $expl)[1];
 						
