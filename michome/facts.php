@@ -25,11 +25,11 @@
                 <div style="width: 60%; height: 100%; text-align: left;" class = "components">
 					<div class = "components_alfa">
 						<div style="width: 100%" class = "components_text">
-                            <p style="color: red;">Максимальное значение в этом году равно <?php echo round($year[0]); ?></p>
-                            <p style="color: aqua;">Минимальное значение в этом году равно <?php echo round($year[1]); ?></p>
+                            <p style="color: red;">Максимальное значение в этом году равно <?php echo round($year[0], 2); ?></p>
+                            <p style="color: aqua;">Минимальное значение в этом году равно <?php echo round($year[1], 2); ?></p>
                             <br/>
-                            <p style="color: red;">Максимальное значение в этом месяце равно <?php echo round($mount[0]); ?></p>
-                            <p style="color: aqua;">Минимальное значение в этом месяце равно <?php echo round($mount[1]); ?></p>
+                            <p style="color: red;">Максимальное значение в этом месяце равно <?php echo round($mount[0], 2); ?></p>
+                            <p style="color: aqua;">Минимальное значение в этом месяце равно <?php echo round($mount[1], 2); ?></p>
                         </div>
 					</div>
 				</div>               

@@ -30,10 +30,10 @@ class MichomeAPI
 	   
 	   $this->ConstantON("Временные", "unix", "^unix_2023-05-12 11:01:12; - преобразует время в UNIXTime", function($expl): string {return strtotime($expl[0]);}, 1);
 	   $this->ConstantON("Временные", "cd", "^cd; - Возвращает текущее время в виде 2023-05-12 11:01:12", function($expl): string {return date("Y-m-d H:i:s");}, 0);
-	   $this->ConstantON("Математическе", "summ", "^summ_2_2; - Возвращает сумму двух аругентов", function($expl): string {return intval($expl[0]) + intval($expl[1]);}, 2);
-	   $this->ConstantON("Математическе", "diff", "^diff_4_2; - Возвращает разность двух аругентов", function($expl): string {return intval($expl[0]) - intval($expl[1]);}, 2);
-	   $this->ConstantON("Математическе", "mult", "^mult_2_2; - Возвращает произведение двух аругентов", function($expl): string {return intval($expl[0]) * intval($expl[1]);}, 2);
-	   $this->ConstantON("Математическе", "div", "^div_4_2; - Возвращает частное двух аругентов", function($expl): string {return intval($expl[0]) / intval($expl[1]);}, 2);
+	   $this->ConstantON("Математическе", "summ", "^summ_2_2; - Возвращает сумму двух аругентов", function($expl): string {return floatval($expl[0]) + floatval($expl[1]);}, 2);
+	   $this->ConstantON("Математическе", "diff", "^diff_4_2; - Возвращает разность двух аругентов", function($expl): string {return floatval($expl[0]) - floatval($expl[1]);}, 2);
+	   $this->ConstantON("Математическе", "mult", "^mult_2_2; - Возвращает произведение двух аругентов", function($expl): string {return round(floatval($expl[0]) * floatval($expl[1]), 2);}, 2);
+	   $this->ConstantON("Математическе", "div", "^div_4_2; - Возвращает частное двух аругентов", function($expl): string {return round(floatval($expl[0]) / floatval($expl[1]), 2);}, 2);
 	   $this->ConstantON("Погодные", "watterb", "^watterb_754; - Возвращает температуру закипания воды для давления", function($expl): string {return round((234.175 * log10((floatval($expl[0]) * 133.332) / 6.1078)) / (17.08085 - log10((floatval($expl[0]) * 133.332) / 6.1078)));}, 1);
 	   $this->ConstantON("Данные из БД", "rmmax", "^rmmax_192.168.1.11_Temp_5h; - Возвращает максимальное значение за диаппазон", function($expl): string 
 	   {

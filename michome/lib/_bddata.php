@@ -43,6 +43,16 @@ function _GetFromEndData($link, $ip, $count){
 			$p = "DAY";
 		elseif(substr($count, -1) == "s")
 			$p = "SECOND";
+		elseif(substr($count, -1) == "c")
+			$p = "MONTH";
+		elseif(substr($count, -1) == "i"){
+			$p = "HOUR";
+			$count = date("i");
+		}
+		elseif(substr($count, -1) == "v"){
+			$p = "DAY";
+			$count = date("d");
+		}
 		else
 			$p = "MINUTE";
 		
@@ -269,6 +279,13 @@ class BDDataCollection
 		$tmp = $this->BDDatas();
 		array_walk($tmp, function (&$value, $key) use($skey) {
 			$value = intval($value->GetFromName($skey));
+		});
+		return $tmp;
+	}
+	public function SelectUnixTime(){
+		$tmp = $this->BDDatas();
+		array_walk($tmp, function (&$value, $key) {
+			$value = strtotime($value->Date);
 		});
 		return $tmp;
 	}
