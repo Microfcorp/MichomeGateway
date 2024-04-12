@@ -19,6 +19,7 @@ class MichomeAPI
     public $Gateway = 'localhost';    
     public $link;
 	public $constantAction = array();
+	public $varDefined = array();
 	public $portServer = 80;
     
     // объявление метода
@@ -28,6 +29,17 @@ class MichomeAPI
        $this->link = $link;
 	   $this->portServer = $this->GetSettingORCreate('ServerPort', '80', 'Порт сервера Michome')->Value;	  
 	   
+	   $this->ConstantON("Переменные", "sv", "^sv_v1_33; - Задает значение локальной переменной", function($expl): string 
+	   {		   
+		   $this->varDefined[$expl[0]] = $expl[1];
+		   return "";
+	   }, 2);
+	   $this->ConstantON("Переменные", "gv", "^gv_v1; - Возвращает значение локальной переменной", function($expl): string|null 
+	   {
+			if(empty($this->varDefined[$expl[0]]))
+				return null;
+		   return $this->varDefined[$expl[0]];
+	   }, 1);
 	   $this->ConstantON("Временные", "unix", "^unix_2023-05-12 11:01:12; - преобразует время в UNIXTime", function($expl): string {return strtotime($expl[0]);}, 1);
 	   $this->ConstantON("Временные", "cd", "^cd; - Возвращает текущее время в виде 2023-05-12 11:01:12", function($expl): string {return date("Y-m-d H:i:s");}, 0);
 	   $this->ConstantON("Математическе", "summ", "^summ_2_2; - Возвращает сумму двух аругентов", function($expl): string {return floatval($expl[0]) + floatval($expl[1]);}, 2);
@@ -302,8 +314,8 @@ class MichomeAPI
     }
     
 	//Возвращает максимальное и минимальное значение из БД
-    public function MaxMinValue($device, $type, $date = 1){
-       return _MaxMinValue($this->link, $device, $type, $date);
+    public function MaxMinValue($device, $type, $date = 1, $enddate = 1){
+       return _MaxMinValue($this->link, $device, $type, $date, $enddate);
     }
     
     public function GetSettingsFromType($type){
@@ -549,27 +561,19 @@ class MichomeAPI
             $rd = $this->SendCmd($ip, $req);
             $str = str_ireplace("^send_".$expl.";", $rd, $str);      
         }
-		//Преобразовать SQL время в unixtime
-		//^unix_2023-05-12 11:01:12;
-		/*while(IsStr($str, "^unix_")){
-            $expl = substr($str, stripos($str, "^unix")+6, (stripos($str, ";", stripos($str, "^unix")) - (stripos($str, "^unix")+6)));     
-            $time = explode('_', $expl)[0];
-            $rd = strtotime($time);
-            $str = str_ireplace("^unix_".$expl.";", $rd, $str);      
-        }*/	
-		
+				
 		$at = 0;
 		$tmparr = $this->constantAction;
 		$nstr = array_walk($tmparr, function (&$value, $key) {
 			$value = "^".$value[1];
 		});
-		while(IsStr($str, $tmparr)){
+		while(IsStr($str, $tmparr)){			
 			foreach($this->constantAction as $tmp)
 			{			
 				$fullName = "^".$tmp[1].($tmp[4] == 0 ? ";" : "_");
 				$countName = strlen($fullName);
 				
-				while(IsStr($str, $fullName)){
+				while(IsStr($str, $fullName)){					
 					$startargs = stripos($str, $fullName)+$countName;
 					$lengthargs = stripos($str, ";", stripos($str, $fullName));
 					if($startargs > $lengthargs)
@@ -581,14 +585,28 @@ class MichomeAPI
 						break;
 					
 					$rd = $tmp[3](explode('_', $expl));
+					if($rd === null)
+						break;
+					
 					if($tmp[4] == 0)
 						$str = str_ireplace($fullName, $rd, $str);     
 					else
-						$str = str_ireplace($fullName.$expl.";", $rd, $str);      
+						$str = str_ireplace($fullName.$expl.";", $rd, $str); 
 				}
 			}
 			if($at++ > 3) {$this->AddLog("localhost", "Incorrect constant", "0", "Incorrecting constant on: " . $str, date("Y-m-d H:i:s")); break;}
 		}
+		
+		//Удалить эту строку
+		//^end;
+		while(IsStr($str, "^end")){		
+			$cmd = stripos($str, "^end;");
+			$firstN = stripos($str, "\n", stripos($str, "^end;"));
+			$str = str_replace_once("\n", "", $str, $firstN);
+			$firstN = stripos($str, "\r", stripos($str, "^end;"));
+			$str = str_replace_once("\r", "", $str, $firstN);
+			$str = str_replace_once("^end;", "", $str); 			
+        }	
 		
         return $str;
     }
@@ -775,5 +793,9 @@ function AutoNewLine($text, $fontsize, $width){
 	}
 	
 	return $t;
+}
+function str_replace_once($search, $replace, $text, $startPos = 0){ 
+   $pos = strpos($text, $search, $startPos); 
+   return $pos!==false ? substr_replace($text, $replace, $pos, strlen($search)) : $text; 
 }
 ?>

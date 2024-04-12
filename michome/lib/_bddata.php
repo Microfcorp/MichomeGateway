@@ -163,13 +163,16 @@ function _AddLog($link, $ip, $type, $rssi, $log, $date){
     $result = mysqli_query($link, $guery);
 }
 
-function _MaxMinValue($link, $ip, $datetype, $date = 1){
+function _MaxMinValue($link, $ip, $datetype, $date = 1, $enddate = 1){
+	if($enddate == 1){
+		$enddate = date("Y-m-d H:i:s");
+	}
     if(is_valid_ip($ip))
-        $results = mysqli_query($link, "SELECT * FROM michom WHERE `ip` = '$ip' AND `date` >= '$date'");
+        $results = mysqli_query($link, "SELECT * FROM michom WHERE `ip` = '$ip' AND `date` >= '$date' AND `date` <= '$enddate'");
     else if($ip == '1')
-		$results = mysqli_query($link, "SELECT * FROM michom WHERE `date` >= '$date'");
+		$results = mysqli_query($link, "SELECT * FROM michom WHERE `date` >= '$date' AND `date` <= '$enddate'");
 	else
-        $results = mysqli_query($link, "SELECT * FROM michom WHERE michom.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `date` >= '$date'");
+        $results = mysqli_query($link, "SELECT * FROM michom WHERE michom.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `date` >= '$date' AND `date` <= '$enddate'");
 
 	$ret = [];
     while($row = $results->fetch_assoc()) {
@@ -293,11 +296,15 @@ class BDDataCollection
 		$rt = ['id', 'ip', 'type', 'data', 'temp', 'humm', 'dawlen', 'visota', 'date'];
 		foreach($this->Select('data') as $tmp){
 			$arr = explode(";", $tmp);
+			$et = 0;
 			foreach($arr as $tmp1){
-				if($tmp1 == "") continue;
+				if($tmp1 == "") continue;				
 				$na = explode("=", $tmp1)[0];
-				if(!in_array(mb_strtolower($na), $rt))
+				$va = explode("=", $tmp1)[1];
+				$para = mb_strtolower(preg_replace('/[^a-zA-Zа-яА-Я]/ui', '',$na));
+				if(!in_array(mb_strtolower($na), $rt) && $this->SelectFloat($para)[$et] != floatval($va))
 					$rt[] = mb_strtolower($na);
+				$et = $et + 1;
 			}
 		}
 		if($filter != "none"){

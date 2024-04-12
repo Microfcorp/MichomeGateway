@@ -58,7 +58,7 @@
 					return false;
 				}
 				
-				infacts.href = "facts.php?module="+device+"&type="+typeD;
+				infacts.href = "facts.php?module="+device+"&type="+typeD+"&year="+value.split('-')[0]+"&mounth="+value.split('-')[1];
 				
 				if(typeG == "col"){
 				  var filter = usred.checked ? "median" : "none";

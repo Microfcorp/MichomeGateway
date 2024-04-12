@@ -109,7 +109,7 @@ header("Michome-Page: Room-Manager");
 						echo "<div class = \"components_alfa\">";
 						echo "<div class = \"components_title\">".$rm['Name']."</div>";
 						echo "<div style=\"width: auto\" class = \"components_text\">";
-						echo "<span class='roomspan'>".$API->GetWebConstant($API->GetConstant(nl2br($rm['Data'])))."</span>";
+						echo "<span class='roomspan'>".nl2br($API->GetWebConstant($API->GetConstant($rm['Data'])))."</span>";
 						echo "<br />";
 						echo "<script>window.setTimeout(\"LoadModules('".$rm['ID']."', '".$rm['Modules']."')\", 100);</script>";
 						echo "<div id=\"roomlinks".$rm['ID']."\"></div>";
