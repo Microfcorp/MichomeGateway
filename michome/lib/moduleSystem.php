@@ -86,6 +86,8 @@ class MichomeModuleCore
 	public $CronFunction; //function($mod) //Выполняется каждую минуту
 	public $CronFunction5min; //function($mod) //Выполняется каждые 5 минут
 	public $CronFunction10min; //function($mod) //Выполняется каждые 10 минут
+	public $CronFunctionStartup; //function($mod) //Выполняется при запуске системы
+	public $CronFunctionStop; //function($mod) //Выполняется при выключении системы
 	
 	public function __construct($TypeModule, $DescModule, $DefaultSettings, $Commands, $MichomePage, $PathModule) {
        $this->TypeModule = $TypeModule;

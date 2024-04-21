@@ -305,7 +305,7 @@ class BDDataCollection
 				if(!in_array(mb_strtolower($na), $rt) && $this->SelectFloat($para)[$et] != floatval($va))
 					$rt[] = mb_strtolower($na);
 				$et = $et + 1;
-			}
+			}		
 		}
 		if($filter != "none"){
 			foreach($rt as $tmp){

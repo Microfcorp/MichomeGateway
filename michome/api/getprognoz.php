@@ -64,7 +64,7 @@ function GetNightWeather($dayar){ //На 21 час вечера
 	else return [200, "00:00"];
 }
 
-function WindDegParse($degree){ //На 21 час вечера
+function WindDegParse($degree){ //Конвертация угла к напревлению ветра
 	$idsW = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 	if($degree > 150 && $degree < 210)
 		return $idsW[1];

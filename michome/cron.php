@@ -12,7 +12,6 @@ else
 	$interval = 1; //Интервал выполнения в кроне
 
 if($interval == 1){ //Это для минутного крона
-	//$interval = $interval+0; //Прибавляем минуту(на всякий случай)
 	$todayH = date("H");//Получаем часы
 	$todayM = date("i");//Получаем минуты
 	$today = ($todayH*60)+$todayM;//Переводим в минуты
@@ -36,6 +35,7 @@ if($interval == 1){ //Это для минутного крона
 		$typeS = '0';
 	  
 		if(IsStr($Name, "^bt")) { $enable = '0'; $typeS = '1';}
+		if(IsStr($Name, "^sts")) { $enable = '0'; $typeS = '2';}
 
 		$N = $API->GetIFs($Name, $enable, $ID);
 		$Name = $N[0];
@@ -43,6 +43,7 @@ if($interval == 1){ //Это для минутного крона
 		
 		if($enable == "0" & $typeS == '0') echo "Disable <br />";
 		elseif($typeS == '1') echo "Button disable <br />";
+		elseif($typeS == '2') echo "StartSystem disable <br />";
 		else{
 			$CSEinterval = $row['Timeout']; //Интервал отправки данных
 			
@@ -97,6 +98,39 @@ if($interval == 10){
 		$vod = $tmp->BaseClass->CronFunction10min;
 		if($vod != NULL)
 			$vod->call($API, $tmp);
+	}
+}
+
+if($interval == 998 || $interval == 999){ //При запуске и остановке системы	
+	foreach($MODs as $tmp){
+		$vod = $tmp->BaseClass->CronFunctionStartup;
+		if($vod != NULL)
+			$vod->call($API, $tmp);
+	}
+	
+	$results = mysqli_query($link, "SELECT * FROM `scenes` WHERE `Enable`=1 AND `Name` LIKE '%^sts%'");//Жестко качаем все из БД
+	while($row = $results->fetch_assoc()) {
+		$Name = $API->GetConstant($row['Name']);
+		$enable = $row['Enable'];        
+		$ID = $row['ID'];        
+		$typeS = '0';
+	  
+		if(IsStr($Name, "^bt")) { $enable = '0'; $typeS = '1';}
+
+		$N = $API->GetIFs($Name, $enable, $ID);
+		$Name = $N[0];
+		$enable = $N[1];        
+		
+		if($enable == "0" & $typeS == '0') echo "Disable <br />";
+		elseif($typeS == '1') echo "Button disable <br />";
+		else{							
+			$data = $API->GetConstant($interval == 998 ? $row['Data'] : $row['NData']);
+			$data = $API->GetNotification($data);
+			if($API->SendCmd($row['Module'], $data.'&m=cron') != "Ошибка соеденения с модулем" || IsStr($Name, "^nos;")){ //Отправляем команду
+				mysqli_query($link, "UPDATE `scenes` SET `CSE`='".date("H:i")."' WHERE `ID`=".$ID);//Запоминаем время работы
+			}
+			echo "Send ON <br />";
+		}
 	}
 }
 ?>

@@ -32,6 +32,7 @@
 		<title>Настройки</title>
 		<link rel="stylesheet" type="text/css" href="styles/style.css"/>
         <script type="text/javascript" src="/site/MicrofLibrary.js"></script>
+        <script type="text/javascript" src="libmichome.js"></script>
         <script type="text/javascript">    
             function Edit(id){
                 var datas = document.getElementsByClassName('i_'+id);
@@ -50,6 +51,16 @@
 					var j = JSON.parse(d);
 					if(j['isvalid'] != true){
 						alert("Ошибка валидации констант в поле \"Наименование\"");
+					}
+					else{
+						if(IsStr(na, "^sts;")){
+							datas[2].disabled = true;
+							datas[3].disabled = true;
+						}
+						else{
+							datas[2].disabled = false;
+							datas[3].disabled = false;
+						}
 					}
 				});
 				postAjax('api/constants.php?type=validate&view=json&cmd='+dt, "GET", "", function(d){
@@ -118,6 +129,7 @@
                             <p> ^ede; - Конец выполнения по закату</p>
                             <p> ^nos; - Не проверять, были ли отправлены данные</p>
                             <p> ^ons; - Выполнить только единожды в сутки</p>
+                            <p> ^sts; - Выполнять при запуске системы</p>
                             <p> ^cbp; - Только в действиях с кнопкой! Заменяется на количество нажатий</p>
                             <p> ^pbp; - Только в действиях с кнопкой! Заменяется на нажатый пин</p>
                             <p> ^cs_14; - Если был выполнен сценарий {14}</p>

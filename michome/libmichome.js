@@ -30,3 +30,7 @@ function SendCMD(device, cmd){
 function SendCMDAlert(device, cmd){
 	return postAjax('api/setcmd.php?device='+ device +'&cmd='+ cmd, "GET", "", function(d){alert(d);});
 }
+
+function IsStr(str, find){
+	return str.indexOf(find) > -1;
+}
