@@ -2,7 +2,6 @@
 //error_reporting(0);
 header('Access-Control-Allow-Origin: *');
 include_once("../../site/mysql.php");
-//require_once("../lib/foreca.php");
 require_once("../lib/michom.php");
 
 $today = date("H");
@@ -13,14 +12,13 @@ else{
     $b = 1;
 }
 
-//$foreca = new Foreca('Russia', 'Ostrogozhsk');
 $michome = new MichomeAPI("localhost", $link);
 
 $ultemper = $michome->GetPosledData("192.168.1.11")->Temp;
 //$Garage = $michome->GetPosledData("192.168.1.14");
 
 $ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "https://openweathermap.org/data/2.5/onecall?lat=".$michome->GetSettingORCreate("latitude", "50.860145", "Широта в градусах")->Value."&lon=".$michome->GetSettingORCreate("longitude", "39.082347", "Долгота в градусах")->Value."&units=metric&appid=439d4b804bc8187953eb36d2a8c26a02"); ///*"http://openweathermap.org/data/2.5/forecast/daily/?appid=b6907d289e10d714a6e88b30761fae22&id=514198&units=metric"*/
+curl_setopt($ch, CURLOPT_URL, "https://openweathermap.org/data/2.5/onecall?lat=".$michome->GetSettingORCreate("latitude", "50.860145", "Широта в градусах")->Value."&lon=".$michome->GetSettingORCreate("longitude", "39.082347", "Долгота в градусах")->Value."&units=metric&appid=439d4b804bc8187953eb36d2a8c26a02"); 
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 $mainreq = @curl_exec($ch);
 
@@ -38,8 +36,6 @@ $req4 = $jmrq["daily"][4];
 $req5 = $jmrq["daily"][5];
 $hourly = $jmrq["hourly"];
 $current = $jmrq["current"];
-
-//$prognoz = $foreca->GetAllPrognoz();
 
 $ids = Array(200=>0,201=>0,202=>0,210=>0,211=>0,212=>0,221=>0,230=>0,231=>0,232=>0,300=>1,301=>1,302=>1,310=>1,311=>1,312=>1,313=>1,314=>1,321=>1,500=>6,501=>2,502=>2,503=>2,504=>2,511=>2,520=>2,521=>2,522=>2,531=>2,600=>3,601=>3,602=>3,611=>3,612=>3,615=>3,616=>3,620=>3,621=>3,622=>3,800=>4,801=>5,802=>5,803=>5,804=>5);
 
@@ -124,7 +120,7 @@ elseif($_GET['type'] == "VK"){
 }
 else{      
     if(!isset($_GET['dt'])){	
-		$ret = Array('type'=>'json', 'curdate'=>date("Y-m-d"), 'dawlen'=>$michome->GetPosledData("192.168.1.10")->Dawlen, 'tempgr'=>'0'/*$Garage->Temp*/, 'hummgr'=>'0'/*$Garage->Humm*/, 'temp'=>$ultemper, 'time'=>date("H:i:s"), 'ic'=>$ids[$current['weather'][0]['id']], 'd'=>$b, 
+		$ret = Array('type'=>'json', 'curdate'=>date("Y-m-d"), 'd'=>$b, 'dawlen'=>round($michome->GetPosledData("192.168.1.10")->Dawlen, 1), 'tempgr'=>'0', 'hummgr'=>'0', 'temp'=>$ultemper, 'time'=>date("H:i:s"), 'unixtime'=>time(), 'ic'=>$ids[$current['weather'][0]['id']], 
 		 'data'=>Array(
 			Array('unixtime'=>$req['dt'], 'times'=>date("Y-m-d", $req['dt']),  '0'=>round($req['temp']["day"], 1),  '1'=>round($req['temp']["night"], 1),  '2'=>$req["wind_speed"],  '3'=>round($req['pressure']/1.334, 1),  '4'=>($ids[$req['weather'][0]['id']]), '5'=>($ids[GetNightWeather(GetHourlyFromDay($req['dt']))[0]]), '6'=>WindDegParse($req['wind_deg']) ), 
 			Array('unixtime'=>$req1['dt'], 'times'=>date("Y-m-d", $req1['dt']), '0'=>round($req1['temp']["day"], 1), '1'=>round($req1['temp']["night"], 1), '2'=>$req1["wind_speed"], '3'=>round($req1['pressure']/1.334, 1), '4'=>($ids[$req1['weather'][0]['id']]), '5'=>($ids[GetNightWeather(GetHourlyFromDay($req1['dt']))[0]]), '6'=>WindDegParse($req1['wind_deg']) ), 

@@ -100,6 +100,7 @@
 					let p2 = document.createElement('p');
 					p2.innerHTML = "Последний раз был в сети: не используется";
 					divC.setAttribute("isonline", "0");
+					divB.onclick = function(){show(ip);};
 					divCMain.append(p1);
 					divCMain.append(p2);
 					divCMain.append(p8);
@@ -107,103 +108,140 @@
 				else{ //Если гуд соеденились
 					//Informetr_Pogoda/nInformetr/n-57/n192.168.1.13/n4194304/n64.00/n23296/n1638400/nPower On/n2.40/n2.15/nNov 27 2022/n15:40:41/nC:\Users\Lexap\OneDrive\���������\Arduino\libraries\Michome\Michom.cpp/nfsmanageron/n
 					divC.setAttribute("isonline", "1");
+					var IsSafeMode = false;
+					
 					var md = d.split('/n');
-					var rssi = md[2];
-					ip = md[3];
-					var flashsize = md[4];
-					var vcc = md[5];
-					var ram = md[6];
-					var startState = md[8];
-					var FirVer = md[9];
-					var MicVer = md[10];
-					var DateCompilation = md[11] + " " + md[12];
+					if(md.length < 5)
+						IsSafeMode = true;
+					
+					var rssi = IsSafeMode ? "-99" : md[2];
+					ip = IsSafeMode ? ip : md[3];
+					var flashsize = IsSafeMode ? "0" : md[4];
+					var vcc = IsSafeMode ? "0" : md[5];
+					var ram = IsSafeMode ? "0" : md[6];
+					var startState = IsSafeMode ? "0" : md[8];
+					var FirVer = IsSafeMode ? "0" : md[9];
+					var MicVer = IsSafeMode ? "0" : md[10];
+					var DateCompilation = IsSafeMode ? "" : (md[11] + " " + md[12]);
 					
 					divB.onclick = function(){show(ip);};
 					
-					let p1 = document.createElement('p');
-					p1.style.color = "green";
-					p1.innerHTML = "Модуль в сети";
 					let p8 = document.createElement('p');
 					p8.innerHTML = "Тип модуля: " + type;
-					let p9 = document.createElement('p');
-					p9.innerHTML = "ID модуля: " + mID;
-					let p2 = document.createElement('p');
-					p2.innerHTML = "Версия ПО модуля: " + FirVer;
-					let p3 = document.createElement('p');
-					p3.innerHTML = "Версия системы Michome: " + MicVer + (ActualMichomeVersion > parseFloat(MicVer) ? " <i>(Устаревшая версия)</i>" : "");
-					let p4 = document.createElement('p');
-					p4.innerHTML = "Уровень сигнала: " + rssi;
-					let p5 = document.createElement('p');
-					p5.innerHTML = "Размер Flash: " + formatFileSize(flashsize);
-					let p6 = document.createElement('p');
-					p6.innerHTML = "Свободно ОЗУ: " + formatFileSize(ram);
-					let p7 = document.createElement('p');
-					p7.innerHTML = "Напряжение питания модуля: " + vcc;
-					let a00 = document.createElement('a');
-					a00.innerHTML = "Открыть логи";
-					a00.href = "proxy.php?module=" + mID + "&path=/getlogs";
-					a00.target = "_blank";
-					a00.rel = "noopener noreferrer";
-					let a0 = document.createElement('p');
-					a0.append(a00);
-					let a11 = document.createElement('a');
-					a11.innerHTML = "Открыть страницу модуля (локально)";
-					a11.href = "http://" + ip;
-					let a12 = document.createElement('a');
-					a12.innerHTML = "Открыть страницу модуля (прокси)";
-					a12.href = "proxy.php?module=" + mID;
-					let a1 = document.createElement('p');
-					a1.append(a11);
-					let a112 = document.createElement('p');
-					a112.append(a12);					
 					
-					divCMain.append(p1);
-					divCMain.append(p8);
-					divCMain.append(p9);
-					divCMain.append(p2);
-					divCMain.append(p3);
-					divCMain.append(p4);
-					divCMain.append(p5);
-					divCMain.append(p6);					
-					if(vcc != "null")
-						divCMain.append(p7);
-					divCMain.append(a0);
-					divCMain.append(a1);
-					divCMain.append(a112);
-					
-					postAjax('api/getdevice.php?type=typeinfo&typemodule='+type, "GET", "", function(deinf){
-						var moduleinfo = JSON.parse(deinf);
+					if(IsSafeMode){
+						let p1 = document.createElement('p');
+						p1.style.color = "orange";
+						p1.innerHTML = "Модуль в сети. Безопасный режим";
 						
-						if(moduleinfo["error"] == 0){
-							p8.title = moduleinfo["typedesc"];
-							for(var u = 0; u < moduleinfo["typeurl"].length; u++){
-								var urlcmd = moduleinfo["typeurl"][u][0];
-								var namecmd = moduleinfo["typeurl"][u][1];
-								
-								let acmd = document.createElement('a');
-								acmd.innerHTML = namecmd;
-								acmd.href = "#";
-								acmd.name = urlcmd;
-								acmd.setAttribute("module", mID);
-								acmd.onclick = function(){SendCMDAlert(this.attributes["module"].value, this.name); return false;};
-								let pcmd = document.createElement('p');
-								pcmd.append(acmd);
-								divCMain.append(pcmd);
+						let a00 = document.createElement('a');
+						a00.innerHTML = "Открыть логи";
+						a00.href = "proxy.php?module=" + mID + "&path=/getlogs";
+						a00.target = "_blank";
+						a00.rel = "noopener noreferrer";
+						let a0 = document.createElement('p');
+						a0.append(a00);
+						let a11 = document.createElement('a');
+						a11.innerHTML = "Открыть страницу модуля (локально)";
+						a11.href = "http://" + ip;
+						let a12 = document.createElement('a');
+						a12.innerHTML = "Открыть страницу модуля (прокси)";
+						a12.href = "proxy.php?module=" + mID;
+						let a1 = document.createElement('p');
+						a1.append(a11);
+						let a112 = document.createElement('p');
+						a112.append(a12);
+						
+						divCMain.append(p1);
+						divCMain.append(a0);
+						divCMain.append(a1);
+						divCMain.append(a112);
+					}
+					else{
+						let p1 = document.createElement('p');
+						p1.style.color = "green";
+						p1.innerHTML = "Модуль в сети";
+						let p9 = document.createElement('p');
+						p9.innerHTML = "ID модуля: " + mID;
+						let p2 = document.createElement('p');
+						p2.innerHTML = "Версия ПО модуля: " + FirVer;
+						let p3 = document.createElement('p');
+						p3.innerHTML = "Версия системы Michome: " + MicVer + (ActualMichomeVersion > parseFloat(MicVer) ? " <i>(Устаревшая версия)</i>" : "");
+						let p4 = document.createElement('p');
+						p4.innerHTML = "Уровень сигнала: " + rssi;
+						let p5 = document.createElement('p');
+						p5.innerHTML = "Размер Flash: " + formatFileSize(flashsize);
+						let p6 = document.createElement('p');
+						p6.innerHTML = "Свободно ОЗУ: " + formatFileSize(ram);
+						let p7 = document.createElement('p');
+						p7.innerHTML = "Напряжение питания модуля: " + vcc;
+						let a00 = document.createElement('a');
+						a00.innerHTML = "Открыть логи";
+						a00.href = "proxy.php?module=" + mID + "&path=/getlogs";
+						a00.target = "_blank";
+						a00.rel = "noopener noreferrer";
+						let a0 = document.createElement('p');
+						a0.append(a00);
+						let a11 = document.createElement('a');
+						a11.innerHTML = "Открыть страницу модуля (локально)";
+						a11.href = "http://" + ip;
+						let a12 = document.createElement('a');
+						a12.innerHTML = "Открыть страницу модуля (прокси)";
+						a12.href = "proxy.php?module=" + mID;
+						let a1 = document.createElement('p');
+						a1.append(a11);
+						let a112 = document.createElement('p');
+						a112.append(a12);					
+						
+						divCMain.append(p1);
+						divCMain.append(p8);
+						divCMain.append(p9);
+						divCMain.append(p2);
+						divCMain.append(p3);
+						divCMain.append(p4);
+						divCMain.append(p5);
+						divCMain.append(p6);					
+						if(vcc != "null")
+							divCMain.append(p7);
+						divCMain.append(a0);
+						divCMain.append(a1);
+						divCMain.append(a112);
+					}
+					
+					if(!IsSafeMode){
+						postAjax('api/getdevice.php?type=typeinfo&typemodule='+type, "GET", "", function(deinf){
+							var moduleinfo = JSON.parse(deinf);
+							
+							if(moduleinfo["error"] == 0){
+								p8.title = moduleinfo["typedesc"];
+								for(var u = 0; u < moduleinfo["typeurl"].length; u++){
+									var urlcmd = moduleinfo["typeurl"][u][0];
+									var namecmd = moduleinfo["typeurl"][u][1];
+									
+									let acmd = document.createElement('a');
+									acmd.innerHTML = namecmd;
+									acmd.href = "#";
+									acmd.name = urlcmd;
+									acmd.setAttribute("module", mID);
+									acmd.onclick = function(){SendCMDAlert(this.attributes["module"].value, this.name); return false;};
+									let pcmd = document.createElement('p');
+									pcmd.append(acmd);
+									divCMain.append(pcmd);
+								}
+								for(var u = 0; u < moduleinfo["typemurl"].length; u++){
+									var urlcmd = moduleinfo["typemurl"][u][0];
+									var namecmd = moduleinfo["typemurl"][u][1];
+									
+									let acmd = document.createElement('a');
+									acmd.innerHTML = namecmd;
+									acmd.href = urlcmd.replace("{id}", mID);
+									let pcmd = document.createElement('p');
+									pcmd.append(acmd);
+									divCMain.append(pcmd);
+								}
 							}
-							for(var u = 0; u < moduleinfo["typemurl"].length; u++){
-								var urlcmd = moduleinfo["typemurl"][u][0];
-								var namecmd = moduleinfo["typemurl"][u][1];
-								
-								let acmd = document.createElement('a');
-								acmd.innerHTML = namecmd;
-								acmd.href = urlcmd.replace("{id}", mID);
-								let pcmd = document.createElement('p');
-								pcmd.append(acmd);
-								divCMain.append(pcmd);
-							}
-						}
-					});
-
+						});
+					}
 				}			
 			});
 			

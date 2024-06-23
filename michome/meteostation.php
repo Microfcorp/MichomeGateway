@@ -41,10 +41,36 @@ if(isset($_GET['module'])){
 		
 		postAjax('/michome/api/setcmd.php?device='+moduleAddress+'&cmd=getmeteoinfo?nonehtml=1%26id='+id+'&timeout=5000', "GET", "", function(d){
 			spanText.title = d.replaceAll("<br />", "\n");
-			DescText.innerHTML = "<br />Описание датчика " + id + ": <br />" + d;			
+			DescText.innerHTML = "<br />Описание датчика " + num + " (" + id + "): <br />" + d;			
 		});
 		
-		let f = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'getmeteo?id='+id+"%26nonehtml=1", "GET", "", function(d){spanValues.innerHTML = d.split('\n')[0] + "  "; spanValues1.innerHTML = d.split('\n')[1] + "  "; spanValues2.innerHTML = d.split('\n')[2] + "  ";});};
+		let f = function(){
+			postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'getmeteo?id='+id+"%26nonehtml=1", "GET", "", function(d)
+			{
+				var ds = d.split('\n');
+				if(ds.length > 0 && ds[0] != ""){
+					spanValues.innerHTML = ds[0] + "  ";
+				}
+				else{
+					spanText.style.display = "none";
+					spanValues.style.display = "none";
+				}
+				if(ds.length > 1 && ds[1] != ""){
+					spanValues1.innerHTML = ds[1] + "  ";
+				}
+				else{
+					spanText1.style.display = "none";
+					spanValues1.style.display = "none";
+				}
+				if(ds.length > 2 && ds[2] != ""){
+					spanValues2.innerHTML = ds[2] + "  ";
+				}	
+				else{
+					spanText2.style.display = "none";
+					spanValues2.style.display = "none";
+				}				
+			});
+		};
 		window.setInterval(f, 6000);
 		f();
 		
@@ -104,11 +130,11 @@ if(isset($_GET['module'])){
 					CreateMeteo(ids[i], i);	
 
 					let op = document.createElement('option');
-					op.innerHTML = "Датчик " + ids[i];
+					op.innerHTML = "Датчик " + i + " (" + ids[i] + ")";
 					op.value = ids[i];
 					document.getElementById("selectInit").append(op);	
 					let op1 = document.createElement('option');
-					op1.innerHTML = "Датчик " + ids[i];
+					op1.innerHTML = "Датчик " + i + " (" + ids[i] + ")";
 					op1.value = ids[i];					
 					document.getElementById("selectReset").append(op1);	
 				}			
