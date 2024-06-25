@@ -34,36 +34,60 @@ if(isset($_GET['module'])){
 		spanText1.innerHTML = "Влажность с гигрометра " + num + ": ";		
 		spanText2.innerHTML = "Давление с барометра " + num + ": ";		
 		spanValues.style.color = "indianred";	
+		spanValues.style.fontWeight = "bold";	
 		spanValues1.style.color = "indianred";	
-		spanValues2.style.color = "indianred";	
+		spanValues1.style.fontWeight = "bold";
+		spanValues2.style.color = "indianred";
+		spanValues2.style.fontWeight = "bold";		
 		DescText.style.fontStyle = "italic";
 		DescText.style.color = "aquamarine";
 		
 		postAjax('/michome/api/setcmd.php?device='+moduleAddress+'&cmd=getmeteoinfo?nonehtml=1%26id='+id+'&timeout=5000', "GET", "", function(d){
 			spanText.title = d.replaceAll("<br />", "\n");
-			DescText.innerHTML = "<br />Описание датчика " + num + " (" + id + "): <br />" + d;			
+			spanText1.title = d.replaceAll("<br />", "\n");
+			spanText2.title = d.replaceAll("<br />", "\n");
+			DescText.innerHTML = "<br />Описание датчика " + num + " (" + id + "): <br />" + d.replaceAll("\n", "<br />");			
 		});
 		
 		let f = function(){
-			postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'getmeteo?id='+id+"%26nonehtml=1", "GET", "", function(d)
+			postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'getmeteo?id='+id+"%26nonehtml=1&timeout=2500", "GET", "", function(d)
 			{
+				var dataRead = [false, false, false];
 				var ds = d.split('\n');
-				if(ds.length > 0 && ds[0] != ""){
-					spanValues.innerHTML = ds[0] + "  ";
+				
+				for(var i = 0; i < ds.length; i++){
+					if(IsStr(ds[i], "C"))
+						dataRead[0] = ds[i];
+					if(IsStr(ds[i], "%"))
+						dataRead[1] = ds[i];
+					if(IsStr(ds[i], "мм.рт.ст"))
+						dataRead[2] = ds[i];
+				}
+				
+				if(dataRead[0]){
+					spanValues.innerHTML = dataRead[0] + "  ";
+					spanText.style.display = "inline";
+					spanValues.style.display = "inline";
 				}
 				else{
-					spanText.style.display = "none";
-					spanValues.style.display = "none";
+					spanText.innerHTML = "На данном модуле отсутствуют данные";
+					spanValues.style.display = "none";					
 				}
-				if(ds.length > 1 && ds[1] != ""){
-					spanValues1.innerHTML = ds[1] + "  ";
+				
+				if(dataRead[1]){
+					spanValues1.innerHTML = dataRead[1] + "  ";
+					spanText1.style.display = "inline";
+					spanValues1.style.display = "inline";
 				}
 				else{
-					spanText1.style.display = "none";
+					spanText1.style.display = "none";					
 					spanValues1.style.display = "none";
 				}
-				if(ds.length > 2 && ds[2] != ""){
-					spanValues2.innerHTML = ds[2] + "  ";
+				
+				if(dataRead[2]){
+					spanValues2.innerHTML = dataRead[2] + "  ";
+					spanText2.style.display = "inline";
+					spanValues2.style.display = "inline";
 				}	
 				else{
 					spanText2.style.display = "none";
@@ -76,12 +100,9 @@ if(isset($_GET['module'])){
 		
 		tr.append(td);
 		td.append(p);
-		if(spanValues.innerHTML != "0.00C  ")
-			p.append(spanText);
-		if(spanValues1.innerHTML != "0.00%  ")
-			p.append(spanText1);
-		if(spanValues2.innerHTML != "0.00 мм.рт.ст  ")
-			p.append(spanText2);
+		p.append(spanText);
+		p.append(spanText1);
+		p.append(spanText2);
 		p.append(DescText);
 		spanText.append(spanValues);
 		spanText1.append(spanValues1);
@@ -122,6 +143,10 @@ if(isset($_GET['module'])){
 	}
 	
 	function FromLoadPage(){
+		if(moduleAddress == ""){
+			alert("Не указан модуль");
+			return;
+		}
 		//alert(GetFirmwareVersionModule(moduleAddress));
 		//if(GetFirmwareVersionModule(moduleAddress) >= 1.63){
 			postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=meteoenable&timeout=5000', "GET", "", function(d){
