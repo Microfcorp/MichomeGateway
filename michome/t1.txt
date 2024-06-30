@@ -1,1 +1,1 @@
-{"ip":"192.168.1.11","firmware":"1.63","rssi":"-64","mac":"5C:CF:7F:37:64:F6","secretkey":"10cdb4e914f7d9d4f5d9cd9aa8da13d834ae6364","secret":"MICHoMeMoDuLeORIGINALFIRMWARE","type":"termometr","data":{"temper": [-7.00]}}         
+{"ip":"192.168.1.13","firmware":"2.70","rssi":"-64","mac":"80:7D:3A:67:5B:08","secretkey":"10cdb4e914f7d9d4f5d9cd9aa8da13d834ae6364","secret":"MICHoMeMoDuLeORIGINALFIRMWARE","type":"init","data":{"type": "Informetr","id": "Informetr_Pogoda" }}         

@@ -10,8 +10,9 @@ if(isset($_POST['id'])){
     $Name=(mysqli_real_escape_string($link, $_POST['name']));
     $Data=(mysqli_real_escape_string($link, $_POST['data']));
     $Modules=(mysqli_real_escape_string($link, $_POST['modules']));
+    $mName=(mysqli_real_escape_string($link, $_POST['mName']));
 	
-	$API->EditRoom($ID, $Name, $Data, $Modules);
+	$API->EditRoom($ID, $Name, $Data, $Modules, $mName);
 }
 
 if(empty($_GET['setting']) || $_GET['setting'] != '1'){
@@ -164,6 +165,7 @@ header("Michome-Page: Room-Manager");
 						//echo "<div class = \"components\">";
 						echo "<p><textarea style=\"min-width: 350px; min-height: 100px; width: 98%;\" name='data'>".($rm['Data'])."</textarea></p>";
 						echo "<p><input style=\"min-width: 350px; width: -webkit-fill-available;\" type='text' name='modules' value='".$rm['Modules']."' /></p>";
+						echo "<p><input style=\"min-width: 350px; width: -webkit-fill-available;\" type='text' name='mName' value='".$rm['mName']."' /></p>";
 						echo "<p><input style=\"min-width: 350px;\" type='submit' value='Сохранить' /><button onclick='Remove(\"".$rm['ID']."\")'>Удалить</button></p>";
 						//echo "</div>";
 						echo "</form>";

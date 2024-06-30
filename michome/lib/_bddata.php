@@ -234,7 +234,7 @@ class BDData
 					return $va;
 				}
 			}
-			return "";
+			return null;
 		}
     }
     
@@ -274,7 +274,8 @@ class BDDataCollection
 	public function SelectFloat($skey){
 		$tmp = $this->BDDatas();
 		array_walk($tmp, function (&$value, $key) use($skey) {
-			$value = floatval($value->GetFromName($skey));
+			$v1 = $value->GetFromName($skey);
+			$value = floatval($v1);
 		});
 		return $tmp;
 	}

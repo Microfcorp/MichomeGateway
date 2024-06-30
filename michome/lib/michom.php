@@ -335,8 +335,8 @@ class MichomeAPI
         return _RemoveRoom($this->link, $id);
     }
 	
-	public function EditRoom($id, $name, $data, $modules){
-        return _EditRoom($this->link, $id, $name, $data, $modules);
+	public function EditRoom($id, $name, $data, $modules, $mName){
+        return _EditRoom($this->link, $id, $name, $data, $modules, $mName);
     }
 	
 	public function GetAllSetting(){

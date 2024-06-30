@@ -41,7 +41,7 @@ function _TimeIns($link, $device = 1, $type = FALSE, $datee = "", $isArray = FAL
         
 		
         if(empty($max)){
-            return !$isArray ? ('nan'.";".'nan'.";".'nan') : ['nan', 'nan', 'nan'];
+            return !$isArray ? ('0'.";".'0'.";".'0') : ['0', '0', '0'];
         }
         else{
             return !$isArray ? ($min.";".$max.";".($max-$min)) : [$min, $max, ($max-$min)];

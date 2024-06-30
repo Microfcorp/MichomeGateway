@@ -4,7 +4,7 @@ function _GetRooms($link){
 	$results = mysqli_query($link, "SELECT * FROM rooms WHERE 1");
 	$rt = [];
     while($row = $results->fetch_assoc()) {
-        $rt[] = ["ID" => $row['ID'], "Name" => $row['Name'], "Data" => $row['Data'], "Modules" => $row['Modules']];
+        $rt[] = ["ID" => $row['ID'], "Name" => $row['Name'], "Data" => $row['Data'], "Modules" => $row['Modules'], "mName" => $row['mName']];
     }
 	return $rt;
 }
@@ -18,7 +18,7 @@ function _RemoveRoom($link, $id){
     mysqli_query($link, "ALTER TABLE `rooms` auto_increment = 1");
 }
 
-function _EditRoom($link, $id, $name, $data, $modules){
-	$results = mysqli_query($link, "UPDATE `rooms` SET `Name`='$name', `Data`='$data', `Modules`='$modules' WHERE `ID`='$id';");
+function _EditRoom($link, $id, $name, $data, $modules, $mName){
+	$results = mysqli_query($link, "UPDATE `rooms` SET `Name`='$name', `Data`='$data', `Modules`='$modules', `mName`='$mName' WHERE `ID`='$id';");
 }
 ?>

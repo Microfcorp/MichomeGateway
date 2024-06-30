@@ -66,6 +66,7 @@ $mode = isset($_GET['mode']) ? $_GET['mode'] : "png";
 //Модуль для сбора информации
 $ipd = (isset($_GET['ip'])) ? $_GET['ip'] : 'localhost';
 $ipd = str_replace("-", '_', $ipd);
+$ipd = str_replace("--", '_', $ipd);
     
 if(isset($_GET['period'])){ //Если указано количество строк для выборки
     $period = intval($_GET['period']); //Количество строк для выборки				  

@@ -9,13 +9,12 @@ if(isset($_GET['ischeckconnect']) && ($_GET['ischeckconnect'] == "1" || $_POST['
 
 $API = new MichomeAPI('localhost', $link);
 
-$temperdht = "";
-$hummdht = "";
-$temperbmp = "";
-$davlen = "";
 $data = "";
 $rsid = "";
 $date = date("Y-m-d H:i:s");
+$isArchive = "-1";
+
+$JSONData = Array("name"=>"getpost", "type"=>"", "serverDate"=>time(), "device"=>"", "data"=>Array(), "error"=>"none", "errorCode"=>"0"); //Основная структура данных
 
 if(isset($_GET['6']))
 	$getjson = $_GET['6'];
@@ -24,33 +23,51 @@ elseif(isset($_POST['6']))
 else
 	$getjson = file_get_contents('php://input');
 
-var_dump($getjson);
-
 //file_put_contents("t1.txt", $getjson);
 
 $obj = json_decode($getjson);
-
-if(empty($obj->{'ip'})){
-	exit("None IP Address");
-}
-
 try{
+	if(empty($obj->{'ip'})){
+		$JSONData["error"] = "None IP Address";
+		$JSONData["errorCode"] = 1;
+		exit(json_encode($JSONData));
+	}
     $ip = $obj->{'ip'};
     $type = $obj->{'type'};
-    $secret = $obj->{'secretkey'};
-    $sign = $obj->{'secret'};
+    $secret = isset($obj->{'secretkey'}) ? $obj->{'secretkey'} : "";
+    $sign = isset($obj->{'secret'}) ? $obj->{'secret'} : "";
     $mac = $obj->{'mac'};
     $firmware = $obj->{'firmware'};
+	
+	$JSONData["type"] = $type;
+	$JSONData["device"] = $ip;
+	
+	if($ip == "192.168.1.13"){
+		$JSONData["error"] = "Fuck YOU";
+		$JSONData["errorCode"] = 228;
+		exit(json_encode($JSONData));
+	}
 }
 catch (Exception $e){
-    exit("Error");
+    $JSONData["error"] = "Unexepted error";
+	$JSONData["errorCode"] = -1;
+	exit(json_encode($JSONData));
 }
 
-if(sha1(substr($sign, 0, 13)) != $secret){    
+$ModuleSerial = isset($_SERVER['HTTP_MODULE_SERIAL']) ? $_SERVER['HTTP_MODULE_SERIAL'] : false;
+$ModuleMAC = isset($_SERVER['HTTP_MODULE_MAC']) ? $_SERVER['HTTP_MODULE_MAC'] : false;
+$ModuleType = isset($_SERVER['HTTP_MODULE_TYPE']) ? $_SERVER['HTTP_MODULE_TYPE'] : false;
+$ModuleIP = isset($_SERVER['HTTP_MODULE_IP']) ? $_SERVER['HTTP_MODULE_IP'] : false;
+$ModuleRoom = isset($_SERVER['HTTP_MODULE_ROOM']) ? $_SERVER['HTTP_MODULE_ROOM'] : false;
+$ModuleNetwork = isset($_SERVER['HTTP_MODULE_NETWORK']) ? $_SERVER['HTTP_MODULE_NETWORK'] : false;
+$ModuleTime = isset($_SERVER['HTTP_MODULE_TIME']) ? intval($_SERVER['HTTP_MODULE_TIME']) : false;
+$ModuleID = isset($_SERVER['HTTP_MODULE_ID']) ? $_SERVER['HTTP_MODULE_ID'] : false;
+
+/*if(sha1(substr($sign, 0, 13)) != $secret){    
     $API->AddLog($ip, 'LoginFailed', $rsid, 'Failed Password. '.sha1(substr($sign, 0, 13)), $date);
     $API->SendNotification("Была попытка неудачной авторизации модулем", "all");
 	exit("Error");
-}
+}*/
 
 //Получение rsid
 if(isset($obj->{'rsid'})){
@@ -63,7 +80,53 @@ else{
     $rsid = '';    
 }
 
-$data = "rsid=" . $rsid . ";";
+if($ModuleMAC != false && $ModuleIP != false){ //Для проверки валидности по маку и айпи
+	if($ModuleMAC != $mac || $ModuleIP != $ip){
+		$API->AddLog($ip, 'LoginFailed', $rsid, 'MAC or IP error header and json', $date);
+	}
+}
+
+if($ModuleNetwork != false && $ModuleNetwork != ""){ //Для отсекания устройств из чужих сетей
+	$cNetwork = $API->GetSettingORCreate("mNetwork", "LeHome", "Название сети Michome")->Value;
+	if($ModuleNetwork != $cNetwork){
+		$API->AddLog($ip, 'NetworkFailed', $rsid, 'This module is network: '.$ModuleNetwork.". Current network: ".$cNetwork, $date);
+		$JSONData["error"] = "Network not found";
+		$JSONData["errorCode"] = 2;
+		exit(json_encode($JSONData));
+	}
+}
+
+if($ModuleRoom != false && $ModuleID != false){ //Для перемещения устройства между комнатами
+	$mRoom = $API->GetRooms();
+	foreach($mRoom as $tmp){ //Перебираем все комнаты
+		$mods = $tmp["Modules"];
+		if($tmp["mName"] == $ModuleRoom){ //Название текущей комнаты совпадает с название комнаты модуля
+			if(!IsStr($tmp["Modules"], $ModuleID)){
+				$mods = $tmp["Modules"] . ($tmp["Modules"] != "" ? "," : "") . $ModuleID;
+				$API->EditRoom($tmp["ID"], $tmp["Name"], $tmp["Data"], $mods, $tmp["mName"]);
+			}
+		}
+		else{
+			if(IsStr($tmp["Modules"], $ModuleID)){
+				$mods = str_ireplace($ModuleID, "", $mods);
+				$mods = trim($mods, " ,");
+				$API->EditRoom($tmp["ID"], $tmp["Name"], $tmp["Data"], $mods, $tmp["mName"]);
+			}
+		}
+	}
+}
+
+if($ModuleTime != false){ //Для проверки архивности данных
+	if($ModuleTime > 1719475970){ //Значение адеквотно и модуль точно скачал свое время
+		if(time() - $ModuleTime >= 60){ //Значение уходит в архив больше, чем на минуту
+			//Меняем временную метку этих данных на архивную с модуля
+			$date = date("Y-m-d H:i:s", $ModuleTime);
+			$isArchive = "1";
+		}
+	}
+}
+
+$data = "rsid=" . $rsid . ";isArchive=" . $isArchive . ";";
 
 $isMods = false;
 foreach($MODs as $tmp){
@@ -126,7 +189,7 @@ if(!$isMods){
 		$meteo = $obj->{'data'}->{'meteo'}; //Метео
 		$tempmain = -1;
 		$hummmain = -1;
-		$dawlenmain = -1;
+		$dawlenmain = 0;
 		for($i = 0; $i < count($meteo); $i++){		
 			if(intval($meteo[$i][0]) > 1024 || intval($meteo[$i][1]) > 1024) continue;	
 			$data = $data . "Temp".$i."=".$meteo[$i][0].((isset($meteo[$i][1]) && intval($meteo[$i][1]) != 0) ? (";Humm".$i."=".$meteo[$i][1]) : "").((isset($meteo[$i][2]) && intval($meteo[$i][2]) != 0) ? (";Dawlen".$i."=".$meteo[$i][2]) : "").";";
@@ -135,7 +198,7 @@ if(!$isMods){
 				$tempmain = $meteo[$i][0];
 				$hummmain = $meteo[$i][1];
 			}
-			if($dawlenmain == -1 && isset($meteo[$i][2]) && intval($meteo[$i][2]) != 0){
+			if($dawlenmain == 0 && isset($meteo[$i][2]) && intval($meteo[$i][2]) != 0){
 				$dawlenmain = $meteo[$i][2];
 			}
 		}
@@ -172,12 +235,6 @@ if(!$isMods){
 		$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `date`) VALUES ('$ip', 'hdc1080andAlarm','$status','$temper','$humm','$date')"; 
 		$result = mysqli_query($link, $guery);
 	}
-	elseif($type == "get_light_status"){//Модуль света	
-		$status = $obj->{'data'}->{'status'};
-
-		$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `date`) VALUES ('$ip', 'get_light_status','$status','$date')"; 
-		$result = mysqli_query($link, $guery);
-	}
 	elseif($type == "get_button_press"){//Событие нажатия кнопки
 		$status = $obj->{'data'}->{'status'};
 		$pin = explode('=',$status)[0];
@@ -212,9 +269,7 @@ if(!$isMods){
 		$API->AddLog($ip, 'StudioLight', $rsid, 'Text=OK;', $date);
 	}
 	elseif($type == "OLED"){	//Модуль освещения
-		//$status = $obj->{'data'}->{'status'};
-		
-		//$API->AddLog($ip, 'StudioLight', $rsid, 'Text=OK;', $date);
+
 	}
 	elseif($type == "Log"){	//Лог
 		$status = "Text=" . $obj->{'data'}->{'log'} . ";";
@@ -229,21 +284,14 @@ if(!$isMods){
 		$count = mysqli_num_rows($res);
 		if( $count > 0 ) {
 			$bdid = $res->fetch_assoc()['id'];
-			$res = mysqli_query($link, "UPDATE `michome`.`modules` SET `ip`='$ip', `type`='$moduletype', `mac`='$mac', `laststart`=CURTIME() WHERE `id`='$bdid';");
+			$res = mysqli_query($link, "UPDATE `michome`.`modules` SET `ip`='$ip', `type`='$moduletype', `mac`='$mac', `mID` = '$moduleid', `laststart`=CURTIME() WHERE `id`='$bdid';");
 		} //Обновляем IP...
 		else { //Добавляем в базу модулей
 			$setting = $API->GetSettingsFromType($moduletype);
 			$guery = "INSERT INTO `modules`(`mac`, `ip`, `type`, `mID`, `urls`, `setting`) VALUES ('$mac', '$ip','$moduletype','$moduleid','refresh=Обновить данные;restart=Перезагрузить;clearlogs=Отчистить логи;cleardatalogs=Отчистить логи данных', '$setting')";       
 			$result = mysqli_query($link, $guery);
 		}    
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, 'http://'.$ip.'/setsettings?s='.$API->GetSettingsFromName($moduleid));
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 10);
-		curl_setopt ($ch, CURLOPT_TIMEOUT, 10);
-		$pr = curl_exec($ch);
-		curl_close($ch);
-		
+		$JSONData["data"]["settings"] = $API->GetSettingsFromName($moduleid);		
 		$API->AddLog($ip, 'StartingModule', $rsid, "Text=Module ".$moduleid." Starting;", $date);
 	}
 	else{//Произвольное событие
@@ -252,6 +300,5 @@ if(!$isMods){
 		$result = mysqli_query($link, $guery);
 	}
 }
-echo $ip . "<br>";
-echo $rsid. "<br>";
+exit(json_encode($JSONData));
 ?>
