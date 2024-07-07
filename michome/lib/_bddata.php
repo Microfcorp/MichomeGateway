@@ -303,7 +303,7 @@ class BDDataCollection
 				$na = explode("=", $tmp1)[0];
 				$va = explode("=", $tmp1)[1];
 				$para = mb_strtolower(preg_replace('/[^a-zA-Zа-яА-Я]/ui', '',$na));
-				if(!in_array(mb_strtolower($na), $rt) && $this->SelectFloat($para)[$et] != floatval($va))
+				if(!in_array(mb_strtolower($na), $rt) && (isset($this->SelectFloat($para)[$et]) && $this->SelectFloat($para)[$et] != floatval($va)))
 					$rt[] = mb_strtolower($na);
 				$et = $et + 1;
 			}		

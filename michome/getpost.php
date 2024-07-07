@@ -295,7 +295,7 @@ if(!$isMods){
 		$API->AddLog($ip, 'StartingModule', $rsid, "Text=Module ".$moduleid." Starting;", $date);
 	}
 	else{//Произвольное событие
-		$data = $data . $obj->{'data'};
+		$data = $data;
 		$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `date`) VALUES ('$ip', '$type','$data','$date')"; 
 		$result = mysqli_query($link, $guery);
 	}

@@ -1,4 +1,4 @@
-const ActualMichomeVersion = 2.22;
+const ActualMichomeVersion = 2.25;
 
 function IsModuleInNetwork(mID){
 	return postAjax('api/setcmd.php?device='+ mID +'&cmd='+ 'getmoduleinfo', "GET", "", function(d){
@@ -9,19 +9,13 @@ function IsModuleInNetwork(mID){
 	});
 }
 
-async function GetFirmwareVersionModule(mID){
-	var ver = "";
-	var isset = false;
+function GetFirmwareVersionModule(mID, fun){
 	postAjax('api/setcmd.php?device='+ mID +'&cmd='+ 'getmoduleinfo', "GET", "", function(d){
 		if(d.lastIndexOf("Ошибка") != -1)
-			ver = 0.0;
+			fun(0.0);
 		else //Если гуд соеденились
-			ver = parseFloat(d.split('/n')[9]);
-		isset = true;
-		//console.log(d);
+			fun(parseFloat(d.split('/n')[9]));
 	});
-	//while(!isset);
-	return ver;
 }
 
 function SendCMD(device, cmd){
