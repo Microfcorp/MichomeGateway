@@ -207,7 +207,7 @@ if(!$isMods){
 		}
 		else{
 			$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `dawlen`, `date`) VALUES ('$ip', '$type', '$data', '$tempmain', '$hummmain', '$dawlenmain', '$date')";
-			//$result = mysqli_query($link, $guery);
+			$result = mysqli_query($link, $guery);
 		}	
 	}
 	elseif($type == "Informetr"){	//Информетр
@@ -266,7 +266,7 @@ if(!$isMods){
 	elseif($type == "StudioLight"){	//Модуль освещения
 		$status = $obj->{'data'}->{'status'};
 		
-		//$API->AddLog($ip, 'StudioLight', $rsid, 'Text=OK;', $date);
+		$API->AddLog($ip, 'StudioLight', $rsid, 'Text=OK;', $date);
 	}
 	elseif($type == "OLED"){	//Модуль освещения
 
@@ -284,20 +284,20 @@ if(!$isMods){
 		$count = mysqli_num_rows($res);
 		if( $count > 0 ) {
 			$bdid = $res->fetch_assoc()['id'];
-			//$res = mysqli_query($link, "UPDATE `michome`.`modules` SET `ip`='$ip', `type`='$moduletype', `mac`='$mac', `mID` = '$moduleid', `laststart`=CURTIME() WHERE `id`='$bdid';");
+			$res = mysqli_query($link, "UPDATE `michome`.`modules` SET `ip`='$ip', `type`='$moduletype', `mac`='$mac', `mID` = '$moduleid', `laststart`=CURTIME() WHERE `id`='$bdid';");
 		} //Обновляем IP...
 		else { //Добавляем в базу модулей
 			$setting = $API->GetSettingsFromType($moduletype);
 			$guery = "INSERT INTO `modules`(`mac`, `ip`, `type`, `mID`, `urls`, `setting`) VALUES ('$mac', '$ip','$moduletype','$moduleid','refresh=Обновить данные;restart=Перезагрузить;clearlogs=Отчистить логи;cleardatalogs=Отчистить логи данных', '$setting')";       
-			//$result = mysqli_query($link, $guery);
+			$result = mysqli_query($link, $guery);
 		}    
 		$JSONData["data"]["settings"] = $API->GetSettingsFromName($moduleid);		
-		//$API->AddLog($ip, 'StartingModule', $rsid, "Text=Module ".$moduleid." Starting;", $date);
+		$API->AddLog($ip, 'StartingModule', $rsid, "Text=Module ".$moduleid." Starting;", $date);
 	}
 	else{//Произвольное событие
 		$data = $data;
 		$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `date`) VALUES ('$ip', '$type','$data','$date')"; 
-		//$result = mysqli_query($link, $guery);
+		$result = mysqli_query($link, $guery);
 	}
 }
 exit(json_encode($JSONData));
