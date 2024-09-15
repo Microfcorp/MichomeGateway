@@ -28,3 +28,11 @@ function SendCMDAlert(device, cmd){
 function IsStr(str, find){
 	return str.indexOf(find) > -1;
 }
+
+function downloadAsFile(data, metaType, fileName) {
+	let a = document.createElement("a");
+	let file = new Blob([data], {type: metaType});
+	a.href = URL.createObjectURL(file);
+	a.download = fileName;
+	a.click();
+}

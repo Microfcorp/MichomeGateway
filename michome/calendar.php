@@ -27,6 +27,9 @@
         <script type="text/javascript" src="/site/MicrofLibrary.js"></script>
         <script type="text/javascript" src="libmichome.js"></script>
 		<script>
+			const GraphicsWidth = 640;
+			const GraphicsHeight = 425;
+			
 			function GenerateDataType(mID){
 				DateTypem.innerHTML = "";
 				postAjax('api/getdata.php?device='+mID+'&cmd=unique&filter=nonenull&view=json', "GET", "", function(d){
@@ -42,9 +45,23 @@
 				});
 			}
 			
+			function downloadCSV(){
+				var csvURL = document.getElementById('img1').getAttribute("csv");
+				postAjax(csvURL, "GET", "", function(d){
+					downloadAsFile(d, "text/csv", "MichomeCalendar.csv");
+				});				
+			}
+			
+			function downloadMAP(){
+				var mapURL = document.getElementById('img1').getAttribute("map");
+				postAjax(mapURL, "GET", "", function(d){
+					downloadAsFile(d, "application/json", "MichomeCalendarMap.json");
+				});				
+			}
+			
 			function Graphics(typeG, value){
 				vibday.value = value;
-				//alert(device);
+				
 				var device, typeD;
 				if(PresetDat.value != ""){ //Берем из пресета
 					device = PresetDat.value.split(';')[0];
@@ -60,12 +77,7 @@
 				
 				infacts.href = "facts.php?module="+device+"&type="+typeD+"&year="+value.split('-')[0]+"&mounth="+value.split('-')[1];
 				
-				if(typeG == "col"){
-				  var filter = usred.checked ? "median" : "none";
-				  document.getElementById('img1').src = "grafick.php?ip="+device+"&type="+module+"&period="+value+"&filter="+filter;
-				  LoadMapGraphics("type="+module+"&period="+txt);
-				}
-				else if(typeG == "selday"){		
+				if(typeG == "selday"){		
 					GenerateGraphicsForDay(device, typeD, value);
 				}
 			}
@@ -76,14 +88,18 @@
 				postAjax('api/timeins.php?device='+device+'&type=selday&date='+date, "GET", "", function(d){
 					var filter = usred.checked ? "median" : "none";
 					var arr = d.split(';');
-					document.getElementById('img1').src = "grafick.php?width=640&height=425&ip="+device+"&type="+typeD+"&period="+arr[2]+"&start="+arr[0]+"&filter="+filter;
+					document.getElementById('img1').src = "grafick.php?width="+GraphicsWidth+"&height="+GraphicsHeight+"&ip="+device+"&type="+typeD+"&period="+arr[2]+"&start="+arr[0]+"&filter="+filter;
+					document.getElementById('img1').setAttribute("csv", "grafick.php?mode=csv&width="+GraphicsWidth+"&height="+GraphicsHeight+"&ip="+device+"&type="+typeD+"&period="+arr[2]+"&start="+arr[0]+"&filter="+filter);
 					LoadMapGraphics("type="+typeD+"&period="+arr[2]+"&start="+arr[0], device);
 				});							
 			}
 			
 			function LoadMapGraphics(resp, ip){
 				var filter = usred.checked ? "median" : "none";
-				postAjax('grafick.php?width=640&height=425&mode=map&'+resp+'&ip='+ip+"&filter="+filter, "GET", "", function(d){
+				var mapPath = 'grafick.php?width='+GraphicsWidth+'&height='+GraphicsHeight+'&mode=map&'+resp+'&ip='+ip+"&filter="+filter;
+				
+				document.getElementById('img1').setAttribute("map", mapPath);
+				postAjax(mapPath, "GET", "", function(d){
 					
 					while (maps.firstChild) {
 						maps.removeChild(maps.firstChild);
@@ -156,6 +172,7 @@
 			<div style="width: 98%;" class = "components">
 				<div style="width: 100%; padding-left: 15px; padding-top: 8px;" class = "components_title">График данных</div>
 				<div style="height: 100%; padding-left: 15px; padding-top: 0px;" class = "components_text">
+					<p><a href="#" onclick="downloadCSV(); return false;">Скачать CSV график</a> <a href="#" onclick="downloadMAP(); return false;">Скачать JSON карту графика</a><p>
 					<p class="temphis" id="temphist">Что когда было<p>
 					<table>
 						<tbody>

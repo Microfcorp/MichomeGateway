@@ -33,6 +33,8 @@ $fontSize = 10;
 if($width > 800)
 	$fontSize = 11;
 
+$aData = "N;Date;Value".PHP_EOL; //Шапка для CSV
+
 //вспомогательная функция для определения цвета
 function ImageColor($im, $color_array)
 {
@@ -103,12 +105,15 @@ if(!$isNoneFloat){
 		}
 	}
 }
-if($mode == "map")
+if($mode == "map" || $mode == "csv")
 	$date = $dataBD->Select('date'); //Получаем данные времени
 
 if(count(array_filter($data)) < 1){
 	if($mode == "map"){
 		exit(json_encode(array("responce"=>"error", "text"=>"Ошибка формирования графика. Данные отсутствуют")));
+	}
+	else if($mode == "csv"){
+		exit("Данные отсутствуют");
 	}
 	elseif($mode == "png" || $mode == "jpg" || $mode == "gif"){
 		$im = @ImageCreate ($width, $height) or die ("Cannot Initialize new GD image stream");
@@ -199,6 +204,9 @@ for($i = 0; $i < $cnt; $i++)
 	$arr["data"][] = ($x2).';'.($y2).";".$data[$i].";".$date[$i];
 	$arr["data"][] = (($x1+$x2)/2).';'.(($y1+$y2)/2).";".$data[$i].";".$date[$i];
   }
+  elseif($mode == "csv"){
+	$aData = $aData.$i.";".$date[$i].";".$data[$i].PHP_EOL;
+  }
   elseif($mode == "png" || $mode == "jpg" || $mode == "gif"){
 	//Рисуются две линии, чтобы сделать график более заметным      
 	ImageLine($im, $x1, $y1, $x2, $y2, $color);
@@ -210,6 +218,10 @@ if($mode == "map"){
 	header("Content-type: application/json");	
 	$arr["responce"] = "OK";
 	exit(json_encode($arr));
+}
+if($mode == "csv"){
+	header("Content-type: text/csv");	
+	exit($aData);
 }
 else{   
 	$SrAr = array_sum($data)/count($data);       

@@ -297,17 +297,18 @@ class BDDataCollection
 		$rt = ['id', 'ip', 'type', 'data', 'temp', 'humm', 'dawlen', 'visota', 'date'];
 		foreach($this->Select('data') as $tmp){
 			$arr = explode(";", $tmp);
-			$et = 0;
+			$et = -1;
 			foreach($arr as $tmp1){
+				$et = $et + 1;
 				if($tmp1 == "") continue;				
 				$na = explode("=", $tmp1)[0];
 				$va = explode("=", $tmp1)[1];
-				$para = mb_strtolower(preg_replace('/[^a-zA-Zа-яА-Я]/ui', '',$na));
+				$para = mb_strtolower(preg_replace('/[^a-zA-Zа-яА-Я]/ui', '', $na));
 				if(!in_array(mb_strtolower($na), $rt) && (isset($this->SelectFloat($para)[$et]) && $this->SelectFloat($para)[$et] != floatval($va)))
-					$rt[] = mb_strtolower($na);
-				$et = $et + 1;
+					$rt[] = mb_strtolower($na);				
 			}		
 		}
+		
 		if($filter != "none"){
 			foreach($rt as $tmp){
 				$lineData = $this->Select($tmp);
