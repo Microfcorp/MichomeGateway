@@ -58,26 +58,36 @@
 			<div class = "title_menu">Управление Michome. Настройка комманд бота</div>
 			<div style="width: 100%;" class = "components">
 				<div style="width: 100%; padding-left: 15px; padding-top: 8px;" class = "components_title">Настройка комманд бота</div>
-				<div style="height: 100%; padding-left: 15px; padding-top: 0px;" class = "components_text">
-					<table cellspacing="0" cellpadding="4"><tbody>
-					<tr><td><b>State</b></td><td></td><td><b>Комманда</b></td><td></td><td><b>Описание</b></td><td></td><td><b>Действие</b></td><td></td><td></td></tr>
-					<?
-						$results = mysqli_query($link, "SELECT * FROM `botcmd` WHERE 1");
-						while($row = $results->fetch_assoc()) {//$row['ID']
-							echo "<tr>
-							<td class='scenesT'><input class='en' type='checkbox' ".($row['Enabled'] == '1' ? "checked" : "")." id='enabled".$row['ID']."' /></td>
+				<div style="width: max-content; height: 100%; padding-left: 15px; padding-top: 0px;" class = "components_text">
+					<table class="tablePage" cellspacing="0" cellpadding="4"><tbody>
+						<tr class="scenesH">
+							<td><b>Состояние</b></td>
 							<td></td>
-							<td class='scenesT'><input type='text' value='".$row['Name']."' id='name".$row['ID']."' /></td>
+							<td><b>Комманда</b></td>
 							<td></td>
-							<td class='scenesT'><input style='width: 300px;' type='text' value='".$row['Desc']."' id='desc".$row['ID']."' /></td>
+							<td><b>Описание</b></td>
 							<td></td>
-							<td class='scenesT'><textarea style='width: 400px;' id='cmd".$row['ID']."'>".$row['Cmd']."</textarea></td>
+							<td><b>Действие</b></td>
 							<td></td>
-							<td class='scenesT'><input type='button' onclick='Save(".$row['ID'].")' value='Сохранить' /> <input type='button' onclick='Delete(".$row['ID'].")' value='Удалить' /></td>
-							</tr>";
-						} 
-					?>
-					</table></tbody>
+							<td></td>
+						</tr>
+						<?
+							$results = mysqli_query($link, "SELECT * FROM `botcmd` WHERE 1");
+							while($row = $results->fetch_assoc()) {//$row['ID']
+								echo "<tr>
+								<td class='scenesT'><div class='checkbox-toggle'><input class='en' type='checkbox' ".($row['Enabled'] == '1' ? "checked" : "")." id='enabled".$row['ID']."' /><label for='enabled".$row['ID']."' class='CToggle'><span></span></label></div></td>							
+								<td></td>
+								<td class='scenesT'><input type='text' value='".$row['Name']."' id='name".$row['ID']."' /></td>
+								<td></td>
+								<td class='scenesT'><input style='width: 300px;' type='text' value='".$row['Desc']."' id='desc".$row['ID']."' /></td>
+								<td></td>
+								<td class='scenesT'><textarea style='width: 400px;' id='cmd".$row['ID']."'>".$row['Cmd']."</textarea></td>
+								<td></td>
+								<td class='scenesT'><input type='button' onclick='Save(".$row['ID'].")' value='Сохранить' /> <input type='button' onclick='Delete(".$row['ID'].")' value='Удалить' /></td>
+								</tr>";
+							} 
+						?>
+					</tbody></table>
 					<p><a href="#" onclick="Add();">Добавить новый</a></p>
 				</div>
 			</div>

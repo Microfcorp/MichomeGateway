@@ -26,7 +26,15 @@ function SendCMDAlert(device, cmd){
 }
 
 function IsStr(str, find){
-	return str.indexOf(find) > -1;
+	if(Array.isArray(find)){ //Если ищем по массиву вхождений
+		for(var i = 0; i < find.length; i++){
+			if(IsStr(str, find[i]))
+				return true;
+		}
+		return false;
+	}
+	else //Если ищем по единственному вхождению
+		return str.indexOf(find) > -1;
 }
 
 function downloadAsFile(data, metaType, fileName) {

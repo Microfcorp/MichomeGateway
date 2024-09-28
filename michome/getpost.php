@@ -64,7 +64,7 @@ $ModuleTime = isset($_SERVER['HTTP_MODULE_TIME']) ? intval($_SERVER['HTTP_MODULE
 $ModuleID = isset($_SERVER['HTTP_MODULE_ID']) ? $_SERVER['HTTP_MODULE_ID'] : false;
 
 /*if(sha1(substr($sign, 0, 13)) != $secret){    
-    $API->AddLog($ip, 'LoginFailed', $rsid, 'Failed Password. '.sha1(substr($sign, 0, 13)), $date);
+    $API->AddLog($ModuleID, 'LoginFailed', $rsid, 'Failed Password. '.sha1(substr($sign, 0, 13)), $date);
     $API->SendNotification("Была попытка неудачной авторизации модулем", "all");
 	exit("Error");
 }*/
@@ -82,14 +82,14 @@ else{
 
 if($ModuleMAC != false && $ModuleIP != false){ //Для проверки валидности по маку и айпи
 	if($ModuleMAC != $mac || $ModuleIP != $ip){
-		$API->AddLog($ip, 'LoginFailed', $rsid, 'MAC or IP error header and json', $date);
+		$API->AddLog($ModuleID, 'LoginFailed', $rsid, 'MAC or IP none equal on header and json', $date);
 	}
 }
 
 if($ModuleNetwork != false && $ModuleNetwork != ""){ //Для отсекания устройств из чужих сетей
 	$cNetwork = $API->GetSettingORCreate("mNetwork", "LeHome", "Название сети Michome")->Value;
 	if($ModuleNetwork != $cNetwork){
-		$API->AddLog($ip, 'NetworkFailed', $rsid, 'This module is network: '.$ModuleNetwork.". Current network: ".$cNetwork, $date);
+		$API->AddLog($ModuleID, 'NetworkFailed', $rsid, 'This module is network: '.$ModuleNetwork.". Current network: ".$cNetwork, $date);
 		$JSONData["error"] = "Network not found";
 		$JSONData["errorCode"] = 2;
 		exit(json_encode($JSONData));
@@ -129,14 +129,14 @@ if($ModuleTime != false){ //Для проверки архивности дан�
 $data = "rsid=" . $rsid . ";isArchive=" . $isArchive . ";";
 
 $isMods = false;
-foreach($MODs as $tmp){
+foreach($MODs as $tmp){ //Обработка типов данных их модов
 	if($tmp->BaseClass->TypeModule == $type && $tmp->Type == MichomeModuleType::ModuleCore){
 		$isMods = true;
 		$vod = $tmp->BaseClass->POSTFunction;
 		if($vod != NULL){
 			$rt = $vod->call($API, array($tmp, $obj));
 			if($rt == false){
-				$API->AddLog($ip, $type, $rsid, "Text=None valid ".$type." data;", $date);
+				$API->AddLog($ModuleID, $type, $rsid, "Text=None valid ".$type." data;", $date);
 			}
 			$data = $data . $rt->data;
 			
@@ -147,8 +147,8 @@ foreach($MODs as $tmp){
 	}
 }
 
-if(!$isMods){
-	if($type == "msinfoo"){	//Модуль сбора информации
+if(!$isMods){ //Обработка стандартных модулей
+	if($type == "msinfoo"){	//Модуль сбора информации (УСТАРЕВШИЙ!!!!)
 		$temperdht = $obj->{'data'}->{'temper'}; //Температура DHT11
 		$temp = $obj->{'data'}->{'temperbmp'}; //Температура BMP180
 		
@@ -163,7 +163,7 @@ if(!$isMods){
 			$result = mysqli_query($link, $guery);
 		}
 		else{      
-			$API->AddLog($ip, 'msinfoo', $rsid, 'Text=MsinfooNAN;', $date);
+			$API->AddLog($ModuleID, 'msinfoo', $rsid, 'Text=MsinfooNAN;', $date);
 
 			$data1 = $API->GetPosledData('192.168.1.10')->Humm;
 
@@ -171,7 +171,7 @@ if(!$isMods){
 			$result = mysqli_query($link, $guery);
 		}
 	}
-	elseif($type == "termometr"){	//Термометр
+	elseif($type == "termometr"){	//Термометр (УСТАРЕВШИЙ!!!)
 		$temper = $obj->{'data'}->{'temper'}; //Температура
 		if(is_array($temper)){
 			for($i = 0; $i < count($temper); $i++){
@@ -203,7 +203,7 @@ if(!$isMods){
 			}
 		}
 		if($tempmain == -1 && $hummmain == -1){
-			$API->AddLog($ip, $type, $rsid, "Text=None valid MeteoStation data;", $date);
+			$API->AddLog($ModuleID, $type, $rsid, "Text=None valid MeteoStation data;", $date);
 		}
 		else{
 			$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `dawlen`, `date`) VALUES ('$ip', '$type', '$data', '$tempmain', '$hummmain', '$dawlenmain', '$date')";
@@ -214,20 +214,20 @@ if(!$isMods){
 		$type = $obj->{'data'}->{'data'};
 		$message = "Text=Informetr: ".$type.";";
 		
-		$API->AddLog($ip, 'Informetr', $rsid, $message, $date);
+		$API->AddLog($ModuleID, 'Informetr', $rsid, $message, $date);
 		
 		if($type == "GetData"){
 
 		}
 	}
-	elseif($type == "hdc1080" || $type == "hdc1080mx"){ //HDC1080	
+	elseif($type == "hdc1080" || $type == "hdc1080mx"){ //HDC1080 (НЕ ПОДДЕРЖИВАЕТСЯ)
 		$temper = $obj->{'data'}->{'temper'};
 		$humm = $obj->{'data'}->{'humm'};
 
 		$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `date`) VALUES ('$ip', 'hdc1080','$data','$temper','$humm','$date')"; 
 		$result = mysqli_query($link, $guery);
 	}
-	elseif($type == "hdc1080andAlarm"){	//HDC1080 и сигнализация
+	elseif($type == "hdc1080andAlarm"){	//HDC1080 и сигнализация (НЕ ПОДДЕРЖИВАЕТСЯ)
 		$temper = $obj->{'data'}->{'temper'};
 		$humm = $obj->{'data'}->{'humm'};
 		$status = $obj->{'data'}->{'butt'};
@@ -240,7 +240,7 @@ if(!$isMods){
 		$pin = explode('=',$status)[0];
 		$count = explode('=',$status)[1];
 
-		$results = mysqli_query($link, "SELECT * FROM `scenes` WHERE `Enable`=1 AND `Name` LIKE '%^bt%%".$ip."%'");//Жестко качаем все из БД
+		$results = mysqli_query($link, "SELECT * FROM `scenes` WHERE `Enable`=1 AND `Name` LIKE '%^bt%%".$ip."%'");//Жестко качаем все, где есть кнопка из БД
 		while($row = $results->fetch_assoc()) {
 			$na = $row['Name'];
 			$na = str_replace("^cbp;", $count, $na);
@@ -248,13 +248,13 @@ if(!$isMods){
 			
 			$N = $API->GetIFs($API->GetButton($API->GetConstant($na), $ip, $pin, $count), $row['Enable'], $row['ID']);
 			$Name = $N[0];
-			if($N[1] != "0"){
+			if($N[1] != "0"){ //Если выполнены все условия
 				$data = $API->GetConstant($row['Data']);
 				$data = str_replace("^cbp;", $count, $data);
 				$data = str_replace("^pbp;", $pin, $data);
 				
 				$API->GetNotification($data);
-				if($API->SendCmd($row['Module'], $data) != "Ошибка соеденения с модулем" || IsStr($Name, "^nos")){ //Отправляем команду
+				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $data.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду
 					mysqli_query($link, "UPDATE `scenes` SET `CSE`='".date("H:i")."' WHERE `ID`=".$row['ID']);//Запоминаем время работы
 				}
 			}
@@ -266,15 +266,12 @@ if(!$isMods){
 	elseif($type == "StudioLight"){	//Модуль освещения
 		$status = $obj->{'data'}->{'status'};
 		
-		$API->AddLog($ip, 'StudioLight', $rsid, 'Text=OK;', $date);
-	}
-	elseif($type == "OLED"){	//Модуль освещения
-
+		$API->AddLog($ModuleID, 'StudioLight', $rsid, 'Text=OK;', $date);
 	}
 	elseif($type == "Log"){	//Лог
 		$status = "Text=" . $obj->{'data'}->{'log'} . ";";
 		
-		$API->AddLog($ip, 'Log', $rsid, $status, $date);
+		$API->AddLog($ModuleID, 'Log', $rsid, $status, $date);
 	}
 	elseif($type == "init"){ //Инициализация модуля
 		$moduletype = $obj->{'data'}->{'type'};
@@ -292,7 +289,7 @@ if(!$isMods){
 			$result = mysqli_query($link, $guery);
 		}    
 		$JSONData["data"]["settings"] = $API->GetSettingsFromName($moduleid);		
-		$API->AddLog($ip, 'StartingModule', $rsid, "Text=Module ".$moduleid." Starting;", $date);
+		$API->AddLog($ModuleID, 'StartingModule', $rsid, "Text=Module ".$moduleid." Starting;", $date);
 	}
 	else{//Произвольное событие
 		$data = $data;

@@ -16,11 +16,11 @@ function _GetPosledData($link, $ip){
     
     //Потом получает из логиновой базы
     if(is_valid_ip($ip))
-        $results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = '$ip' ORDER BY `id` DESC LIMIT 1");
+        $results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = (SELECT t.mID FROM modules AS t WHERE t.ip = '$ip' ORDER BY t.id DESC LIMIT 1) ORDER BY `id` DESC LIMIT 1");
     else if($ip == '1')
 		$results = mysqli_query($link, "SELECT * FROM logging WHERE 1 ORDER BY `id` DESC LIMIT 1");
 	else
-        $results = mysqli_query($link, "SELECT * FROM logging WHERE logging.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) ORDER BY logging.`id` DESC LIMIT 1");
+        $results = mysqli_query($link, "SELECT * FROM logging WHERE logging.ip = '$ip' ORDER BY logging.`id` DESC LIMIT 1");
     
     while($row = $results->fetch_assoc()) {
         if($row['id'] != "")
@@ -77,11 +77,11 @@ function _GetFromEndData($link, $ip, $count){
 		return new BDDataCollection($ret);
     
     if(is_valid_ip($ip))
-        $results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = '$ip' ORDER BY `id` DESC LIMIT ".$count);
+        $results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = (SELECT t.mID FROM modules AS t WHERE t.ip = '$ip' ORDER BY t.id DESC LIMIT 1) ORDER BY `id` DESC LIMIT ".$count);
     else if($ip == '1')
 		$results = mysqli_query($link, "SELECT * FROM logging WHERE 1 ORDER BY `id` DESC LIMIT ".$count);
 	else
-        $results = mysqli_query($link, "SELECT * FROM logging WHERE logging.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND ORDER BY logging.`id` DESC LIMIT ".$count);
+        $results = mysqli_query($link, "SELECT * FROM logging WHERE logging.ip = '$ip' AND ORDER BY logging.`id` DESC LIMIT ".$count);
     
     while($row = $results->fetch_assoc()) {
         if($row['id'] != "")
@@ -110,11 +110,11 @@ function _GetDataForDay($link, $ip, $day, $IsLog){
 		return new BDDataCollection($ret);
     
     if(is_valid_ip($ip))
-        $results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = '$ip' AND `date` >= '$day' AND `Date` < ADDDATE('$day', 1)");
+        $results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = (SELECT t.mID FROM modules AS t WHERE t.ip = '$ip' ORDER BY t.id DESC LIMIT 1) AND `date` >= '$day' AND `Date` < ADDDATE('$day', 1)");
     else if($ip == '1')
 		$results = mysqli_query($link, "SELECT * FROM logging WHERE `date` >= '$day' AND `Date` < ADDDATE('$day', 1)");
 	else
-        $results = mysqli_query($link, "SELECT * FROM logging WHERE logging.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `date` >= '$day' AND `date` < ADDDATE('$day', 1) ");
+        $results = mysqli_query($link, "SELECT * FROM logging WHERE logging.ip = '$ip' AND `date` >= '$day' AND `date` < ADDDATE('$day', 1) ");
     
     while($row = $results->fetch_assoc()) {
         if($row['id'] != "")
@@ -143,11 +143,11 @@ function _GetDataRange($link, $ip, $startID, $endID, $IsLog = false){
 	}
     else{
 		if(is_valid_ip($ip))
-			$results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = '$ip' AND `id` >= '$startID' AND `id` <= '$endID'");
+			$results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = (SELECT t.mID FROM modules AS t WHERE t.ip = '$ip' ORDER BY t.id DESC LIMIT 1) AND `id` >= '$startID' AND `id` <= '$endID'");
 		else if($ip == '1')
 			$results = mysqli_query($link, "SELECT * FROM logging WHERE `id` >= '$startID' AND `id` <= '$endID'");
 		else
-			$results = mysqli_query($link, "SELECT * FROM logging WHERE logging.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `id` >= '$startID' AND `id` <= '$endID' ");
+			$results = mysqli_query($link, "SELECT * FROM logging WHERE logging.ip = '$ip' AND `id` >= '$startID' AND `id` <= '$endID' ");
 		
 		while($row = $results->fetch_assoc()) {
 			if($row['id'] != "")
@@ -158,8 +158,8 @@ function _GetDataRange($link, $ip, $startID, $endID, $IsLog = false){
 	}
 }
 //Добавить лог
-function _AddLog($link, $ip, $type, $rssi, $log, $date){
-    $guery = "INSERT INTO `logging`(`ip`, `type`, `rssi`, `log`, `date`) VALUES ('$ip', '$type','$rssi','$log','$date')";
+function _AddLog($link, $moduleID, $type, $rssi, $log, $date){
+    $guery = "INSERT INTO `logging`(`ip`, `type`, `rssi`, `log`, `date`) VALUES ('$moduleID', '$type','$rssi','$log','$date')";
     $result = mysqli_query($link, $guery);
 }
 
@@ -336,7 +336,7 @@ class BDDataCollection
 class BDLogData
 {
     public $ID;
-    public $IP;
+    public $moduleID;
     public $Type;
     public $RSSI;
     public $Log;
@@ -345,9 +345,9 @@ class BDLogData
     
     public $link;
     
-    public function __construct($ID, $IP, $Type, $RSSI, $Log, $Date, $link) {
+    public function __construct($ID, $MODULEID, $Type, $RSSI, $Log, $Date, $link) {
        $this->ID = $ID;
-       $this->IP = $IP;
+       $this->moduleID = $MODULEID;
        $this->Type = $Type;
        $this->RSSI = $RSSI;
        $this->Log = $Log;
@@ -359,7 +359,7 @@ class BDLogData
 	public function GetFromName($name){
 		$name = mb_strtolower($name);
         if($name == "id") return $this->ID;
-        elseif($name == "ip") return $this->IP;
+        elseif($name == "mid") return $this->moduleID;
         elseif($name == "type") return $this->Type;
         elseif($name == "rssi") return $this->RSSI;
         elseif($name == "log" || $name == "data") return $this->Log;

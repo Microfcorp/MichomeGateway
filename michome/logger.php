@@ -8,7 +8,9 @@ $countfrompage = 35;
 
 $resultsall = mysqli_query($link, "SELECT COUNT(`id`) FROM logging WHERE 1")->fetch_assoc()['COUNT(`id`)'];
 
-$page = !empty($_GET['p']) ? ($_GET['p'] * $countfrompage) : floor($resultsall/$countfrompage) * $countfrompage;
+//478167
+
+$page = !empty($_GET['p']) ? ($_GET['p'] * $countfrompage) : (floor($resultsall/$countfrompage) - 1) * $countfrompage;
 
 $results = mysqli_query($link, "SELECT * FROM logging WHERE `id` > ".$page . " AND `id` < " . ($page + $countfrompage));
 $serv = [];
@@ -16,36 +18,27 @@ while($row = $results->fetch_assoc()) {
     $serv[] = Array($row['id'],$row['ip'],$row['type'],$row['rssi'],$row['log'],$row['date']);
 }
 
-//$serv = array_reverse($serv);
+$modulesBD = $API->GetAllModulesBD();
 
-function GetIPName($ip){
-    if($ip == "localhost"){
-        return "Малинка";
-    }
-    elseif($ip == "192.168.1.10"){
-        return "Модуль сбора информации";
-    }
-    elseif($ip == "192.168.1.11"){
-        return "Модуль уличного термометра";
-    }
-    elseif($ip == "192.168.1.12"){
-        return "Модуль 'Царского света'";
-    }
-    elseif($ip == "192.168.1.13"){
-        return "Модуль информетра";
-    }
-    elseif($ip == "192.168.1.14"){
-        return "Модуль HDC1080";
-    }
-    elseif($ip == "192.168.1.34"){
-        return "Модуль освещения";
-    }
+function GetIPName($id){
+	global $API;
+	global $modulesBD;
+	
+    foreach($modulesBD as $module){
+		$idBD = $module['mid'];
+		$typeBD = $module['type'];
+		if($id == $idBD){
+			$moduleDesc = $API->GetModuleInfoFromType($typeBD);
+			return ($moduleDesc ? $moduleDesc->Descreption : "Описание данного модуля отсутствует");
+		}
+	}
+	return "Описание данного модуля отсутствует";
 }
 ?>
 <!Doctype html>
 <html>
 	<head>
-		<title>Настройки</title>
+		<title>Просмотр логов</title>
 		<link rel="stylesheet" type="text/css" href="styles/style.css"/>
         <script type="text/javascript" src="/site/MicrofLibrary.js"></script>      
 	</head>
@@ -56,13 +49,12 @@ function GetIPName($ip){
 			<div class = "com">
                 <div style="width: 100%; height: 100%;" class = "components">
 					<div class = "components_alfa">
-						<div style="width: auto" class = "components_text">
-                        
+						<div style="width: auto" class = "components_text">                      
                             <table style="width: 100%; text-align: start; padding: 0; margin: 0; font-size: large; display: inline-block;">
                                 <tbody>
                                     <tr>
                                         <td class='logcell'><b>ID</b></td>
-                                        <td class='logcell'><b>IP</b></td>
+                                        <td class='logcell'><b>Тип модуля</b></td>
                                         <td class='logcell'><b>Тип</b></td>
                                         <td class='logcell'><b>RSSI</b></td>
                                         <td class='logcell'><b>Сообщение</b></td>
@@ -85,7 +77,7 @@ function GetIPName($ip){
                             <a href="logger.php?p=<? echo floor($page/$countfrompage - 1); ?>"><<</a>
                             <a href="logger.php?p=<? echo floor($page/$countfrompage + 1); ?>">>></a>
                             <br />
-                            <a href="logger.php?p=<? echo floor($resultsall/$countfrompage); ?>">Последняя</a>
+                            <a href="logger.php?p=<? echo floor($resultsall/$countfrompage) - 1; ?>">Последняя</a>
                             <a href="logger.php?p=<? echo (0); ?>">Первая</a>
                             
                         </div>
@@ -95,13 +87,5 @@ function GetIPName($ip){
 		</div>
         
 		<?php require_once(__DIR__."//../site/verhn.php");?> 
-        
-        <div>
-            <dialog style="padding: 16px; margin: auto;" id="dialog">
-              <div id="tables"></div>
-              <button onclick="save()">Сохранить</button>
-              <button onclick="closed()">Закрыть</button>
-            </dialog>
-        </div>
 	</body>
 </html>	

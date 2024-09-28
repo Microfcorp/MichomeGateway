@@ -1,13 +1,22 @@
+@import url("checkboxToggle.css");
+
 *{
 	/*padding: 0;*/
 	margin: 0;
 }
 
-A {
+.DataV + A, .DataV + A:visited {
     color: cadetblue; /* Цвет ссылок */
+	text-underline-position: auto;
+    text-decoration-thickness: inherit;
 }
-A:visited {
-    color: cadetblue; /* Цвет посещенных ссылок */
+
+A, A:visited {
+    color: cadetblue; /* Цвет ссылок */
+	text-decoration: underline;
+	text-underline-position: under;
+	text-decoration-thickness: from-font;
+	padding-bottom: 5px;
 }
 A:active {
     color: brown; /* Цвет активных ссылок */
@@ -18,14 +27,13 @@ p{
     padding-bottom: 1.5px;
 }
 
-.noselect {
+.noselect, .graphics {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
   -khtml-user-select: none; /* Konqueror HTML */
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently
-                        supported by Chrome and Opera */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
 }
 
 .SendCmdF{
@@ -41,8 +49,8 @@ p{
     height: 20px;
 }
 
-.DataV{
-    
+.DataV > p{
+    padding-top: 3.5px;
 }
 
 #m_SendCmd{
@@ -87,7 +95,7 @@ p{
 }
  
 .tooltip:hover span{
-visibility: visible;
+	visibility: visible;
 }
 
 .menu{
@@ -245,11 +253,13 @@ input:checked + .slider:before {
 }
 
 dialog::backdrop {
-  background-color: rgba(0, 0, 0, 0.8);
+	background-color: rgba(0, 0, 0, 0.8);
 }
 
 dialog{
     border-radius: 9px;
+	border-color: cadetblue;
+	box-shadow: 8px 7px 20px 0px rgb(9 63 255 / 78%);
 }
 
 .logcell{
@@ -288,36 +298,68 @@ dialog{
 	color: chartreuse;
 }
 .graphics{
-	user-select: none;
+	border-radius: 5px;
+	border-color: rgb(39 184 220);
+	box-shadow: 3px 3px 15px rgb(39 184 220 / 65%);
+	background-color: gray;
 }
 
-tr.isev > * > input:not([type=checkbox], [type=button]), tr.isev > * > textarea{
-	background: #cecece;	
+.settingValue{
+	color: black;
+	width: 350px;
+	height: 18px;
+	border-radius: 5px;
 }
 
-td.scenesT > input:not([type=checkbox], [type=button]), td.scenesT > textarea{
+.tablePage{
+	width: 100%; 
+	text-align: center; 
+	display: inline-block; 
+	table-layout: fixed;
+}
+
+.calendarInput{
+	width: 200px;
+}
+
+.calendarPoint{
+	cursor: grab;
+}
+
+tr.isev > * > input:not([type=checkbox], [type=button]):enabled, tr.isev > * > textarea:enabled, tr.isev > * > select:enabled, tr.isev > * > button:enabled{
+	background-color: #cecece;	
+}
+
+td.scenesT > input:not([type=checkbox], [type=button]), td.scenesT > textarea, td.scenesT > select, td.scenesT > button{
 	border-radius: 3px;
     border-color: #0000ff75;
 }
-td.scenesT > input:not([type=checkbox], [type=button]){
+
+td.scenesT > textarea:disabled, td.scenesT > select:disabled{
+	background-color: #435371;
+}
+
+td.scenesT > input:not([type=checkbox], [type=button]), td.scenesT > select, td.scenesT > button{
 	height: 35px;
 }
 td.scenesT > input[type=checkbox]{
 	height: 15px;
 }
-td.scenesT > input[type=button]{
+td.scenesT > input[type=button], .sb{
 	border-radius: 6px;
     border-color: transparent;
     height: 26px;
 	background-color: aliceblue;
 }
 
-td.scenesT > input[type=button]:hover{
+td.scenesT > input[type=button]:hover, .sb:hover{
 	background-color: #80c5f3;
+	border-color: transparent;
 }
 
-td.scenesT > input[type=button]:active{
-	background-color: #ff8c8c;;
+td.scenesT > input[type=button]:active, .sb:active{
+	background-color: #ff8c8c;
+	border-color: transparent;
 }
 
 td.scenesT > textarea{
@@ -343,4 +385,24 @@ td.scenesT{
 
 tr.scenesH > td > *{
 	text-decoration: underline;
+	/* text-underline-offset: 3.6px; */
+	text-underline-position: under;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.moduleSetting > input[type=button], .moduleSetting > button{
+	border-color: #48bce8;
+}
+
+.moduleSettingValue{
+	border-radius: 3px;
+    border-color: #0000ff75;
+	height: 25px;
+}
+
+.moduleSettingName{
+	font-weight: 600;
+    font-family: monospace;
+	font-size: 14px;
 }

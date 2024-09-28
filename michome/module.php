@@ -11,16 +11,7 @@
 		<link rel="stylesheet" type="text/css" href="styles/style.css"/>
         <script type="text/javascript" src="/site/MicrofLibrary.js"></script>
         <script type="text/javascript" src="libmichome.js"></script>
-		<style>
-			dialog::backdrop {
-			  background-color: rgba(0, 0, 0, 0.8);
-			}
-		</style>
         <script type="text/javascript">        
-        function SendModule(url, data){
-            postAjax('api/setcmd.php?device='+ url +'&cmd='+ data.replace( /&/g, "%26" ), "GET", "", function(d){alert(d)});
-        }
-
         var ips = "";
 
         function show(ip){
@@ -29,7 +20,7 @@
                     var table = document.createElement('table');
                     var html = '<tbody>';
                     for (var i = 0; i < d.split(';').length; i++) {
-                        html += '<tr><td class="n n|'+i+'">'+d.split(';')[i].split('=')[0]+'</td><td><input class="v v|'+i+'" type="text" value="'+d.split(';')[i].split('=')[1]+'"></input></td></tr>';
+                        html += '<tr><td class="moduleSettingName n n|'+i+'">'+d.split(';')[i].split('=')[0]+'</td><td><input class="moduleSettingValue v v|'+i+'" type="text" value="'+d.split(';')[i].split('=')[1]+'"></input></td></tr>';
                     }
                     table.innerHTML = html + '</tbody>';
                     tables.innerHTML = table.outerHTML;
@@ -55,12 +46,12 @@
             
             postAjax('api/saveallsettings.php?device='+ ips + '&d='+result, "POST", "", function(d)
                 {
-                   if(d!="OK"){
+                   if(d != "OK"){
                        alert("Ошибка");
                    }
                 }
             );
-            SendModule(ips, 'setsettings?s='+ result);
+            SendCMDAlert(ips, 'setsettings?s='+ result);
             
             dialog.close();
         }
@@ -304,10 +295,11 @@
 		<?php require_once(__DIR__."//../site/verhn.php");?> 
         
         <div>
-            <dialog style="padding: 16px; margin: auto;" id="dialog">
+            <dialog class="moduleSetting" style="padding: 16px; margin: auto;" id="dialog">
               <div id="tables"></div>
-              <button onclick="save()">Сохранить</button>
-              <button onclick="closed()">Закрыть</button>
+              <button class="sb" onclick="save()">Сохранить</button>
+              <button class="sb" onclick="closed()">Закрыть</button>
+			  <button class="sb" style="color: red;" onclick="">Забыть модуль</button>
             </dialog>
         </div>
 	</body>

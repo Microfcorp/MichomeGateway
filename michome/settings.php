@@ -52,7 +52,7 @@
 		<div class = "body">
 			<div class = "title_menu">Управление Michome. Настройки системы</div>
 			<div style="width: 100%;" class = "components">
-				<div style="width: 100%; padding-left: 15px; padding-top: 8px;" class = "components_title">Моды</div>
+				<div style="width: 100%; padding-left: 15px; padding-top: 8px;" class = "components_title">Модификации</div>
 				<div style="height: 100%; padding-left: 15px; padding-top: 0px;" class = "components_text">
 					<table><tbody>
 					<?
@@ -77,7 +77,7 @@
 						foreach(array_filter($API->GetAllSetting(), function($v, $k) {
 									return !IsStr($v->Name, "_");
 								}, ARRAY_FILTER_USE_BOTH) as $tmp){
-							echo "<tr><td><b>".$tmp->Name."</b></td><td> - </td><td>".$tmp->Desc."</td><td> - </td><td><input name='".$tmp->Name."' id='settingValue".$tmp->ID."' type='text' value='".$tmp->Value."' /></td><td> <input value='Сохранить' type='button' onclick='saveSetting(".$tmp->ID.")' /></td></tr>";
+							echo "<tr><td class='roomLink'><b>".$tmp->Name."</b></td><td> - </td><td class='roomLink'>".$tmp->Desc."</td><td> - </td><td><input class='settingValue' name='".$tmp->Name."' id='settingValue".$tmp->ID."' type='text' value='".$tmp->Value."' /></td><td> <input class='sb' value='Сохранить' type='button' onclick='saveSetting(".$tmp->ID.")' /></td></tr>";
 						}
 					?>
 					</table></tbody>

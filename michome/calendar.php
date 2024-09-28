@@ -122,7 +122,7 @@
 						area.target = "_blank";
 						area.alt = "hyacinth";
 						area.setAttribute("onclick", "Setn('"+str.split(';')[2]+" было "+str.split(';')[3]+"')");
-						area.style.cursor = 'grab';
+						area.setAttribute('class', 'calendarPoint');
 						maps.appendChild(area);
 						
 					}
@@ -157,30 +157,65 @@
 			<div style="width: 98%;" class = "components">
 				<div style="width: 100%; padding-left: 15px; padding-top: 8px;" class = "components_title">Настройки календаря</div>
 				<div style="height: 100%; padding-left: 15px; padding-top: 0px;" class = "components_text">
-					<table><tbody>
-						<tr><td><b>Выберите пресет данных: </b></td> <td><select id="PresetDat" onchange="extData.style.display = 'none'; LoadPreset(this.value);"><? echo $presetOptions; ?></select></td></tr>
-						<tr><td><a href="#" onclick="CloseOpenTable(extData); return false;">Или укажите тип данных вручную</a></td></tr>
-						<tr id='extData' style='display: none'><td><b>Выберите модуль: </b></td><td><select id="DevD" onchange="GenerateDataType(this.value)"><? echo $modulesOptions; ?></select></td><td><b>Выберите тип данные для построения графика: </b></td><td><select id="DateTypem" onchange="PresetDat.selectedIndex = -1; Graphics('selday', vibday.value)"></select></td></tr>
-						<tr><td><b>Укажите за какую дату вывести данные: </b></td> <td><input onchange="Graphics('selday', this.value)" type="date" id='vibday' /></td> <td><input onclick="Graphics('selday', '<? echo date("Y-m-d"); ?>')" value="За сегодня" type="button" /></td></tr>
+					<table style="text-align: left;" class="tablePage"><tbody>
+						<tr>
+							<td class="scenesT">
+								<b>Выберите пресет данных: </b>
+							</td> 
+							<td class="scenesT">
+								<select class="calendarInput" id="PresetDat" onchange="extData.style.display = 'none'; LoadPreset(this.value);"><? echo $presetOptions; ?></select>
+							</td>
+						</tr>
+						<tr>
+							<td class="scenesT">
+								<a href="#" onclick="CloseOpenTable(extData); return false;">Или укажите тип данных вручную</a>
+							</td>
+						</tr>
+						<tr id='extData' style='display: none;'>
+							<td class="scenesT"><b>Выберите модуль: </b></td>
+							<td class="scenesT"><select class="calendarInput" id="DevD" onchange="GenerateDataType(this.value)"><? echo $modulesOptions; ?></select></td>
+							<td class="scenesT"><b>Выберите тип данные для построения графика: </b></td>
+							<td class="scenesT"><select class="calendarInput" id="DateTypem" onchange="PresetDat.selectedIndex = -1; Graphics('selday', vibday.value)"></select></td>
+						</tr>
+						<tr>
+							<td class="scenesT"><b>Укажите за какую дату вывести данные: </b></td> 
+							<td class="scenesT"><input class="calendarInput" onchange="Graphics('selday', this.value)" type="date" id='vibday' /></td> 
+							<td class="scenesT"><input onclick="Graphics('selday', '<? echo date("Y-m-d"); ?>')" value="За сегодня" type="button" /></td>
+						</tr>
 						<tr></tr>
-						<tr><td><b><input onclick="Graphics('selday', vibday.value); setcookie('UsredCalendar', this.checked ? 'on' : 'off', 9999999999);" id="usred" type="checkbox" /> <label for="usred">Включить фильтр данных</label></b></td></tr>
+						<tr>
+							<td class="scenesT">
+								<b>Включить фильтр данных: 
+									<div class='checkbox-toggle'>
+										<input onclick="Graphics('selday', vibday.value); setcookie('UsredCalendar', this.checked ? 'on' : 'off', 9999999999);" id="usred" type="checkbox" /> 
+										<label class='CToggle' for="usred"><span></span></label>
+									</div>
+								</b>
+							</td>
+						</tr>
 						<tr></tr>
-						<tr><td><a id="infacts" href="facts.php">Интересные факты</a></td></tr>
-					</table></tbody>
+						<tr>
+							<td class="scenesT"><a id="infacts" href="facts.php">Интересные факты</a></td>
+						</tr>
+					</tbody></table>
 				</div>
 			</div>
 			<div style="width: 98%;" class = "components">
 				<div style="width: 100%; padding-left: 15px; padding-top: 8px;" class = "components_title">График данных</div>
 				<div style="height: 100%; padding-left: 15px; padding-top: 0px;" class = "components_text">
-					<p><a href="#" onclick="downloadCSV(); return false;">Скачать CSV график</a> <a href="#" onclick="downloadMAP(); return false;">Скачать JSON карту графика</a><p>
-					<p class="temphis" id="temphist">Что когда было<p>
-					<table>
+					<p>
+						<a href="#" onclick="downloadCSV(); return false;">Скачать CSV график</a> 
+						<a href="#" onclick="downloadMAP(); return false;">Скачать JSON карту графика</a>
+					</p>
+					<br />
+					<p class="temphis" id="temphist">Что когда было</p>
+					<table class="tablePage">
 						<tbody>
 							<tr>
-								<td><p><img class="graphics" id="img1" usemap="#flowers"></img></p></td>
+								<td><p><img class="graphics" id="img1" usemap="#grafickPoints"></img></p></td>
 							</tr>
 							<tr>
-								<td><map id="maps" name="flowers"></map></td>
+								<td><map id="maps" name="grafickPoints"></map></td>
 							</tr>
 						</tbody>
 					</table>

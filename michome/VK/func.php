@@ -155,6 +155,7 @@ function Michome_Prognoz(){
 	return file_get_contents("http://localhost/michome/prognoz.php?type=VK");
 }
 function Michome_DateVrem(){	
+	global $API;
 	return ("Время восхода солнца: ".date_sunrise(time(),SUNFUNCS_RET_STRING,50.860145, 39.082347, 90+50/60, 3)."<br>Время захода солнца: ".date_sunset(time(),SUNFUNCS_RET_STRING,50.860145, 39.082347, 90+50/60, 3));
 }
 function Michome_SetLight($p,$s){
@@ -194,54 +195,6 @@ function RemoveNot($id){
 }
 
 function mymisto(){
-	$url = "http://abitur.bsu.edu.ru/abitur/priem/competition/index.php?idFakultet=2168&type=1&forma=1";
-	$html = file_get_html($url);
-	$tr = $html->find('.TabTr',22)->find('tr');
-	//$tr = $html->find('.TabTr',10);
-	$kolpod = 0;
-	$isorig = 0;
-	$tmp = "";
-	foreach($tr as $tt) {
-		//echo $tt->find('td', 1);
-		$misto = $tt->find('td', 0);
-		$snils = $tt->find('td', 1);
-		$ispod = $tt->find('td', 9);
-		$typedoc = $tt->find('td', 10);
-		
-		if(strpos($ispod, "Подано") !== FALSE){
-			$kolpod = $kolpod + 1;
-		}
-		
-		if(strpos($typedoc, "Оригинал") !== FALSE){
-			$isorig = $isorig + 1;
-		}
-		
-		if(strpos($snils, "159-363-741-00") !== FALSE){
-			$tmp .= "Твой снилс: 159-***-***-00
-";
-			$tmp .= "Твое место среди подавих заявление: " . $kolpod . '
-';
-			$tmp .= "Твое место среди предоставивших оригинал: " . $isorig . '
-';
-			//$tmp .= "Твое место среди общего рейтинга: " . $misto . '\n';
-			$tmp .= intval($kolpod) <= 22 ? "Ты пока проходишь))" : "Упс, ты в пролете((" . '
-';
-			$tmp .= '
-';
-		}
-	}
-	$tmp .= '
-';
-	$tmp .= "Всего подавих заявление: " . $kolpod . '
-';
-	$tmp .= "Всего предоставивших оригинал: " . $isorig . '
-';
-	$tmp .= '
-';
-	$tmp .= "Всего доступных бюджетных мест: 22 (25)" . '
-';
-	//echo($tr);
-	//echo($html);
-	return $tmp;
+	
 }
 ?>

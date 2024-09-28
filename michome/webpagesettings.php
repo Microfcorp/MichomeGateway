@@ -30,7 +30,7 @@
 <!Doctype html>
 <html>
 	<head>
-		<title>Настройки веб страниц</title>
+		<title>Настройка веб-страниц</title>
 		<link rel="stylesheet" type="text/css" href="styles/style.css"/>
         <script type="text/javascript" src="/site/MicrofLibrary.js"></script>
         <script type="text/javascript" src="libmichome.js"></script>
@@ -66,16 +66,46 @@
 			<div style="width: 100%;" class = "components">
 				<div style="width: 100%; padding-left: 15px; padding-top: 8px;" class = "components_title">Настройки страницы</div>
 				<div style="height: 100%; padding-left: 15px; padding-top: 0px;" class = "components_text">
-					<table cellspacing="0" cellpadding="4"><tbody>
-					<tr><td><b>ID</b></td><td></td><td><b>Тип</b></td><td></td><td><b>Имя</b></td><td></td><td><b>Значение</b></td></tr>
-					<?
-						$page = $API->GetWebPagesFromType($typePage)->WebPages();
-						foreach($page as $tmp){
-							echo "<tr><td><input style='width: 50px;' id='pageNum".$tmp->ID."' type='number' value='".$tmp->ID."' /></td><td> - </td><td><select id='pageSub".$tmp->ID."'><option ".($tmp->SubType == "TextValue" ? "selected" : "")." value='TextValue'>Текстовое значение</option><option ".($tmp->SubType == "SpanValue" ? "selected" : "")." value='SpanValue'>Спановое значение</option><option ".($tmp->SubType == "HeaderValue" ? "selected" : "")." value='HeaderValue'>Заголовочное значение</option></select></td><td> - </td><td><input id='pageName".$tmp->ID."' type='text' value='".$tmp->Name."' /></td><td> - </td><td><input style='width: 600px;' id='pageValue".$tmp->ID."' type='text' value='".$tmp->Value."' /></td> <td><input value='Сохранить' type='button' onclick='saveSetting(".$tmp->ID.")' /></td> <td><input value='Удалить' type='button' onclick='removeSettings(".$tmp->ID.")' /></td></tr>";
-						}
-					?>
-					<tr><td></td><td></td><td><a href="#" onclick="addNew();">Вставить новую</a></td></tr>
-					</table></tbody>
+					<table class="tablePage" cellspacing="0" cellpadding="4"><tbody>
+						<tr class="scenesH">
+							<td><b>ID</b></td>
+							<td></td>
+							<td><b>Тип</b></td>
+							<td></td>
+							<td><b>Имя</b></td>
+							<td></td>
+							<td><b>Значение</b></td>
+						</tr>
+						<?
+							$page = $API->GetWebPagesFromType($typePage)->WebPages();
+							foreach($page as $tmp){
+								echo "<tr>
+								<td class='scenesT'><input style='width: 50px;' id='pageNum".$tmp->ID."' type='number' value='".$tmp->ID."' /></td>
+								<td class='scenesT'> - </td>
+								<td class='scenesT'>
+									<select id='pageSub".$tmp->ID."'>
+										<option ".($tmp->SubType == "TextValue" ? "selected" : "")." value='TextValue'>Текстовое значение</option>
+										<option ".($tmp->SubType == "SpanValue" ? "selected" : "")." value='SpanValue'>Спановое значение</option>
+										<option ".($tmp->SubType == "HeaderValue" ? "selected" : "")." value='HeaderValue'>Заголовочное значение</option>
+									</select>
+								</td>
+								<td class='scenesT'> - </td>
+								<td class='scenesT'><input id='pageName".$tmp->ID."' type='text' value='".$tmp->Name."' /></td>
+								<td class='scenesT'> - </td>
+								<td class='scenesT'><input style='width: 600px;' id='pageValue".$tmp->ID."' type='text' value='".$tmp->Value."' /></td> 
+								<td class='scenesT'><input value='Сохранить' type='button' onclick='saveSetting(".$tmp->ID.")' /></td> 
+								<td class='scenesT'><input value='Удалить' type='button' onclick='removeSettings(".$tmp->ID.")' /></td>
+								</tr>";
+							}
+						?>
+						<tr>
+							<td></td>
+							<td></td>
+							<td>
+								<a href="#" onclick="addNew();">Вставить новую</a>
+							</td>
+						</tr>
+					</tbody></table>
 				</div>
 			</div>
 		</div>

@@ -51,19 +51,19 @@
 			<div style="width: 100%;" class = "components">
 				<div style="width: 100%; padding-left: 15px; padding-top: 8px;" class = "components_title">Настройка уведомлений</div>
 				<div style="height: 100%; padding-left: 15px; padding-top: 0px;" class = "components_text">
-					<table cellspacing="0" cellpadding="4"><tbody>
+					<table class="tablePage" cellspacing="0" cellpadding="4"><tbody>
 					<tr><td><b>ID пользователя</b></td><td></td><td><b>Группа уведомлений</b></td><td></td><td><b>Мессенджер</b></td><td></td><td><b>Состояние</b></td></tr>
 					<?
 						$results = mysqli_query($link, "SELECT * FROM `UsersVK` WHERE 1");
 						while($row = $results->fetch_assoc()) {
 							echo "<tr>
-							<td><i>".$row['ID']."</i></td>
+							<td class='scenesT'><i>".$row['ID']."</i></td>
 							<td></td>
-							<td>".GroupP($row['Type'])."</td>
+							<td class='scenesT'>".GroupP($row['Type'])."</td>
 							<td></td>
-							<td>".MessangerP($row['Messanger'])."</td>
+							<td class='scenesT'>".MessangerP($row['Messanger'])."</td>
 							<td></td>
-							<td><input onchange='Edit(".$row['ID'].", this.checked);' style='width: 30px'" . ($row['Enable']=="1" ? "checked" : "") . " type='checkbox'></input></td>
+							<td class='scenesT'><div class='checkbox-toggle'><input id='cbx-".$row['ID']."' onchange='Edit(".$row['ID'].", this.checked);' style='width: 30px'" . ($row['Enable']=="1" ? "checked" : "") . " type='checkbox' /><label for='cbx-".$row['ID']."' class='CToggle'><span></span></label></div></td>
 							</tr>";
 						} 
 					?>

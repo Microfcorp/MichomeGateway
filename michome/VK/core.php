@@ -1,17 +1,23 @@
 <?php include_once("../../site/mysql.php"); ?>
-<?php include_once("../../site/BotSet.php"); ?>
 <?php include_once("func.php"); ?>
 <?php include_once("../lib/SamsungTV.php"); ?>
 <?php include_once("../lib/michom.php"); ?>
 
 <?
+$API = new MichomeAPI('127.0.0.1', $link);
+
+//Строка для подтверждения адреса сервера из настроек Callback API
+$confirmationToken = $API->GetSettingORCreate("VKconfirm", "ccc00000", "Токен VK для подтверждения сервера")->Value;
+//Секретный ключ
+$secretKey = $API->GetSettingORCreate("VKsecret", "Michome", "VK Секретный ключ")->Value;
+//Ключ доступа сообщества
+$token = $API->GetSettingORCreate("VKtoken", "", "Токен для работы VK бота")->Value;
+
 if (!isset($_REQUEST)) {
     return;
 }
 
 $tv = new SamsungTV("192.168.1.31");
-
-$API = new MichomeAPI('127.0.0.1', $link);
 
 //Получаем и декодируем уведомление
 $data = json_decode(file_get_contents('php://input'));

@@ -1,24 +1,71 @@
--- --------------------------------------------------------
--- Хост:                         127.0.0.1
--- Версия сервера:               10.5.18-MariaDB-0+deb11u1 - Debian 11
--- Операционная система:         debian-linux-gnu
--- HeidiSQL Версия:              11.3.0.6295
--- --------------------------------------------------------
+-- MariaDB dump 10.19  Distrib 10.5.18-MariaDB, for debian-linux-gnu (x86_64)
+--
+-- Host: localhost    Database: michome
+-- ------------------------------------------------------
+-- Server version	10.5.18-MariaDB-0+deb11u1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+--
+-- Current Database: `michome`
+--
 
--- Дамп структуры базы данных michome
-CREATE DATABASE IF NOT EXISTS `michome` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `michome` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
+
 USE `michome`;
 
--- Дамп структуры для таблица michome.botcmd
-CREATE TABLE IF NOT EXISTS `botcmd` (
+--
+-- Table structure for table `UsersVK`
+--
+
+DROP TABLE IF EXISTS `UsersVK`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `UsersVK` (
+  `ID` bigint(20) NOT NULL,
+  `Type` text NOT NULL,
+  `Enable` tinyint(1) NOT NULL DEFAULT 1,
+  `KeyboardID` int(11) NOT NULL DEFAULT 0,
+  `Messanger` enum('VK','TG') NOT NULL DEFAULT 'VK',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Пользователи ВК и ТГ ботов';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `WebPages`
+--
+
+DROP TABLE IF EXISTS `WebPages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `WebPages` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Type` enum('M','R','C','H','G','Null') DEFAULT 'Null',
+  `SubType` enum('TextValue','SpanValue','HeaderValue') DEFAULT 'TextValue',
+  `Name` text DEFAULT NULL,
+  `Value` text DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `ID` (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Настройки web страниц';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `botcmd`
+--
+
+DROP TABLE IF EXISTS `botcmd`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `botcmd` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Enabled` enum('1','0') DEFAULT '0',
   `Name` text DEFAULT NULL,
@@ -27,11 +74,16 @@ CREATE TABLE IF NOT EXISTS `botcmd` (
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Комманды для ботов';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Экспортируемые данные не выделены.
+--
+-- Table structure for table `calendarPresets`
+--
 
--- Дамп структуры для таблица michome.calendarPresets
-CREATE TABLE IF NOT EXISTS `calendarPresets` (
+DROP TABLE IF EXISTS `calendarPresets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `calendarPresets` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id строки',
   `Name` text NOT NULL COMMENT 'Имя пресета',
   `Module` text NOT NULL COMMENT 'ID модуля',
@@ -39,11 +91,16 @@ CREATE TABLE IF NOT EXISTS `calendarPresets` (
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Список пресетов календаря';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Экспортируемые данные не выделены.
+--
+-- Table structure for table `logging`
+--
 
--- Дамп структуры для таблица michome.logging
-CREATE TABLE IF NOT EXISTS `logging` (
+DROP TABLE IF EXISTS `logging`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `logging` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ip` text NOT NULL,
   `type` text NOT NULL,
@@ -54,12 +111,17 @@ CREATE TABLE IF NOT EXISTS `logging` (
   UNIQUE KEY `id_2` (`id`),
   KEY `id` (`id`),
   KEY `date` (`date`)
-) ENGINE=InnoDB AUTO_INCREMENT=476600 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Данные логирования';
+) ENGINE=InnoDB AUTO_INCREMENT=482625 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Данные логирования';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Экспортируемые данные не выделены.
+--
+-- Table structure for table `michom`
+--
 
--- Дамп структуры для таблица michome.michom
-CREATE TABLE IF NOT EXISTS `michom` (
+DROP TABLE IF EXISTS `michom`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `michom` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ip` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `type` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
@@ -73,12 +135,17 @@ CREATE TABLE IF NOT EXISTS `michom` (
   UNIQUE KEY `id` (`id`),
   KEY `id_2` (`id`),
   KEY `date` (`date`)
-) ENGINE=InnoDB AUTO_INCREMENT=900677 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Основная таблица данных';
+) ENGINE=InnoDB AUTO_INCREMENT=1013995 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Основная таблица данных';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Экспортируемые данные не выделены.
+--
+-- Table structure for table `mods`
+--
 
--- Дамп структуры для таблица michome.mods
-CREATE TABLE IF NOT EXISTS `mods` (
+DROP TABLE IF EXISTS `mods`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mods` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `ModName` text NOT NULL,
   `ParamType` text DEFAULT NULL,
@@ -87,11 +154,16 @@ CREATE TABLE IF NOT EXISTS `mods` (
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Настройки модов';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Экспортируемые данные не выделены.
+--
+-- Table structure for table `modules`
+--
 
--- Дамп структуры для таблица michome.modules
-CREATE TABLE IF NOT EXISTS `modules` (
+DROP TABLE IF EXISTS `modules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `modules` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `mac` text NOT NULL,
   `ip` text NOT NULL,
@@ -103,23 +175,34 @@ CREATE TABLE IF NOT EXISTS `modules` (
   `laststart` datetime DEFAULT curtime(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Настройка модулей';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Экспортируемые данные не выделены.
+--
+-- Table structure for table `rooms`
+--
 
--- Дамп структуры для таблица michome.rooms
-CREATE TABLE IF NOT EXISTS `rooms` (
+DROP TABLE IF EXISTS `rooms`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rooms` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `Name` text DEFAULT 'Новая комната',
-  `Data` text DEFAULT NULL,
-  `Modules` text DEFAULT NULL,
+  `Name` text DEFAULT 'Новая комната' COMMENT 'Название комнаты',
+  `Data` text DEFAULT NULL COMMENT 'Текст комнаты',
+  `Modules` text DEFAULT NULL COMMENT 'Список модулей в комнате',
+  `mName` text DEFAULT 'leroom' COMMENT 'Название для модулей',
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Комнаты';
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Комнаты';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Экспортируемые данные не выделены.
+--
+-- Table structure for table `scenes`
+--
 
--- Дамп структуры для таблица michome.scenes
-CREATE TABLE IF NOT EXISTS `scenes` (
+DROP TABLE IF EXISTS `scenes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `scenes` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` text NOT NULL,
   `TStart` time NOT NULL,
@@ -132,12 +215,17 @@ CREATE TABLE IF NOT EXISTS `scenes` (
   `Enable` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Сценарии автоматизации';
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Сценарии автоматизации';
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Экспортируемые данные не выделены.
+--
+-- Table structure for table `settings`
+--
 
--- Дамп структуры для таблица michome.settings
-CREATE TABLE IF NOT EXISTS `settings` (
+DROP TABLE IF EXISTS `settings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `settings` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID настройки',
   `Name` text NOT NULL DEFAULT '' COMMENT 'Ключ настройки',
   `Value` text DEFAULT '' COMMENT 'Значение настройки',
@@ -145,36 +233,19 @@ CREATE TABLE IF NOT EXISTS `settings` (
   `LastModify` datetime NOT NULL DEFAULT curtime() COMMENT 'Последнее изменение',
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Настройки системы Michome';
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Настройки системы Michome';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
--- Экспортируемые данные не выделены.
-
--- Дамп структуры для таблица michome.UsersVK
-CREATE TABLE IF NOT EXISTS `UsersVK` (
-  `ID` bigint(20) NOT NULL,
-  `Type` text NOT NULL,
-  `Enable` tinyint(1) NOT NULL DEFAULT 1,
-  `KeyboardID` int(11) NOT NULL DEFAULT 0,
-  `Messanger` enum('VK','TG') NOT NULL DEFAULT 'VK',
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Пользователи ВК и ТГ ботов';
-
--- Экспортируемые данные не выделены.
-
--- Дамп структуры для таблица michome.WebPages
-CREATE TABLE IF NOT EXISTS `WebPages` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `Type` enum('M','R','C','H','G','Null') DEFAULT 'Null',
-  `SubType` enum('TextValue','SpanValue','HeaderValue') DEFAULT 'TextValue',
-  `Name` text DEFAULT NULL,
-  `Value` text DEFAULT NULL,
-  PRIMARY KEY (`ID`),
-  KEY `ID` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Настройки web страниц';
-
--- Экспортируемые данные не выделены.
-
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2024-09-29  1:11:27
+-e 
+
+INSERT INTO `logging` (`id`, `ip`, `type`, `rssi`, `log`, `date`) VALUES (1, 'Gateway', 'Starting', '0', 'Starting', CURTIME());

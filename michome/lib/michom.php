@@ -1,6 +1,7 @@
 <?php
 set_time_limit(5);
 define("ServerPath", __DIR__."/../");
+define("GatewayID", "Gateway");
 $MODs = array();
 //require_once("/var/www/html/site/mysql.php");
 require_once("_settings.php");
@@ -153,6 +154,11 @@ class MichomeAPI
 		   $Timeins = $this->TimeIns($module, 'selday', date("Y-m-d"), true);
 	   return $Timeins;
     }
+	
+	//Возвращает выхлоп стандартной функции suninfo с подставлением всех настроек
+	public function GetSunInfo(){
+		return date_sun_info(time(), floatval($this->GetSettingORCreate("latitude", "50.860145", "Широта в градусах")->Value), floatval($this->GetSettingORCreate("longitude", "39.082347", "Долгота в градусах")->Value));;
+	}
 	
 	public function SendCmdUpdate($device, $timeout=2000, $isOOP = false){
 		return $this->SendCmd($device, "update", $timeout, $isOOP);
@@ -309,8 +315,8 @@ class MichomeAPI
 	}
     
 	//Добавляет лог
-    public function AddLog($ip, $type, $rssi, $log, $date){
-       return _AddLog($this->link, $ip, $type, $rssi, $log, $date);
+    public function AddLog($mID, $type, $rssi, $log, $date){
+       return _AddLog($this->link, $mID, $type, $rssi, $log, $date);
     }
     
 	//Возвращает максимальное и минимальное значение из БД
@@ -430,7 +436,7 @@ class MichomeAPI
 	public function GetWebConstant($strl){
 		$str = $strl;
 		if(!ValidateConst($str)){
-			$this->AddLog("localhost", "Incorrect constant", "0", "Incorrecting constant on: " . $str, date("Y-m-d H:i:s"));
+			$this->AddLog(GatewayID, "Incorrect constant", "0", "Incorrecting constant on: " . $str, date("Y-m-d H:i:s"));
 			return "Ошибка преобразования констант";
 		}
         //^gr_192.168.1.11_Temp_curday;
@@ -499,7 +505,7 @@ class MichomeAPI
     public function GetConstant($strl){
         $str = $strl;		
 		if(!ValidateConst($str)){
-			$this->AddLog("localhost", "Incorrect constant", "0", "Incorrecting constant on: " . $str, date("Y-m-d H:i:s"));
+			$this->AddLog(GatewayID, "Incorrect constant", "0", "Incorrecting constant on: " . $str, date("Y-m-d H:i:s"));
 			return "Ошибка преобразования констант";
 		}
 		
@@ -594,7 +600,7 @@ class MichomeAPI
 						$str = str_ireplace($fullName.$expl.";", $rd, $str); 
 				}
 			}
-			if($at++ > 3) {$this->AddLog("localhost", "Incorrect constant", "0", "Incorrecting constant on: " . $str, date("Y-m-d H:i:s")); break;}
+			if($at++ > 3) {$this->AddLog(GatewayID, "Incorrect constant", "0", "Incorrecting constant on: " . $str, date("Y-m-d H:i:s")); break;}
 		}
 		
 		//Удалить эту строку
