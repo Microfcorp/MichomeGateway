@@ -48,6 +48,17 @@
 			const TagDisabledEndTime = ["^sts;", "^eds;", "^ede;", "^bt"];
 			const TagDisabledNDataTime = ["^bt", "^cbp;", "^pbp;"];
 			
+			const StructRenameData = [[["^bt", "^cbp;", "^pbp;"], "Данные при нажатии кнопки"], ["^sts;", "Данные, при запуске системы"]];
+			const StructRenameNData = [[["^bt", "^cbp;", "^pbp;"], "Не поддерживается для событий с кнопкой"], ["^sts;", "Данные, при выключении системы"]];
+			
+			function RenameBlockPlace(name, block, tagsStruct){
+				for(var i = 0; i < tagsStruct.length; i++){
+					if(IsStr(name, tagsStruct[i][0])){
+						block.placeholder = tagsStruct[i][1];
+					}
+				}
+			}
+			
 			function UpdateVisible(id){ //Обновляет отображение активности блоков сценария
 				var datas = document.getElementsByClassName('i_'+id);
                 
@@ -64,6 +75,8 @@
 				datas[2].disabled = IsStr(na, TagDisabledStartTime);
 				datas[3].disabled = IsStr(na, TagDisabledEndTime);
 				datas[6].disabled = IsStr(na, TagDisabledNDataTime);
+				RenameBlockPlace(na, datas[5], StructRenameData);
+				RenameBlockPlace(na, datas[6], StructRenameNData);
 			}
             function Edit(id){
                 var datas = document.getElementsByClassName('i_'+id);

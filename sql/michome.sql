@@ -135,7 +135,7 @@ CREATE TABLE `michom` (
   UNIQUE KEY `id` (`id`),
   KEY `id_2` (`id`),
   KEY `date` (`date`)
-) ENGINE=InnoDB AUTO_INCREMENT=1013995 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Основная таблица данных';
+) ENGINE=InnoDB AUTO_INCREMENT=1014095 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Основная таблица данных';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -245,7 +245,7 @@ CREATE TABLE `settings` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-09-29  1:11:27
--e 
+-- Dump completed on 2024-09-29  6:47:08
+
 
 INSERT INTO `logging` (`id`, `ip`, `type`, `rssi`, `log`, `date`) VALUES (1, 'Gateway', 'Starting', '0', 'Starting', CURTIME());
