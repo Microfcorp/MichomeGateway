@@ -37,7 +37,7 @@ CREATE TABLE `UsersVK` (
   `KeyboardID` int(11) NOT NULL DEFAULT 0,
   `Messanger` enum('VK','TG') NOT NULL DEFAULT 'VK',
   PRIMARY KEY (`ID`)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Пользователи ВК и ТГ ботов';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -48,14 +48,14 @@ DROP TABLE IF EXISTS `WebPages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `WebPages` (
-  `ID` int(11) NOT NULL,
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Type` enum('M','R','C','H','G','Null') DEFAULT 'Null',
   `SubType` enum('TextValue','SpanValue','HeaderValue') DEFAULT 'TextValue',
   `Name` text DEFAULT NULL,
   `Value` text DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Настройки web страниц';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -66,14 +66,14 @@ DROP TABLE IF EXISTS `botcmd`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `botcmd` (
-  `ID` int(11) NOT NULL,
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Enabled` enum('1','0') DEFAULT '0',
   `Name` text DEFAULT NULL,
   `Desc` text DEFAULT NULL,
   `Cmd` text DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Комманды для ботов';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -84,13 +84,13 @@ DROP TABLE IF EXISTS `calendarPresets`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `calendarPresets` (
-  `ID` int(11) NOT NULL COMMENT 'Id строки',
+  `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id строки',
   `Name` text NOT NULL COMMENT 'Имя пресета',
   `Module` text NOT NULL COMMENT 'ID модуля',
   `Type` text NOT NULL COMMENT 'Тип данных',
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Список пресетов календаря';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -101,7 +101,7 @@ DROP TABLE IF EXISTS `logging`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `logging` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `ip` text NOT NULL,
   `type` text NOT NULL,
   `rssi` text NOT NULL,
@@ -111,7 +111,7 @@ CREATE TABLE `logging` (
   UNIQUE KEY `id_2` (`id`),
   KEY `id` (`id`),
   KEY `date` (`date`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Данные логирования';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -122,7 +122,7 @@ DROP TABLE IF EXISTS `michom`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `michom` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `ip` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `type` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
   `data` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
@@ -135,7 +135,7 @@ CREATE TABLE `michom` (
   UNIQUE KEY `id` (`id`),
   KEY `id_2` (`id`),
   KEY `date` (`date`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Основная таблица данных';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -146,14 +146,14 @@ DROP TABLE IF EXISTS `mods`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `mods` (
-  `ID` int(11) NOT NULL,
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
   `ModName` text NOT NULL,
   `ParamType` text DEFAULT NULL,
   `ParamName` text DEFAULT NULL,
   `ParamValue` text DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Настройки модов';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -164,7 +164,7 @@ DROP TABLE IF EXISTS `modules`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `modules` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `mac` text NOT NULL,
   `ip` text NOT NULL,
   `type` text NOT NULL,
@@ -174,7 +174,7 @@ CREATE TABLE `modules` (
   `msetting` text DEFAULT NULL,
   `laststart` datetime DEFAULT curtime(),
   PRIMARY KEY (`id`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Настройка модулей';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -185,14 +185,14 @@ DROP TABLE IF EXISTS `rooms`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `rooms` (
-  `ID` int(11) NOT NULL,
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` text DEFAULT 'Новая комната' COMMENT 'Название комнаты',
   `Data` text DEFAULT NULL COMMENT 'Текст комнаты',
   `Modules` text DEFAULT NULL COMMENT 'Список модулей в комнате',
   `mName` text DEFAULT 'leroom' COMMENT 'Название для модулей',
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Комнаты';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -203,7 +203,7 @@ DROP TABLE IF EXISTS `scenes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `scenes` (
-  `ID` int(11) NOT NULL,
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` text NOT NULL,
   `TStart` time NOT NULL,
   `TEnd` time NOT NULL,
@@ -215,7 +215,7 @@ CREATE TABLE `scenes` (
   `Enable` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Сценарии автоматизации';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -226,14 +226,14 @@ DROP TABLE IF EXISTS `settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `settings` (
-  `ID` int(11) NOT NULL COMMENT 'ID настройки',
+  `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID настройки',
   `Name` text NOT NULL DEFAULT '' COMMENT 'Ключ настройки',
   `Value` text DEFAULT '' COMMENT 'Значение настройки',
   `Descreption` text DEFAULT '' COMMENT 'Описание для веба',
   `LastModify` datetime NOT NULL DEFAULT curtime() COMMENT 'Последнее изменение',
   PRIMARY KEY (`ID`),
   KEY `ID` (`ID`)
-);
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Настройки системы Michome';
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -245,7 +245,7 @@ CREATE TABLE `settings` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-07 13:10:39
+-- Dump completed on 2024-10-07 13:13:45
 -e 
 
 INSERT INTO `logging` (`id`, `ip`, `type`, `rssi`, `log`, `date`) VALUES (1, 'Gateway', 'Starting', '0', 'Starting', CURTIME());
