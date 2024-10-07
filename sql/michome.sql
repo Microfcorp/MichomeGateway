@@ -245,7 +245,7 @@ CREATE TABLE `settings` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-07 13:13:45
+-- Dump completed on 2024-10-07 13:14:11
 -e 
 
 INSERT INTO `logging` (`id`, `ip`, `type`, `rssi`, `log`, `date`) VALUES (1, 'Gateway', 'Starting', '0', 'Starting', CURTIME());
