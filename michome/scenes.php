@@ -6,8 +6,6 @@
 
 	$data = array();
 
-	$datas = array();
-
 	$results = mysqli_query($link, "SELECT * FROM `scenes`");
 	while($row = $results->fetch_assoc()) {
 		$data[] = array('ID'=>intval($row['ID']),
@@ -20,8 +18,6 @@
 						'Timeout'=>($row['Timeout']),
 						'Enable'=>($row['Enable']),
 						);
-		if(!in_array($row['Data'], $datas)) $datas[] = $row['Data'];
-		if(!in_array($row['NData'], $datas)) $datas[] = $row['NData'];
 	}
 
 	header("Michome-Page: Scenes");
@@ -63,14 +59,6 @@
 				var datas = document.getElementsByClassName('i_'+id);
                 
                 var na = datas[1].value;
-                var ts = datas[2].value;
-                var te = datas[3].value;
-                var md = datas[4].value;
-                var dt = datas[5].value.replace( /&/g, "%26" );
-                var nt = datas[6].value.replace( /&/g, "%26" );
-                var tm = datas[7].value;
-                var en = datas[8].checked;
-                var nu = datas[0].value;
 				
 				datas[2].disabled = IsStr(na, TagDisabledStartTime);
 				datas[3].disabled = IsStr(na, TagDisabledEndTime);
@@ -218,27 +206,28 @@
                                     for($i=0; $i<count($data); $i++){
                                         $v = $data[$i];
 										$cl = (even($i+1) ? "isev" : "isnev");
-                                        echo "<tr class='scenesT ".$cl."'>";
-                                        echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' style='width: 30px' class='i_".$v['ID']." nu' name='numberic' value='".$v['ID']."' type='number'></input></td>";
-                                        echo "<td class='scenesT'><textarea onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." na' style='width: 280px' name='nams' type=\"text\" placeholder='Название' value=\"".$v['Name']."\">".$v['Name']."</textarea></td>";
-                                        echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." ts' name='tstart' type=\"time\" value='".$v['TStart']."'></input></td>";
-                                        echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." td' name='tend' type=\"time\" value='".$v['TEnd']."'></input></td>";
-                                        echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' style='width: 100px' class='i_".$v['ID']." se' list='moduleslist' name='module' value='".$v['Module']."'></input></td>";
-                                        echo "<td class='scenesT'><textarea onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." da' name='data' placeholder=\"Данные во время периода\" value=\"".$v['Data']."\">".$v['Data']."</textarea></td>";
-                                        echo "<td class='scenesT'><textarea onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." nt' name='ndata' placeholder=\"Данные за периодом\" value=\"".$v['NData']."\">".$v['NData']."</textarea></td>";
-                                        echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' style='width: 45px' class='i_".$v['ID']." tm' name='timeout' value='".$v['Timeout']."' type='number'></input></td>";
-										echo "<td class='scenesT'><div class='checkbox-toggle'>";
-                                        echo "<input id='cbt-".$v['ID']."' onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." en' name='enable' ".($v['Enable']=="1" ? "checked" : "")." type='checkbox'></input>";
-                                        echo "<label for='cbt-".$v['ID']."' class='CToggle'><span></span></label></td></div>";
-										echo "<td class='scenesT'><input type=\"button\" onclick='Delet(".$v['ID'].");' value=\"Удалить\" /> <input type=\"button\" onclick='Check(".$v['ID'].");' value=\"Проверить\" /> <input type=\"button\" onclick='Run(".$v['ID'].");' value=\"Выполнить\" /></td>";
-                                        echo "</tr>";
+                                        echo "<tr class='scenesT ".$cl."'>".PHP_EOL;
+                                        echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' style='width: 30px' class='i_".$v['ID']." nu' name='numberic' value='".$v['ID']."' type='number'></input></td>".PHP_EOL;
+                                        echo "<td class='scenesT'><textarea onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." na' style='width: 280px' name='nams' type=\"text\" placeholder='Название' value=\"".$v['Name']."\">".$v['Name']."</textarea></td>".PHP_EOL;
+                                        echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." ts' name='tstart' type=\"time\" value='".$v['TStart']."'></input></td>".PHP_EOL;
+                                        echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." td' name='tend' type=\"time\" value='".$v['TEnd']."'></input></td>".PHP_EOL;
+                                        echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' style='width: 100px' class='i_".$v['ID']." se' list='moduleslist' name='module' value='".$v['Module']."'></input></td>".PHP_EOL;
+                                        echo "<td class='scenesT'><textarea onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." da' name='data' placeholder=\"Данные во время периода\" value=\"".$v['Data']."\">".$v['Data']."</textarea></td>".PHP_EOL;
+                                        echo "<td class='scenesT'><textarea onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." nt' name='ndata' placeholder=\"Данные за периодом\" value=\"".$v['NData']."\">".$v['NData']."</textarea></td>".PHP_EOL;
+                                        echo "<td class='scenesT'><input onchange='Edit(".$v['ID'].");' style='width: 45px' class='i_".$v['ID']." tm' name='timeout' value='".$v['Timeout']."' type='number'></input></td>".PHP_EOL;
+										echo "<td class='scenesT'><div class='checkbox-toggle'>".PHP_EOL;
+                                        echo "<input id='cbt-".$v['ID']."' onchange='Edit(".$v['ID'].");' class='i_".$v['ID']." en' name='enable' ".($v['Enable']=="1" ? "checked" : "")." type='checkbox'></input>".PHP_EOL;
+                                        echo "<label for='cbt-".$v['ID']."' class='CToggle'><span></span></label></td></div>".PHP_EOL;
+										echo "<td class='scenesT'><input type=\"button\" onclick='Delet(".$v['ID'].");' value=\"Удалить\" /> <input type=\"button\" onclick='Check(".$v['ID'].");' value=\"Проверить\" /> <input type=\"button\" onclick='Run(".$v['ID'].");' value=\"Выполнить\" /></td>".PHP_EOL;
+                                        echo "</tr>".PHP_EOL;
                                     }
                                 ?>
                                 <datalist id="moduleslist">
 									<?php
 										$allModules = $API->GetAllModulesBD();
+										echo PHP_EOL;
 										foreach($allModules as $module){
-											echo "<option value=".$module['ip'].">".$module['mid']."</option>";
+											echo "\t\t\t\t\t\t\t\t\t<option value=".$module['ip'].">".$module['mid']."</option>".PHP_EOL;
 										}
 									?>
                                 </datalist>
