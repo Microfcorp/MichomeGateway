@@ -1,8 +1,8 @@
--- MariaDB dump 10.19  Distrib 10.5.18-MariaDB, for debian-linux-gnu (x86_64)
+-- MariaDB dump 10.19  Distrib 10.11.6-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: michome
 -- ------------------------------------------------------
--- Server version	10.5.18-MariaDB-0+deb11u1
+-- Server version	10.11.6-MariaDB-0+deb12u1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -123,9 +123,9 @@ DROP TABLE IF EXISTS `michom`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `michom` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `ip` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `type` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `data` text CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
+  `ip` text CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `type` text CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `data` text CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
   `temp` float NOT NULL DEFAULT 0,
   `humm` float NOT NULL DEFAULT 0,
   `dawlen` float NOT NULL DEFAULT 0,
