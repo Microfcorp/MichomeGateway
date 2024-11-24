@@ -29,13 +29,12 @@ if (!empty($data['message']['text'])) {
     
     if ($text == '/help') {
         $text_return = "$first_name, вот команды, что я понимаю: 
-						/help - список команд
+						/help - Список доступных команд
 						/subscribe - Подписаться на уведомления
 						/unsubscribe - Отписаться от уведомлений
 						/allnotification - Сменить группу уведомлений на \"Все\"
 						/generalnotification - Сменить группу уведомлений на \"Основные\"
 						/location - Получить местоположение Michome
-						Рекомендую закрепить это сообщение
 						";
 		foreach($API->GetBotCmd() as $tmp)
 		{
