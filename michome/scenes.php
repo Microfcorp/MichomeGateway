@@ -73,8 +73,8 @@
                 var ts = datas[2].value;
                 var te = datas[3].value;
                 var md = datas[4].value;
-                var dt = datas[5].value.replace( /&/g, "%26" );
-                var nt = datas[6].value.replace( /&/g, "%26" );
+                var dt = datas[5].value.replace( /&/g, "%26" ).replace( /\?/g, "%3F" );
+                var nt = datas[6].value.replace( /&/g, "%26" ).replace( /\?/g, "%3F" );
                 var tm = datas[7].value;
                 var en = datas[8].checked;
                 var nu = datas[0].value;
@@ -118,7 +118,7 @@
             }
 			function Check(id){
 				var datas = document.getElementsByClassName('i_'+id);
-				var dt = datas[5].value.replace( /&/g, "%26" );
+				var dt = datas[5].value.replace( /&/g, "%26" ).replace( /\?/g, "%3F" );
                 postAjax('api/constants.php?type=run&view=json&cmd='+dt, "POST", "", function(d){
 					var j = JSON.parse(d);
 					if(j['isvalid'] != true){
