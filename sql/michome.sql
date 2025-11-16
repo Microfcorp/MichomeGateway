@@ -1,8 +1,9 @@
--- MariaDB dump 10.19  Distrib 10.11.6-MariaDB, for debian-linux-gnu (x86_64)
+/*M!999999\- enable the sandbox mode */ 
+-- MariaDB dump 10.19  Distrib 10.11.14-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: michome
 -- ------------------------------------------------------
--- Server version	10.11.6-MariaDB-0+deb12u1-log
+-- Server version	10.11.14-MariaDB-0+deb12u2-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -29,7 +30,7 @@ USE `michome`;
 
 DROP TABLE IF EXISTS `UsersVK`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `UsersVK` (
   `ID` bigint(20) NOT NULL,
   `Type` text NOT NULL,
@@ -46,7 +47,7 @@ CREATE TABLE `UsersVK` (
 
 DROP TABLE IF EXISTS `WebPages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `WebPages` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Type` enum('M','R','C','H','G','Null') DEFAULT 'Null',
@@ -64,7 +65,7 @@ CREATE TABLE `WebPages` (
 
 DROP TABLE IF EXISTS `botcmd`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `botcmd` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Enabled` enum('1','0') DEFAULT '0',
@@ -82,7 +83,7 @@ CREATE TABLE `botcmd` (
 
 DROP TABLE IF EXISTS `calendarPresets`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `calendarPresets` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'Id строки',
   `Name` text NOT NULL COMMENT 'Имя пресета',
@@ -99,7 +100,7 @@ CREATE TABLE `calendarPresets` (
 
 DROP TABLE IF EXISTS `logging`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `logging` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ip` text NOT NULL,
@@ -120,7 +121,7 @@ CREATE TABLE `logging` (
 
 DROP TABLE IF EXISTS `michom`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `michom` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ip` text CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
@@ -144,7 +145,7 @@ CREATE TABLE `michom` (
 
 DROP TABLE IF EXISTS `mods`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mods` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `ModName` text NOT NULL,
@@ -162,7 +163,7 @@ CREATE TABLE `mods` (
 
 DROP TABLE IF EXISTS `modules`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `modules` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `mac` text NOT NULL,
@@ -183,7 +184,7 @@ CREATE TABLE `modules` (
 
 DROP TABLE IF EXISTS `rooms`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `rooms` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` text DEFAULT 'Новая комната' COMMENT 'Название комнаты',
@@ -201,7 +202,7 @@ CREATE TABLE `rooms` (
 
 DROP TABLE IF EXISTS `scenes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `scenes` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` text NOT NULL,
@@ -224,7 +225,7 @@ CREATE TABLE `scenes` (
 
 DROP TABLE IF EXISTS `settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `settings` (
   `ID` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID настройки',
   `Name` text NOT NULL DEFAULT '' COMMENT 'Ключ настройки',

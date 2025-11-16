@@ -1,5 +1,5 @@
-<?php include_once(__DIR__."//../site/mysql.php"); ?>
-<?php include_once(__DIR__."//../site/secur.php"); ?>
+<?php include_once("../site/mysql.php"); ?>
+<?php include_once("../site/secur.php"); ?>
 <?php require_once("lib/michom.php"); ?>
 <?	
 $API = new MichomeAPI('localhost', $link);
