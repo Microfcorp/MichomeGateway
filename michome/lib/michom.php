@@ -47,7 +47,14 @@ class MichomeAPI
 	   $this->ConstantON("Математическе", "diff", "^diff_4_2; - Возвращает разность двух аругентов", function($expl): string {return floatval($expl[0]) - floatval($expl[1]);}, 2);
 	   $this->ConstantON("Математическе", "mult", "^mult_2_2; - Возвращает произведение двух аругентов", function($expl): string {return round(floatval($expl[0]) * floatval($expl[1]), 2);}, 2);
 	   $this->ConstantON("Математическе", "div", "^div_4_2; - Возвращает частное двух аругентов", function($expl): string {return round(floatval($expl[0]) / floatval($expl[1]), 2);}, 2);
+	   $this->ConstantON("Математическе", "max", "^max_4_2; - Возвращает максимальное значение из аргументов", function($expl): string {return max($expl);}, 8);
+	   $this->ConstantON("Математическе", "min", "^min_4_2; - Возвращает минимальное значение из аргументов", function($expl): string {return min($expl);}, 8);
 	   $this->ConstantON("Погодные", "watterb", "^watterb_754; - Возвращает температуру закипания воды для давления", function($expl): string {return round((234.175 * log10((floatval($expl[0]) * 133.332) / 6.1078)) / (17.08085 - log10((floatval($expl[0]) * 133.332) / 6.1078)));}, 1);
+	   $this->ConstantON("Системное", "sysdrv", "^sysdrv; - Возвращает раздел, где установлен Michome", function($expl): string {
+		   $rootDisk = shell_exec("df \"".__DIR__."\" | tail -n 1 | awk '{print $1}'");
+		   $rootDisk = explode('/', $rootDisk);
+		   return trim($rootDisk[count($rootDisk)-1]);
+	   }, 0);
 	   $this->ConstantON("Данные из БД", "rmmax", "^rmmax_192.168.1.11_Temp_5h; - Возвращает максимальное значение за диаппазон", function($expl): string 
 	   {
 		   $rd = $this->GetFromEndData(str_ireplace("-", "_", $expl[0]), $expl[2])->SelectFloat($expl[1]);
