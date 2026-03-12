@@ -75,13 +75,13 @@ function _GetFromEndData($link, $ip, $count){
     
 	if(count($ret) > 0)
 		return new BDDataCollection($ret);
-    
+
     if(is_valid_ip($ip))
         $results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = (SELECT t.mID FROM modules AS t WHERE t.ip = '$ip' ORDER BY t.id DESC LIMIT 1) ORDER BY `id` DESC LIMIT ".$count);
     else if($ip == '1')
 		$results = mysqli_query($link, "SELECT * FROM logging WHERE 1 ORDER BY `id` DESC LIMIT ".$count);
 	else
-        $results = mysqli_query($link, "SELECT * FROM logging WHERE logging.ip = '$ip' AND ORDER BY logging.`id` DESC LIMIT ".$count);
+        $results = mysqli_query($link, "SELECT * FROM logging WHERE ip = '$ip' ORDER BY `id` DESC LIMIT ".$count);
     
     while($row = $results->fetch_assoc()) {
         if($row['id'] != "")
@@ -227,9 +227,10 @@ class BDData
         else{
 			$arr = explode(";", $this->Data);
 			foreach($arr as $tmp){
-				if($tmp == "") continue;
-				$na = explode("=", $tmp)[0];
-				$va = explode("=", $tmp)[1];
+				$splitParams = explode("=", $tmp);
+				if(count($splitParams) < 2) continue;
+				$na = $splitParams[0];
+				$va = $splitParams[1];
 				if(mb_strtolower($na) == $name){
 					return $va;
 				}
@@ -367,9 +368,10 @@ class BDLogData
         else{
 			$arr = explode(";", $this->Log);
 			foreach($arr as $tmp){
-				if($tmp == "") continue;
-				$na = explode("=", $tmp)[0];
-				$va = explode("=", $tmp)[1];
+				$splitParams = explode("=", $tmp);
+				if(count($splitParams) < 2) continue;
+				$na = $splitParams[0];
+				$va = $splitParams[1];
 				if(mb_strtolower($na) == $name){
 					return $va;
 				}

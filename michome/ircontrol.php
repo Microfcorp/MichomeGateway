@@ -14,7 +14,7 @@
 function SensToIR(q){
 	//var host = '<?echo $_SERVER['HTTP_HOST'];?>';
 	
-    postAjax('api/setcmd.php?device='+ '<? echo $module; ?>' +'&cmd='+ 'ir?code='+q, "POST", "", function(){});
+    postAjax('api/setcmd.php?device='+ '<? echo $module; ?>' +'&cmd='+ 'ir%3Fcode='+q, "POST", "", function(){});
 }
 </script>
 </head>

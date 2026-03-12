@@ -30,48 +30,54 @@ header("Michome-Page: Room-Manager");
 			var allModules = "";
 		
 			function CreateStudioLight(mID, ip, type, id){
-				if(IsModuleInNetwork(mID)){
+				IsModuleInNetworkCallBack(mID, function(status){				
 					//<span><a href="studiolight.php?module=192.168.1.34" style="font-size: 12pt; font-family: Verdana, Arial, Helvetica, sans-serif;">Управление освещением</a></span><br />
-					let sp = document.createElement('span');
-					let as = document.createElement('a');
-					let br = document.createElement('br');
-					as.href = "studiolight.php?module="+mID;
-					as.className = "roomLink";
-					as.innerHTML = "Управление освещением ("+mID+")";
-					sp.append(as);
-					document.getElementById("roomlinks"+id).append(sp);
-					document.getElementById("roomlinks"+id).append(br);
-				}
+					if(status){
+						let sp = document.createElement('span');
+						let as = document.createElement('a');
+						let br = document.createElement('br');
+						as.href = "studiolight.php?module="+mID;
+						as.className = "roomLink";
+						as.innerHTML = "Управление освещением ("+mID+")";
+						sp.append(as);
+						document.getElementById("roomlinks"+id).append(sp);
+						document.getElementById("roomlinks"+id).append(br);
+					}
+				});
 			}
 
 			function CreateTermometr(mID, ip, type, id){
-				if(IsModuleInNetwork(mID)){
-					//<span><a href="studiolight.php?module=192.168.1.34" style="font-size: 12pt; font-family: Verdana, Arial, Helvetica, sans-serif;">Управление освещением</a></span><br />
-					let sp = document.createElement('span');
-					let as = document.createElement('a');
-					let br = document.createElement('br');
-					as.href = "termometr.php?module="+mID;
-					as.className = "roomLink";
-					as.innerHTML = "Управление термометром ("+mID+")";
-					sp.append(as);
-					document.getElementById("roomlinks"+id).append(sp);
-					document.getElementById("roomlinks"+id).append(br);
-				}
+				IsModuleInNetworkCallBack(mID, function(status){
+					if(status){
+						//<span><a href="studiolight.php?module=192.168.1.34" style="font-size: 12pt; font-family: Verdana, Arial, Helvetica, sans-serif;">Управление освещением</a></span><br />
+						let sp = document.createElement('span');
+						let as = document.createElement('a');
+						let br = document.createElement('br');
+						as.href = "termometr.php?module="+mID;
+						as.className = "roomLink";
+						as.innerHTML = "Управление термометром ("+mID+")";
+						sp.append(as);
+						document.getElementById("roomlinks"+id).append(sp);
+						document.getElementById("roomlinks"+id).append(br);
+					}
+				});
 			}		
 
 			function CreateMeteo(mID, ip, type, id){
-				if(IsModuleInNetwork(mID)){
-					//<span><a href="studiolight.php?module=192.168.1.34" style="font-size: 12pt; font-family: Verdana, Arial, Helvetica, sans-serif;">Управление освещением</a></span><br />
-					let sp = document.createElement('span');
-					let as = document.createElement('a');
-					let br = document.createElement('br');
-					as.href = "meteostation.php?module="+mID;
-					as.className = "roomLink";
-					as.innerHTML = "Управление метеостанцией ("+mID+")";
-					sp.append(as);
-					document.getElementById("roomlinks"+id).append(sp);
-					document.getElementById("roomlinks"+id).append(br);
-				}
+				IsModuleInNetworkCallBack(mID, function(status){
+					if(status){
+						//<span><a href="studiolight.php?module=192.168.1.34" style="font-size: 12pt; font-family: Verdana, Arial, Helvetica, sans-serif;">Управление освещением</a></span><br />
+						let sp = document.createElement('span');
+						let as = document.createElement('a');
+						let br = document.createElement('br');
+						as.href = "meteostation.php?module="+mID;
+						as.className = "roomLink";
+						as.innerHTML = "Управление метеостанцией ("+mID+")";
+						sp.append(as);
+						document.getElementById("roomlinks"+id).append(sp);
+						document.getElementById("roomlinks"+id).append(br);
+					}
+				});
 			}
 			
 			function LoadModules(id, modules){
@@ -112,7 +118,7 @@ header("Michome-Page: Room-Manager");
 						echo "<div style=\"width: auto\" class = \"components_text\">";
 						echo "<span class='roomspan'>".nl2br($API->GetWebConstant($API->GetConstant($rm['Data'])))."</span>";
 						echo "<br />";
-						echo "<script>window.setTimeout(\"LoadModules('".$rm['ID']."', '".$rm['Modules']."')\", 100);</script>";
+						echo "<script>window.setTimeout(\"LoadModules('".$rm['ID']."', '".$rm['Modules']."')\", 500);</script>";
 						echo "<div id=\"roomlinks".$rm['ID']."\"></div>";
 						echo "</div>";
 						echo "</div>";

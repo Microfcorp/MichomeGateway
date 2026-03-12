@@ -94,15 +94,16 @@ elseif(isset($_GET['remove'])){
 							if($modClass->BaseClass->SettingsFunction)
 								$modClass->BaseClass->SettingsFunction->call($API, $modClass);
 						?>
-						<br /><br />
-						<table><tbody>
-						<?
-							foreach($modClass->GetAllSettings($API) as $tmp){
-								echo "<tr><td class='scenesT'><b>".$tmp->Name."</b></td><td class='scenesT'> - </td><td class='scenesT'>".$tmp->Desc."</td><td class='scenesT'> - </td><td><input name='".$tmp->Name."' id='settingValue".$tmp->ID."' type='text' value='".$tmp->Value."' /></td><td class='scenesT'> <input value='Сохранить' type='button' onclick='saveSetting(".$tmp->ID.")' /></td></tr>";
-							}
-						?>
-						</table></tbody>
+						<br />
 					<? }?>
+					<br />
+					<table><tbody>
+					<?
+						foreach($modClass->GetAllSettings($API) as $tmp){
+							echo "<tr><td class='scenesT'><b>".$tmp->Name."</b></td><td class='scenesT'> - </td><td class='scenesT'>".$tmp->Desc."</td><td class='scenesT'> - </td><td><input name='".$tmp->Name."' id='settingValue".$tmp->ID."' type='text' value='".$tmp->Value."' /></td><td class='scenesT'> <input value='Сохранить' type='button' onclick='saveSetting(".$tmp->ID.")' /></td></tr>";
+						}
+					?>
+					</table></tbody>
 				</div>
 			</div>
 		</div>

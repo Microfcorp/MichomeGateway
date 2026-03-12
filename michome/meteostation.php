@@ -42,7 +42,7 @@ if(isset($_GET['module'])){
 		DescText.style.fontStyle = "italic";
 		DescText.style.color = "aquamarine";
 		
-		postAjax('/michome/api/setcmd.php?device='+moduleAddress+'&cmd=getmeteoinfo?nonehtml=1%26id='+id+'&timeout=5000', "GET", "", function(d){
+		postAjax('/michome/api/setcmd.php?device='+moduleAddress+'&cmd=getmeteoinfo%3Fnonehtml=1%26id='+id+'&timeout=5000', "GET", "", function(d){
 			spanText.title = d.replaceAll("<br />", "\n");
 			spanText1.title = d.replaceAll("<br />", "\n");
 			spanText2.title = d.replaceAll("<br />", "\n");
@@ -50,7 +50,7 @@ if(isset($_GET['module'])){
 		});
 		
 		let f = function(){
-			postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'getmeteo?id='+id+"%26nonehtml=1&timeout=2500", "GET", "", function(d)
+			postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'getmeteo%3Fid='+id+"%26nonehtml=1&timeout=2500", "GET", "", function(d)
 			{
 				var dataRead = [false, false, false];
 				var ds = d.split('\n');
@@ -114,7 +114,7 @@ if(isset($_GET['module'])){
 
 	function initD(){
 		var Did = document.getElementById("selectInit").value;
-		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=initmeteo?id='+Did+'&timeout=5000', "GET", "", function(d){
+		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=initmeteo%3Fid='+Did+'&timeout=5000', "GET", "", function(d){
 			if(d == "Init Error"){
 				alert("Ошибка инициализации");
 			}
@@ -129,7 +129,7 @@ if(isset($_GET['module'])){
 	
 	function resetD(){
 		var Did = document.getElementById("selectInit").value;
-		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=resetmeteo?id='+Did+'&timeout=5000', "GET", "", function(d){
+		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=resetmeteo%3Fid='+Did+'&timeout=5000', "GET", "", function(d){
 			if(d == "Reset Error"){
 				alert("Ошибка сброса");
 			}

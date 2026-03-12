@@ -2,6 +2,10 @@
 $PowerModuleModule = new MichomeModule("PowerModule", MichomeModuleType::ModuleCore);
 $PowerModuleModule->BaseClass = new MichomeModuleCore("PowerModules", "Модуль электромонитора", "update=600000;minvoltage=4;fastvoltage=5", [], [["{modir}/powermodules.php?module={id}", "Конфигурация модуля электромонитора"]], __FILE__);
 
+$PowerModuleModule->BaseClass->InstallFunction = function($modClass) {
+    $modClass->GetSettingORCreate($this, 'PowerCount', '4.56', 'Цена электроэнергии за 1квт');
+};
+
 $PowerModuleModule->BaseClass->InitialFunction = function($modClass) {
     $this->ConstantON("Эектроэнергия", "power", "^power_192.168.1.0_5h; - Возвращает количество потребленных Ватт за последние 5 часов", function($expl) use($modClass): string 
     {
@@ -22,6 +26,13 @@ $PowerModuleModule->BaseClass->InitialFunction = function($modClass) {
 	   }
 	   return array_sum($bdV1);
     }, 3);
+	
+	 $this->ConstantON("Эектроэнергия", "powercount", "^powercount; - Возвращает стоимость эектроэнергии за 1квт", function($expl) use($modClass): string 
+    {
+	   $powerCount = $modClass->GetSettingORCreate($this, 'PowerCount', '4.56', 'Цена электроэнергии за 1квт')->Value;
+	   
+	   return $powerCount;
+    }, 0);
 };
 
 $PowerModuleModule->BaseClass->SettingsFunction = function($modClass) {

@@ -32,14 +32,15 @@ class MichomeAPI
 	   
 	   $this->ConstantON("Переменные", "sv", "^sv_v1_33; - Задает значение локальной переменной", function($expl): string 
 	   {		   
-		   $this->varDefined[$expl[0]] = $expl[1];
-		   return "";
+		   $this->varDefined[$expl[0]] = strval($expl[1]);
+		   return "^end;";
 	   }, 2);
 	   $this->ConstantON("Переменные", "gv", "^gv_v1; - Возвращает значение локальной переменной", function($expl): string|null 
 	   {
-			if(empty($this->varDefined[$expl[0]]))
-				return null;
-		   return $this->varDefined[$expl[0]];
+			if(isset($this->varDefined[$expl[0]]))
+				return $this->varDefined[$expl[0]];
+			$this->AddLog(GatewayID, "Incorrect var constant", "0", "Var ".$expl[0]." is not defined");
+		    return null;
 	   }, 1);
 	   $this->ConstantON("Временные", "unix", "^unix_2023-05-12 11:01:12; - преобразует время в UNIXTime", function($expl): string {return strtotime($expl[0]);}, 1);
 	   $this->ConstantON("Временные", "cd", "^cd; - Возвращает текущее время в виде 2023-05-12 11:01:12", function($expl): string {return date("Y-m-d H:i:s");}, 0);
@@ -143,7 +144,9 @@ class MichomeAPI
 		   return "";
 	   }, 3);
 	   
+	   
 	   foreach($MODs as $tmp){
+		   $tmp->Install($this);
 		   if($tmp->BaseClass->InitialFunction)
 			   $tmp->BaseClass->InitialFunction->call($this, $tmp);
 	   }
@@ -444,7 +447,7 @@ class MichomeAPI
 	public function GetWebConstant($strl){
 		$str = $strl;
 		if(!ValidateConst($str)){
-			$this->AddLog(GatewayID, "Incorrect constant", "0", "Incorrecting constant on: " . $str, date("Y-m-d H:i:s"));
+			$this->AddLog(GatewayID, "Incorrect WEB constant", "0", "Incorrecting WEB constant on: " . $str);
 			return "Ошибка преобразования констант";
 		}
         //^gr_192.168.1.11_Temp_curday;
@@ -503,6 +506,17 @@ class MichomeAPI
 						
             $str = str_ireplace("^pr_".$expl.";", _GenerateHTMLPrognoz($modD, $modT), $str);      
         }
+		
+		//Удалить эту строку
+		//^remline;
+		while(IsStr($str, "^remline")){		
+			$cmd = stripos($str, "^remline;");
+			$firstN = stripos($str, "\n", stripos($str, "^remline;"));
+			$str = str_replace_once("\n", "", $str, $firstN);
+			$firstN = stripos($str, "\r", stripos($str, "^remline;"));
+			$str = str_replace_once("\r", "", $str, $firstN);
+			$str = str_replace_once("^remline;", "", $str); 			
+        }	
 		return $str;
 	}
 	
@@ -513,7 +527,7 @@ class MichomeAPI
     public function GetConstant($strl){
         $str = $strl;		
 		if(!ValidateConst($str)){
-			$this->AddLog(GatewayID, "Incorrect constant", "0", "Incorrecting constant on: " . $str, date("Y-m-d H:i:s"));
+			$this->AddLog(GatewayID, "Incorrect constant", "0", "Incorrecting constant on: " . $str);
 			return "Ошибка преобразования констант";
 		}
 		
@@ -608,10 +622,10 @@ class MichomeAPI
 						$str = str_ireplace($fullName.$expl.";", $rd, $str); 
 				}
 			}
-			if($at++ > 3) {$this->AddLog(GatewayID, "Incorrect constant", "0", "Incorrecting constant on: " . $str, date("Y-m-d H:i:s")); break;}
+			if($at++ > 3) {$this->AddLog(GatewayID, "Incorrect constant", "0", "Incorrecting constant on: " . $str); break;}
 		}
 		
-		//Удалить эту строку
+		//Удалить перенос строки тут
 		//^end;
 		while(IsStr($str, "^end")){		
 			$cmd = stripos($str, "^end;");
@@ -620,7 +634,7 @@ class MichomeAPI
 			$firstN = stripos($str, "\r", stripos($str, "^end;"));
 			$str = str_replace_once("\r", "", $str, $firstN);
 			$str = str_replace_once("^end;", "", $str); 			
-        }	
+        }
 		
         return $str;
     }

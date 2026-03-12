@@ -99,18 +99,18 @@ function postAjax(url, oForm, callback) {
 		b1.value = "Включить";
 		if((pinCMD == 1 && pinType == "Relay") || (pinCMD == 1023 && pinType == "PWM"))
 			b1.className = "selButton";
-		b1.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'setlight?p='+pinID+'%26s='+(pinType == "Relay" ? '1' : '1023'), "", function(){if(pinType == "PWM"){Ranger.value = 1023;} b2.className = ""; b1.className = "selButton";});;};
+		b1.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'setlight%3Fp='+pinID+'%26s='+(pinType == "Relay" ? '1' : '1023'), "", function(){if(pinType == "PWM"){Ranger.value = 1023;} b2.className = ""; b1.className = "selButton";});;};
 		b2.type = "button";
 		b2.value = "Выключить";
 		if(pinCMD == 0)
 			b2.className = "selButton";
-		b2.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'setlight?p='+pinID+'%26s=0', "", function(){if(pinType == "PWM"){Ranger.value=0;} b1.className = ""; b2.className = "selButton";});;};
+		b2.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'setlight%3Fp='+pinID+'%26s=0', "", function(){if(pinType == "PWM"){Ranger.value=0;} b1.className = ""; b2.className = "selButton";});;};
 		spanInputs.append(b1);
 		spanInputs.append(b2);
 		//Ranger.oninput = alert('hh');
 		
 		if(pinType == "PWM"){
-			Ranger.oninput = function(){let val = this.value; let max = this.max; let min = this.min; postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'setlight?p='+pinID+'%26s='+val, "", function(){if(val == min){b1.className = ""; b2.className = "selButton";} else if(val == max) {b2.className = ""; b1.className = "selButton";} else {b1.className = ""; b2.className = "";} });;};
+			Ranger.oninput = function(){let val = this.value; let max = this.max; let min = this.min; postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'setlight%3Fp='+pinID+'%26s='+val, "", function(){if(val == min){b1.className = ""; b2.className = "selButton";} else if(val == max) {b2.className = ""; b1.className = "selButton";} else {b1.className = ""; b2.className = "";} });;};
 		}
 		
 		tr.append(td);
@@ -148,7 +148,7 @@ function postAjax(url, oForm, callback) {
 				
 		b1.type = "button";
 		b1.value = "Старт";
-		b1.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'strobo?p='+pinID+'%26s='+Ranger1.value+'%26t='+Ranger2.value, "", function(){});;};
+		b1.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'strobo%3Fp='+pinID+'%26s='+Ranger1.value+'%26t='+Ranger2.value, "", function(){});;};
 		
 		spanInputs.append(b1);
 		//Ranger.oninput = alert('hh');
@@ -187,7 +187,7 @@ function postAjax(url, oForm, callback) {
 				
 		b1.type = "button";
 		b1.value = "Старт";
-		b1.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'stroboall?s='+Ranger1.value+'%26t='+Ranger2.value, "", function(){});;};
+		b1.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'stroboall%3Fs='+Ranger1.value+'%26t='+Ranger2.value, "", function(){});;};
 		
 		spanInputs.append(b1);
 		//Ranger.oninput = alert('hh');
@@ -202,7 +202,7 @@ function postAjax(url, oForm, callback) {
 	
 	function CreateScriptsAndEffects(){
 		//<tr><td><p>Стробо: <input type="number" min="0" max="100" id="sb4" value="3"><input type="number" min="0" max="500" id="st4" value="30"><input type="button" onclick="Stroboall(document.getElementById('sb4').value, document.getElementById('st4').value)" value="Старт"></p></tr></td>
-		postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'lightscript?type=get', "", function(d){
+		postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'lightscript%3Ftype=get', "", function(d){
 			var linesa = d.split('$');
 			for(var i = 0; i < linesa.length; i++){
 				if(linesa[i].split('|').length < 3) continue;
@@ -226,7 +226,7 @@ function postAjax(url, oForm, callback) {
 				spanText.innerHTML = name + ": ";						
 				b1.type = "button";
 				b1.value = "Выполнить скрипт";
-				b1.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'runscript?s='+id, "", function(){});;};
+				b1.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'runscript%3Fs='+id, "", function(){});;};
 				
 				spanInputs.append(b1);
 				//Ranger.oninput = alert('hh');
@@ -244,7 +244,7 @@ function postAjax(url, oForm, callback) {
 	
 	function CreateEffects(){
 		//<tr><td><p>Стробо: <input type="number" min="0" max="100" id="sb4" value="3"><input type="number" min="0" max="500" id="st4" value="30"><input type="button" onclick="Stroboall(document.getElementById('sb4').value, document.getElementById('st4').value)" value="Старт"></p></tr></td>
-		postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'effects?type=get', "", function(d){
+		postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'effects%3Ftype=get', "", function(d){
 			var linesa = d.split('$');
 			for(var i = 0; i < linesa.length; i++){
 				if(linesa[i].split('|').length < 3) continue;
@@ -268,7 +268,7 @@ function postAjax(url, oForm, callback) {
 				spanText.innerHTML = name + ": ";						
 				b1.type = "button";
 				b1.value = "Управление эффектом";
-				b1.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'effects?type=startstop%26id='+id, "", function(){});;};
+				b1.onclick = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'effects%3Ftype=startstop%26id='+id, "", function(){});;};
 				
 				spanInputs.append(b1);
 				//Ranger.oninput = alert('hh');
@@ -292,84 +292,43 @@ function postAjax(url, oForm, callback) {
 	}
 	
 	function FromLoadPage(){
-		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=getpins&timeout=5000', "", function(d){
-			var lines = d.split("<br />");
-			for(var i = 0; i < lines.length; i++){
-				if(lines[i].split('-').length < 2) continue;
-				let pinID = lines[i].split('-')[0].trim().split('(')[0];
-				let pinType = lines[i].split('-')[1].trim();
-				let pinCMD = lines[i].split('-')[2].trim();
-				
-				CreateLight(pinID, pinType, pinCMD);				
+		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=getpins&timeout=5000&apitype=json', "", function(d){
+			var jsReq = JSON.parse(d);
+			if(jsReq['status']){
+				var lines = jsReq['response'].split("<br />");
+				for(var i = 0; i < lines.length; i++){
+					if(lines[i].split('-').length < 2) continue;
+					let pinID = lines[i].split('-')[0].trim().split('(')[0];
+					let pinType = lines[i].split('-')[1].trim();
+					let pinCMD = lines[i].split('-')[2].trim();
+					
+					CreateLight(pinID, pinType, pinCMD);				
+				}
+				CreatePad();
+				for(var i = 0; i < lines.length; i++){
+					if(lines[i].split('-').length < 2) continue;
+					let pinID = lines[i].split('-')[0].trim().split('(')[0];
+					let pinType = lines[i].split('-')[1].trim();
+					let pinCMD = lines[i].split('-')[2].trim();
+					
+					CreateStrobo(pinID, pinType, pinCMD);				
+				}
+				CreatePad();
+				CreateStroboAll();
+				CreatePad();
+				//CreateScripts();
+				//CreateEffects();	
+				CreateScriptsAndEffects();
 			}
-			CreatePad();
-			for(var i = 0; i < lines.length; i++){
-				if(lines[i].split('-').length < 2) continue;
-				let pinID = lines[i].split('-')[0].trim().split('(')[0];
-				let pinType = lines[i].split('-')[1].trim();
-				let pinCMD = lines[i].split('-')[2].trim();
-				
-				CreateStrobo(pinID, pinType, pinCMD);				
+			else{
+				document.getElementById('components_text').innerHTML = "<h3 style='color: red;'>Ошибка соединения с модулем</h3>";
 			}
-			CreatePad();
-			CreateStroboAll();
-			CreatePad();
-			//CreateScripts();
-			//CreateEffects();	
-			CreateScriptsAndEffects();
 		});
 	}
 	
 	function sleep(ms) {
 		ms += new Date().getTime();
 		while (new Date() < ms){}
-	}
-
-	function sizePic(p, s) {
-		var size = s;
-
-		var host = '<?echo $_SERVER['HTTP_HOST'];?>';
-	
-		if(host != "192.168.1.42"){
-		//console.log('http://<?echo $_SERVER['HTTP_HOST'];?>/michome/api/setcmd.php?device='+ '192.168.1.34' +'&cmd='+ 'setlight?p='+p+'%26s='+size);
-		postAjax('http://<?echo $_SERVER['HTTP_HOST'];?>/michome/api/setcmd.php?device='+ '192.168.1.34' +'&cmd='+ 'setlight?p='+p+'%26s='+size, "", function(){});
-		}
-		else{
-			//console.log('http://192.168.1.34/setlight?p='+p+'&s='+size);
-			postAjax('http://192.168.1.34/setlight?p='+p+'&s='+size, "", function(){});
-		}
-		sleep(500);
-	}
-   
-	function Strobo(p, s, d) {
-	   
-		var size = s;
-
-		var host = '<?echo $_SERVER['HTTP_HOST'];?>';
-		
-		if(host != "192.168.1.42"){
-		//console.log('http://<?echo $_SERVER['HTTP_HOST'];?>/michome/api/setcmd.php?device='+ '192.168.1.34' +'&cmd='+ 'setlight?p='+p+'%26s='+size);
-		postAjax('http://<?echo $_SERVER['HTTP_HOST'];?>/michome/api/setcmd.php?device='+ '192.168.1.34' +'&cmd='+ 'strobo?p='+p+'%26s='+size+'%26t='+d, "", function(){});
-		}
-		else{
-			//console.log('http://192.168.1.34/setlight?p='+p+'&s='+size);
-			postAjax('http://192.168.1.34/strobo?p='+p+'&s='+size+'&t='+d, "", function(){});
-		}	
-	}
-	function Stroboall(s, d) {
-	   
-		var size = s;
-
-		var host = '<?echo $_SERVER['HTTP_HOST'];?>';
-		
-		if(host != "192.168.1.42"){
-		//console.log('http://<?echo $_SERVER['HTTP_HOST'];?>/michome/api/setcmd.php?device='+ '192.168.1.34' +'&cmd='+ 'setlight?p='+p+'%26s='+size);
-		postAjax('http://<?echo $_SERVER['HTTP_HOST'];?>/michome/api/setcmd.php?device='+ '192.168.1.34' +'&cmd='+ 'stroboall?s='+size+'%26t='+d, "", function(){});
-		}
-		else{
-			//console.log('http://192.168.1.34/setlight?p='+p+'&s='+size);
-			postAjax('http://192.168.1.34/stroboall?&s='+size+'&t='+d, "", function(){});
-		}	
 	}
 	
 	window.setTimeout("FromLoadPage()", 1);
@@ -380,9 +339,9 @@ function postAjax(url, oForm, callback) {
 		<div class = "body">
 			<div class = "title_menu">Управление Michome. Управление освещением</div>
 			<div style="text-align: left;" class = "com">
-                <div style="width: 50%; height: auto; text-align: left;" class = "components">
-					<div class = "components_alfa">
-						<div style="width: 100%" class = "components_text">
+                <div style="width: 50%; height: auto; text-align: left;" class="components">
+					<div class="components_alfa">
+						<div style="width: 100%" id="components_text" class="components_text">
 							<table id="changeBR" style="width: 100%; text-align: start; padding: 0; margin: 0; font-size: large; display: inline-block; color: aliceblue;">
 								<tbody>
 								</tbody>

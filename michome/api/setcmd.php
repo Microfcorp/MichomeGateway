@@ -23,6 +23,7 @@ if(isset($_GET['timeout']))
 	$timeout = intval($_GET['timeout']);
 
 $cmd = $_GET['cmd'];
+//$cmd = str_replace("?", "%3F", $cmd);
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, 'http://'.$device.'/'.$cmd);

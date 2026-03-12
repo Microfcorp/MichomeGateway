@@ -4,15 +4,16 @@
 <?
 $API = new MichomeAPI('localhost', $link);
 header("Michome-Page: Logger-Page");
-$countfrompage = 35;
+$countFromPage = 35;
 
 $resultsall = mysqli_query($link, "SELECT COUNT(`id`) FROM logging WHERE 1")->fetch_assoc()['COUNT(`id`)'];
 
 //478167
 
-$page = !empty($_GET['p']) ? ($_GET['p'] * $countfrompage) : (floor($resultsall/$countfrompage) - 1) * $countfrompage;
+$maxPage = ceil($resultsall/($countFromPage));
+$page = !empty($_GET['p']) ? ($_GET['p']) : ($maxPage);
 
-$results = mysqli_query($link, "SELECT * FROM logging WHERE `id` > ".$page . " AND `id` < " . ($page + $countfrompage));
+$results = mysqli_query($link, "SELECT * FROM logging ORDER BY `date` ASC, `id` ASC LIMIT ".$countFromPage." OFFSET ".(($page - 1)*$countFromPage));
 $serv = [];
 while($row = $results->fetch_assoc()) {
     $serv[] = Array($row['id'],$row['ip'],$row['type'],$row['rssi'],$row['log'],$row['date']);
@@ -61,7 +62,7 @@ function GetIPName($id){
                                         <td class='logcell'><b>Дата</b></td>
                                     </tr>
                                     <?
-                                        for($i = 0; $i < $countfrompage && $i < count($serv); $i++){
+                                        for($i = 0; $i < $countFromPage && $i < count($serv); $i++){
                                             echo "<tr>";
                                             echo "<td class='logcell'><b>".$serv[$i][0]."</b></td>";
                                             echo "<td class='logcell' title='".GetIPName($serv[$i][1])."'>".$serv[$i][1]."</td>";
@@ -74,11 +75,11 @@ function GetIPName($id){
                                     ?>
                                 </tbody>
                             </table>
-                            <a href="logger.php?p=<? echo floor($page/$countfrompage - 1); ?>"><<</a>
-                            <a href="logger.php?p=<? echo floor($page/$countfrompage + 1); ?>">>></a>
+                            <a href="logger.php?p=<? echo ($page > 0) ? floor($page - 1) : 0; ?>"><<</a>
+                            <a href="logger.php?p=<? echo ($page < $maxPage) ? floor($page + 1) : $maxPage; ?>">>></a>
                             <br />
-                            <a href="logger.php?p=<? echo floor($resultsall/$countfrompage) - 1; ?>">Последняя</a>
-                            <a href="logger.php?p=<? echo (0); ?>">Первая</a>
+                            <a href="logger.php?p=<? echo $maxPage; ?>">Последняя</a>
+                            <a href="logger.php?p=<? echo (1); ?>">Первая</a>
                             
                         </div>
 					</div>

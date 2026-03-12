@@ -9,12 +9,22 @@ function IsModuleInNetwork(mID){
 	});
 }
 
-function GetFirmwareVersionModule(mID, fun){
+function IsModuleInNetworkCallBack(mID, func){
+	return postAjax('api/setcmd.php?device='+ mID +'&apitype=json&cmd='+ 'getmoduleinfo', "GET", "", function(d){
+		var jsReq = JSON.parse(d);
+		if(!jsReq['status'])
+			func(false);
+		else //Если гуд соеденились
+			func(true);
+	});
+}
+
+function GetFirmwareVersionModule(mID, func){
 	postAjax('api/setcmd.php?device='+ mID +'&cmd='+ 'getmoduleinfo', "GET", "", function(d){
 		if(d.lastIndexOf("Ошибка") != -1)
-			fun(0.0);
+			func(0.0);
 		else //Если гуд соеденились
-			fun(parseFloat(d.split('/n')[9]));
+			func(parseFloat(d.split('/n')[9]));
 	});
 }
 

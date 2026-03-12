@@ -30,12 +30,12 @@ if(isset($_GET['module'])){
 		spanValues.style.color = "indianred";	
 		DescText.style.fontStyle = "italic";
 		
-		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=gettempinfo?nonehtml=1%26id='+id+'&timeout=5000', "GET", "", function(d){
+		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=gettempinfo%3Fnonehtml=1%26id='+id+'&timeout=5000', "GET", "", function(d){
 			spanText.title = d.replaceAll("<br />", "\n");
 			DescText.innerHTML = "<br />Описание термометра " + id + ": <br />" + d;			
 		});
 		
-		let f = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'gettemp?id='+id, "GET", "", function(d){spanValues.innerHTML = d;});};
+		let f = function(){postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'gettemp%3Fid='+id, "GET", "", function(d){spanValues.innerHTML = d;});};
 		window.setInterval(f, 6000);
 		f();
 		
@@ -51,7 +51,7 @@ if(isset($_GET['module'])){
 
 	function initD(){
 		var Did = document.getElementById("selectInit").value;
-		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=inittemp?id='+Did+'&timeout=5000', "GET", "", function(d){
+		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=inittemp%3Fid='+Did+'&timeout=5000', "GET", "", function(d){
 			if(d == "Init Error"){
 				alert("Ошибка инициализации");
 			}
@@ -66,7 +66,7 @@ if(isset($_GET['module'])){
 	
 	function resetD(){
 		var Did = document.getElementById("selectInit").value;
-		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=resettemp?id='+Did+'&timeout=5000', "GET", "", function(d){
+		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=resettemp%3Fid='+Did+'&timeout=5000', "GET", "", function(d){
 			if(d == "Reset Error"){
 				alert("Ошибка сброса");
 			}

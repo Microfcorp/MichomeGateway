@@ -26,7 +26,8 @@ class MichomeModule
 	
 	public function Install($API){
 		if($this->IsInstalled()) return false;
-		$this->BaseClass->InstallFunction->call($API, $this);
+		if($this->BaseClass->InstallFunction)
+			$this->BaseClass->InstallFunction->call($API, $this);
 		file_put_contents(__DIR__."/".$this->Name . "_installed", date("Y-m-d H:i:s"));
 	}
 	
