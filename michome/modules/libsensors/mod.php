@@ -122,6 +122,27 @@ $libSensorsModule->BaseClass->InitialFunction = function($modClass) {
 		return $tmp;
     }, 3);
 	
+	$this->ConstantON("LibSensors", "fanpwm", "^fanpwm_1_2_255; - Управляет скоростью вращения {255} PWM вентилятора {2} системы {1}", function($expl) use($modClass): string 
+    {
+		$fanID = intval($expl[1]);
+		$hwmonID = intval($expl[0]);
+		$pwmValue = max(min(intval($expl[2]), 255), 0);
+		
+		//echo 1 | sudo tee -a /sys/class/hwmon/hwmon1/device/pwm1_enable
+		$pathFan = "/sys/class/hwmon/hwmon$hwmonID/pwm$fanID";
+		if(file_exists($pathFan)){ //Вентилятор есть
+			//запускаем на нем шим
+			exec("echo 1 | sudo tee -a ".$pathFan."_enable");
+			//И даем обороты
+			exec("echo $pwmValue | sudo tee -a ".$pathFan."");
+		}
+		else{
+			$this->AddLog(GatewayID, "LibSensors error", "0", "Fan PWM $fanID on hwmon $hwmonID is not found");
+		}
+		
+		return "";
+    }, 3);
+	
 	$this->ConstantON("LibSensors", "disktemp", "^disktemp_sda1; - Возвращает температуру для диска {sda1}", function($expl) use($modClass): string 
     {
 		$disk = $expl[0];

@@ -322,7 +322,8 @@ class MichomeAPI
 	}
     
 	//Добавляет лог
-    public function AddLog($mID, $type, $rssi, $log, $date){
+    public function AddLog($mID, $type, $rssi, $log, $date = NULL){
+		if($date == NULL) $date = date("Y-m-d H:i:s");
        return _AddLog($this->link, $mID, $type, $rssi, $log, $date);
     }
     

@@ -23,18 +23,19 @@ if($interval == 1){ //Это для минутного крона
 		$Name = $API->GetConstant($row['Name']); //Получаем имя, сразу отпарсив константы
 		$enable = $row['Enable']; //Получаем состояние тогла включения      
 		$ID = $row['ID']; //Получаем ИД     
-		$typeS = '0'; //Тип селектора выполнения (0 - обычный, 1 - действия с кнопкой, 2 - событие включения/выключения системы)
+		$typeS = '0'; //Тип селектора выполнения (0 - обычный, 1 - действия с кнопкой, 2 - событие включения/выключения системы, 3 - else по условию выполняется вне периода)
 	  	
 		if(IsStr($Name, "^bt")) { $enable = '0'; $typeS = '1';} //События с кнопкой выполняются в getpost.php
 		if(IsStr($Name, "^sts")) { $enable = '0'; $typeS = '2';} //События при запуске системы выполняются ниже
+		if(IsStr($Name, "^usefalse")) { $typeS = '3';} //Исполнять else условия, как событие вне периода
 
 		$N = $API->GetIFs($Name, $enable, $ID); //Проверяем все условия
 		$Name = $N[0];
 		$enable = $N[1];        
 		
 		echo $ID . " - ";
-		if($row['Enable'] == "0" && $typeS == '0') echo "Disable toggle <br />"; //Выключено тоглом
-		elseif($enable == "0" && $typeS == '0') echo "Disable ifs <br />"; //Выключено условием
+		if($row['Enable'] == "0" && ($typeS == '0' || $typeS == '3')) echo "Disable toggle <br />"; //Выключено тоглом
+		elseif($enable == "0" && $typeS == '0' && $typeS != '3') echo "Disable ifs <br />"; //Выключено условием
 		elseif($typeS == '1') echo "Button disable <br />"; //Выключено, потому что события кнопки выполняются не здесь
 		elseif($typeS == '2') echo "StartStopSystem disable <br />"; //Выключено, потому что события включения/выключения системы выполняются не здесь
 		else{
@@ -53,7 +54,7 @@ if($interval == 1){ //Это для минутного крона
 			if(IsStr($Name, "^ede;")) $ET = (intval(date("H", $sun_info['sunset']))*60) + intval(date("i", $sun_info['sunset'])); //Конец выполнения по закату                                      
 			            
 			
-			if(($today >= $ST && $today < $ET) && ($CSE+$CSEinterval < $today)){ //Если текущее время больше стартового и меньше конечного
+			if(($today >= $ST && $today < $ET) && ($CSE+$CSEinterval < $today) && ($enable != "0")){ //Если текущее время больше стартового и меньше конечного
 				$data = $API->GetConstant($row['Data']); //Преобразуем константы
 				$data = $API->GetNotification($data); //Отправляем все уведомления
 				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $data.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду и проверяем удачность
@@ -64,12 +65,15 @@ if($interval == 1){ //Это для минутного крона
 					echo "Send ON Error <br />";
 				}
 			}
-			elseif(!($today >= $ST && $today < $ET) && ($today >= $ST && $today < $ET+$interval)){ //Если текущее время не больше стартового и меньше конечного
+			elseif(!($today >= $ST && $today < $ET) && ($today >= $ST && $today < $ET+$interval) || ($enable == "0")){ //Если текущее время не больше стартового и меньше конечного
 				$ndata = $API->GetConstant($row['NData']); //Преобразуем константы
 				$ndata = $API->GetNotification($ndata); //Отправляем все увдомления
 				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $ndata.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду и проверяем удачность
 					mysqli_query($link, "UPDATE `scenes` SET `CSE`='".date("H:i")."' WHERE `ID`=".$ID);//Запоминаем время последней отправки
-					echo "Send OFF Success <br />";
+					if($enable == "0")
+						echo "Send OFF Success from IF Else<br />";
+					else
+						echo "Send OFF Success <br />";
 				}
 				else{
 					echo "Send OFF Error <br />";
