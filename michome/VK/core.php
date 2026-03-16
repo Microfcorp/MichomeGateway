@@ -35,8 +35,8 @@ if(strcmp($data->secret, $secretKey) !== 0 && strcmp($data->type, 'confirmation'
     //Если это уведомление о новом сообщении...
     elseif($data->type == 'message_new' || $data->type == 'message_edit'){
         //...получаем id его автора
-        $userId = $data->object->user_id;
-		$body = $data->object->body;
+        $userId = $data->object->message->from_id;
+		$body = $data->object->message->text;
         
 		if(mb_strtolower($body) == "привет"){
 			MessSend($userId, "Умный дом приветствует тебя",$token);

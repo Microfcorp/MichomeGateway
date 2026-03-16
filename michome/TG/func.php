@@ -51,6 +51,8 @@ function ImageSendTG($chat_id, $text, $imageURL, $reply_markup = '')
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $arrayQuery);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_PROXY, "127.0.0.1:1081");
+		curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
 		curl_setopt($ch, CURLOPT_HEADER, false);
 		$res = curl_exec($ch);
 		curl_close($ch);
@@ -77,6 +79,8 @@ function sendTelegram($method, $response) {
 	curl_setopt($ch, CURLOPT_POST, 1);  
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $response);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_PROXY, "127.0.0.1:1081");
+	curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
 	curl_setopt($ch, CURLOPT_HEADER, false);
 	$res = curl_exec($ch);
 	curl_close($ch);

@@ -5,10 +5,17 @@
 	$API = new MichomeAPI('localhost', $link);
 	
 	if(isset($_GET['id'])){
-		$id = $_GET['id'];
+		$id = intval($_GET['id']);
 		$enable = $_GET['enable'] == "true" ? '1' : '0';
 		
 		mysqli_query($link, "UPDATE `UsersVK` SET `Enable`='$enable' WHERE `ID`=".$id);
+		exit("OK");
+	}
+	elseif(isset($_GET['userid'])){
+		$id = intval($_GET['userid']);
+		$group = mysqli_real_escape_string($link, $_GET['group']);
+		
+		mysqli_query($link, "UPDATE `UsersVK` SET `Type`='$group' WHERE `ID`=".$id);
 		exit("OK");
 	}
 
@@ -21,12 +28,24 @@
 		}
 	}
 	function GroupP($t){
-		if($t == "all"){
-			return "Все";
-		}
-		elseif($t == "general"){
-			return "Основные";
-		}
+		$tmp = "";
+		
+		if($t == "all")
+			$tmp = $tmp . "<option selected value='all'>Первичные (all)</option>";
+		else
+			$tmp = $tmp . "<option value='all'>Первичные (all)</option>";
+		
+		if($t == "general")
+			$tmp = $tmp . "<option selected value='general'>Основные (general)</option>";
+		else
+			$tmp = $tmp . "<option value='general'>Основные (general)</option>";
+		
+		if($t == "warning")
+			$tmp = $tmp . "<option selected value='warning'>Предупредительные (warning)</option>";
+		else
+			$tmp = $tmp . "<option value='warning'>Предупредительные (warning)</option>";
+		
+		return $tmp;
 	}
 	
 	header("Michome-Page: NotificationSettings");   
@@ -41,6 +60,15 @@
 		<script>			
 			function Edit(id, state){
 				postAjax('?id='+id+"&enable="+state, "GET", "", function(d){});
+			}
+			function EditGroup(id, group){
+				postAjax('?userid='+id+"&group="+group, "GET", "", function(d){});
+			}
+			function sendMessage(id){
+				const mes = prompt("Введите сообщение (имеется поддержка констант)");
+				if(mes != null){
+					postAjax('api/sendnotification.php?enableconstant=1&id='+id, "POST", 'text='+mes, function(d){});
+				}
 			}
 		</script>
 	</head>
@@ -59,11 +87,13 @@
 							echo "<tr>
 							<td class='scenesT'><i>".$row['ID']."</i></td>
 							<td></td>
-							<td class='scenesT'>".GroupP($row['Type'])."</td>
+							<td class='scenesT'><select style='height: 25px; border-radius: 10px;' onchange='EditGroup(".$row['ID'].", this.value); return false;'>".GroupP($row['Type'])."</select></td>
 							<td></td>
 							<td class='scenesT'>".MessangerP($row['Messanger'])."</td>
 							<td></td>
 							<td class='scenesT'><div class='checkbox-toggle'><input id='cbx-".$row['ID']."' onchange='Edit(".$row['ID'].", this.checked);' style='width: 30px'" . ($row['Enable']=="1" ? "checked" : "") . " type='checkbox' /><label for='cbx-".$row['ID']."' class='CToggle'><span></span></label></div></td>
+							<td></td>
+							<td class='scenesT'><button style='height: 25px; border-radius: 10px; width: max-content;' onclick='sendMessage(".$row['ID']."); return false;'>Отправить сообщение</button></td>
 							</tr>";
 						} 
 					?>
