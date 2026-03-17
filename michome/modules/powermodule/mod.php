@@ -7,7 +7,7 @@ $PowerModuleModule->BaseClass->InstallFunction = function($modClass) {
 };
 
 $PowerModuleModule->BaseClass->InitialFunction = function($modClass) {
-    $this->ConstantON("Эектроэнергия", "power", "^power_192.168.1.0_5h; - Возвращает количество потребленных Ватт за последние 5 часов", function($expl) use($modClass): string 
+    $this->ConstantON("Электроэнергия", "power", "^power_192.168.1.0_5h; - Возвращает количество потребленных Ватт за последние 5 часов", function($expl) use($modClass): string 
     {
 	   $unixH = 60*60-600;
 	   $bdData = $this->GetFromEndData(str_ireplace("-", "_", $expl[0]), $expl[1]);
@@ -27,7 +27,7 @@ $PowerModuleModule->BaseClass->InitialFunction = function($modClass) {
 	   return array_sum($bdV1);
     }, 3);
 	
-	 $this->ConstantON("Эектроэнергия", "powercount", "^powercount; - Возвращает стоимость эектроэнергии за 1квт", function($expl) use($modClass): string 
+	 $this->ConstantON("Электроэнергия", "powercount", "^powercount; - Возвращает стоимость эектроэнергии за 1квт", function($expl) use($modClass): string 
     {
 	   $powerCount = $modClass->GetSettingORCreate($this, 'PowerCount', '4.56', 'Цена электроэнергии за 1квт')->Value;
 	   

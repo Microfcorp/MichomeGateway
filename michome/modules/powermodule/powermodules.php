@@ -10,7 +10,7 @@ if(isset($_GET['module'])){
 ?>
 <html>
 <head>
-<title>Управление метеостанцией</title>
+<title>Управление энергомонитором</title>
 <link rel="stylesheet" type="text/css" href="styles/style.css"/>
 <script type="text/javascript" src="/site/MicrofLibrary.js"></script>
 <script type="text/javascript" src="libmichome.js"></script>
@@ -30,9 +30,9 @@ if(isset($_GET['module'])){
 		let spanValues2 = document.createElement('span');
 		let DescText = document.createElement('span');		
 		
-		spanText.innerHTML = "Температура с термометра " + num + ": ";
-		spanText1.innerHTML = "Влажность с гигрометра " + num + ": ";		
-		spanText2.innerHTML = "Давление с барометра " + num + ": ";		
+		spanText.innerHTML = "Напряжение " + num + ": ";
+		spanText1.innerHTML = "Ток " + num + ": ";		
+		spanText2.innerHTML = "Мощность " + num + ": ";		
 		spanValues.style.color = "indianred";	
 		spanValues.style.fontWeight = "bold";	
 		spanValues1.style.color = "indianred";	
@@ -42,7 +42,7 @@ if(isset($_GET['module'])){
 		DescText.style.fontStyle = "italic";
 		DescText.style.color = "aquamarine";
 		
-		postAjax('/michome/api/setcmd.php?device='+moduleAddress+'&cmd=getmeteoinfo%3Fnonehtml=1%26id='+id+'&timeout=5000', "GET", "", function(d){
+		postAjax('/michome/api/setcmd.php?device='+moduleAddress+'&cmd=getpminfo%3Fnonehtml=1%26id='+id+'&timeout=5000', "GET", "", function(d){
 			spanText.title = d.replaceAll("<br />", "\n");
 			spanText1.title = d.replaceAll("<br />", "\n");
 			spanText2.title = d.replaceAll("<br />", "\n");
@@ -50,19 +50,21 @@ if(isset($_GET['module'])){
 		});
 		
 		let f = function(){
-			postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'getmeteo%3Fid='+id+"%26nonehtml=1&timeout=2500", "GET", "", function(d)
+			postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'getpm%3Fid='+id+"%26nonehtml=1&timeout=2500", "GET", "", function(d)
 			{
 				var dataRead = [false, false, false];
-				var ds = d.split('\n');
-				
-				for(var i = 0; i < ds.length; i++){
-					if(IsStr(ds[i], "C"))
-						dataRead[0] = ds[i];
-					if(IsStr(ds[i], "%"))
+				var ds = d.split(',');
+				dataRead[0] = ds[0];
+				dataRead[1] = ds[1];
+				dataRead[2] = ds[2];
+				/*for(var i = 0; i < ds.length; i++){
+					if(IsStr(ds[i], "V"))
+						
+					if(IsStr(ds[i], "A"))
 						dataRead[1] = ds[i];
-					if(IsStr(ds[i], "мм.рт.ст"))
+					if(IsStr(ds[i], "w"))
 						dataRead[2] = ds[i];
-				}
+				}*/
 				
 				if(dataRead[0]){
 					spanValues.innerHTML = dataRead[0] + "  ";
@@ -114,7 +116,7 @@ if(isset($_GET['module'])){
 
 	function initD(){
 		var Did = document.getElementById("selectInit").value;
-		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=initmeteo%3Fid='+Did+'&timeout=5000', "GET", "", function(d){
+		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=initpm%3Fid='+Did+'&timeout=5000', "GET", "", function(d){
 			if(d == "Init Error"){
 				alert("Ошибка инициализации");
 			}
@@ -129,7 +131,7 @@ if(isset($_GET['module'])){
 	
 	function resetD(){
 		var Did = document.getElementById("selectInit").value;
-		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=resetmeteo%3Fid='+Did+'&timeout=5000', "GET", "", function(d){
+		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=resetpm%3Fid='+Did+'&timeout=5000', "GET", "", function(d){
 			if(d == "Reset Error"){
 				alert("Ошибка сброса");
 			}
@@ -149,7 +151,7 @@ if(isset($_GET['module'])){
 		}
 		//alert(GetFirmwareVersionModule(moduleAddress));
 		//if(GetFirmwareVersionModule(moduleAddress) >= 1.63){
-			postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=meteoenable&timeout=5000', "GET", "", function(d){
+			postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=pmenable&timeout=5000', "GET", "", function(d){
 				var ids = d.split(',');
 				for(var i = 0; i < ids.length; i++){								
 					CreateMeteo(ids[i], i);	
@@ -165,7 +167,7 @@ if(isset($_GET['module'])){
 				}			
 			});
 			
-			postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=countmeteo&timeout=5000', "GET", "", function(d){
+			postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=countpm&timeout=5000', "GET", "", function(d){
 				for(var i = 0; i < parseInt(d); i++){	
 							
 				}			
@@ -181,7 +183,7 @@ if(isset($_GET['module'])){
 <body>
 		<div class = "body_alfa"></div>
 		<div class = "body">
-			<div class = "title_menu">Управление Michome. Управление метеостанцией</div>
+			<div class = "title_menu">Управление Michome. Управление энергомонитором</div>
 			<div style="text-align: left;" class = "com">
                 <div style="width: 100%; height: auto; text-align: left;" class = "components">
 					<div class = "components_alfa">

@@ -679,6 +679,36 @@ class MichomeAPI
             
             $str = str_ireplace("^bt_".$expl.";", $rd, $str);      
         }
+		while(IsStr($str, "^pw")){
+            $expl = substr($str, stripos($str, "^pw")+4, (stripos($str, ";", stripos($str, "^pw")) - (stripos($str, "^pw")+4)));
+            
+            if(count(explode('_', $expl)) == 2) $fullif = '0';
+            elseif(count(explode('_', $expl)) == 3) $fullif = '3';
+            else $fullif = '2';
+            
+            $md = explode('_', $expl)[0];                                   
+                       
+            if($fullif == '3'){
+                $pi = explode('_', $expl)[1];
+                $co = explode('_', $expl)[2];           
+                if($m == $md & $pi == $p & $co == $c) $rd = '1';
+                else $rd = '0';                   
+                $rd = "^if_".$rd."==1;";
+            }
+            elseif($fullif == '0'){
+                $pi = explode('_', $expl)[1];
+                if($m == $md & $pi == $p) $rd = '1';
+                else $rd = '0';                   
+                $rd = "^if_".$rd."==1;";
+            }
+            else{
+                if($m == $md) $rd = '1';
+                else $rd = '0';                   
+                $rd = "^if_".$rd."==1;";
+            }          
+            
+            $str = str_ireplace("^pw_".$expl.";", $rd, $str);      
+        }
         return $str;
     }
     public function GetIFs($strl, $enb, $id = 0){

@@ -118,7 +118,7 @@ if($ModuleRoom != false && $ModuleID != false){ //Для перемещения 
 
 if($ModuleTime != false){ //Для проверки архивности данных
 	if($ModuleTime > 1719475970){ //Значение адеквотно и модуль точно скачал свое время
-		if(time() - $ModuleTime >= 60){ //Значение уходит в архив больше, чем на минуту
+		if(time() - $ModuleTime >= 90){ //Значение уходит в архив больше, чем на полторы минутф
 			//Меняем временную метку этих данных на архивную с модуля
 			$date = date("Y-m-d H:i:s", $ModuleTime);
 			$isArchive = "1";
@@ -214,7 +214,7 @@ if(!$isMods){ //Обработка стандартных модулей
 		$type = $obj->{'data'}->{'data'};
 		$message = "Text=Informetr: ".$type.";";
 		
-		$API->AddLog($ModuleID, 'Informetr', $rsid, $message, $date);
+		//$API->AddLog($ModuleID, 'Informetr', $rsid, $message, $date);
 		
 		if($type == "GetData"){
 
@@ -245,13 +245,15 @@ if(!$isMods){ //Обработка стандартных модулей
 			$na = $row['Name'];
 			$na = str_replace("^cbp;", $count, $na);
 			$na = str_replace("^pbp;", $pin, $na);
+			$na = str_replace("^cse;", $row['Timeout'], $na);
 			
 			$N = $API->GetIFs($API->GetButton($API->GetConstant($na), $ip, $pin, $count), $row['Enable'], $row['ID']);
 			$Name = $N[0];
 			if($N[1] != "0"){ //Если выполнены все условия
-				$data = $API->GetConstant($row['Data']);
 				$data = str_replace("^cbp;", $count, $data);
 				$data = str_replace("^pbp;", $pin, $data);
+				$data = str_replace("^cse;", $row['Timeout'], $data);
+				$data = $API->GetConstant($row['Data']);				
 				
 				$API->GetNotification($data);
 				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $data.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду
@@ -263,10 +265,42 @@ if(!$isMods){ //Обработка стандартных модулей
 		//$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `dawlen`, `visota`, `date`) VALUES ('$ip', 'get_button_press','$status','','','','','$date')"; 
 		//$result = mysqli_query($link, $guery);
 	}
+	elseif($type == "pin_waiter"){//Событие триггера пина
+		$status = $obj->{'data'}->{'status'};
+		$pin = explode('=',$status)[0];
+		$state = explode('=',$status)[1];
+
+		$results = mysqli_query($link, "SELECT * FROM `scenes` WHERE `Enable`=1 AND `Name` LIKE '%^pw%%".$ip."%'");//Жестко качаем все, где есть кнопка из БД
+		while($row = $results->fetch_assoc()) {
+			$na = $row['Name'];
+			$na = str_replace("^spw;", $state, $na);
+			$na = str_replace("^pbp;", $pin, $na);
+			$na = str_replace("^cse;", $row['Timeout'], $na);
+			
+			$N = $API->GetIFs($API->GetButton($API->GetConstant($na), $ip, $pin, $state), $row['Enable'], $row['ID']);
+			$Name = $N[0];
+			if($N[1] != "0"){ //Если выполнены все условия
+				$data = str_replace("^spw;", $state, $data);
+				$data = str_replace("^pbp;", $pin, $data);
+				$data = str_replace("^cse;", $row['Timeout'], $data);
+				$data = $API->GetConstant($row['Data']);				
+				
+				$API->GetNotification($data);
+				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $data.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду
+					mysqli_query($link, "UPDATE `scenes` SET `CSE`='".date("H:i")."' WHERE `ID`=".$row['ID']);//Запоминаем время работы
+				}
+			}
+		}
+		
+		$data = $data . "pin".$pin."=".$state;
+		
+		$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `dawlen`, `visota`, `date`) VALUES ('$ip', 'pin_waiter','$data','','','','','$date')"; 
+		$result = mysqli_query($link, $guery);
+	}
 	elseif($type == "StudioLight"){	//Модуль освещения
 		$status = $obj->{'data'}->{'status'};
 		
-		$API->AddLog($ModuleID, 'StudioLight', $rsid, 'Text=OK;', $date);
+		//$API->AddLog($ModuleID, 'StudioLight', $rsid, 'Text=OK;', $date);
 	}
 	elseif($type == "Log"){	//Лог
 		$status = "Text=" . $obj->{'data'}->{'log'} . ";";

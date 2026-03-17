@@ -20,7 +20,8 @@ if($interval == 1){ //Это для минутного крона
 
 	$results = mysqli_query($link, "SELECT * FROM `scenes`");//Жестко качаем все из БД
 	while($row = $results->fetch_assoc()) {
-		$Name = $API->GetConstant($row['Name']); //Получаем имя, сразу отпарсив константы
+		$Name = str_replace("^cse;", $row['Timeout'], $row['Name']);
+		$Name = $API->GetConstant($Name); //Получаем имя, сразу отпарсив константы
 		$enable = $row['Enable']; //Получаем состояние тогла включения      
 		$ID = $row['ID']; //Получаем ИД     
 		$typeS = '0'; //Тип селектора выполнения (0 - обычный, 1 - действия с кнопкой, 2 - событие включения/выключения системы, 3 - else по условию выполняется вне периода)
@@ -46,7 +47,7 @@ if($interval == 1){ //Это для минутного крона
 			$CSE = (intval(explode(':', $row['CSE'])[0])*60) + intval(explode(':', $row['CSE'])[1]); //Получаем время последней отправки						
 
 			$sun_info = $API->GetSunInfo();
-			
+
 			if(IsStr($Name, "^sds;")) $ST = (intval(date("H", $sun_info['sunrise']))*60) + intval(date("i", $sun_info['sunrise'])); //Начало выполнения по рассвету
 			if(IsStr($Name, "^sde;")) $ST = (intval(date("H", $sun_info['sunset']))*60) + intval(date("i", $sun_info['sunset'])); //Начало выполнения по закату
 			
@@ -55,7 +56,8 @@ if($interval == 1){ //Это для минутного крона
 			            
 			
 			if(($today >= $ST && $today < $ET) && ($CSE+$CSEinterval < $today) && ($enable != "0")){ //Если текущее время больше стартового и меньше конечного
-				$data = $API->GetConstant($row['Data']); //Преобразуем константы
+				$data = str_replace("^cse;", $CSEinterval, $row['Data']);
+				$data = $API->GetConstant($data); //Преобразуем константы
 				$data = $API->GetNotification($data); //Отправляем все уведомления
 				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $data.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду и проверяем удачность
 					mysqli_query($link, "UPDATE `scenes` SET `CSE`='".date("H:i")."' WHERE `ID`=".$ID); //Записывает время последней отправки
@@ -66,7 +68,8 @@ if($interval == 1){ //Это для минутного крона
 				}
 			}
 			elseif(!($today >= $ST && $today < $ET) && ($today >= $ST && $today < $ET+$interval) || ($enable == "0")){ //Если текущее время не больше стартового и меньше конечного
-				$ndata = $API->GetConstant($row['NData']); //Преобразуем константы
+				$ndata = str_replace("^cse;", $CSEinterval, $row['NData']);
+				$ndata = $API->GetConstant($ndata); //Преобразуем константы
 				$ndata = $API->GetNotification($ndata); //Отправляем все увдомления
 				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $ndata.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду и проверяем удачность
 					mysqli_query($link, "UPDATE `scenes` SET `CSE`='".date("H:i")."' WHERE `ID`=".$ID);//Запоминаем время последней отправки
