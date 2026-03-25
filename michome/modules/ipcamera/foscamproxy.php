@@ -20,11 +20,12 @@
 	$cmd = trim($cmd, " \\/");
 	curl_setopt($ch, CURLOPT_URL, 'http://'.$cmd);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 300);
-	curl_setopt($ch, CURLOPT_TIMEOUT_MS, 300);
+	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 1500);
+	curl_setopt($ch, CURLOPT_TIMEOUT_MS, 1500);
 	curl_setopt($ch, CURLOPT_USERPWD, $login.":".$pass);  
 	$m = @curl_exec($ch);
 	curl_close($ch);
+	
 	header('Content-Length: '.strlen(($m)));
 	if(IsStr($cmd, ".jpg")){
 		

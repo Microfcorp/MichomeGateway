@@ -191,7 +191,10 @@ if(!$isMods){ //Обработка стандартных модулей
 		$hummmain = -1;
 		$dawlenmain = 0;
 		for($i = 0; $i < count($meteo); $i++){		
-			if(intval($meteo[$i][0]) > 1024 || intval($meteo[$i][1]) > 1024) continue;	
+			if(intval($meteo[$i][0]) > 1024 || intval($meteo[$i][1]) > 1024 || intval($meteo[$i][0]) < -100 || intval($meteo[$i][1]) < 0){				
+				$API->AddLog($ModuleID, $type, $rsid, "Text=Error validation MeteoStation data. Sensors: {$i}, Data: ".$meteo[$i].";", $date);
+				continue;
+			}
 			$data = $data . "Temp".$i."=".$meteo[$i][0].((isset($meteo[$i][1]) && intval($meteo[$i][1]) != 0) ? (";Humm".$i."=".$meteo[$i][1]) : "").((isset($meteo[$i][2]) && intval($meteo[$i][2]) != 0) ? (";Dawlen".$i."=".$meteo[$i][2]) : "").";";
 
 			if($tempmain == -1 && $hummmain == -1){

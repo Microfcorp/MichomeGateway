@@ -6,6 +6,9 @@
  * @version 1.0
  * @desc A simple class to help you in developing an ONVIF compliant client
  
+ * FIX LEXAP
+ * CURLOPT_CONNECTTIMEOUT - Change to 3 Seconds
+ 
  * FIX by KuroNeko 03.03.2017
  * getBaseUrl() - fixed "baseuri"
  * _getProfileData() - added "profilename" and fixed "profiletoken"
@@ -945,8 +948,8 @@ class Ponvif {
 		  if ($this->proxyusername!='' && $this->proxypassword!='')
 		    curl_setopt($soap_do, CURLOPT_PROXYUSERPWD, $this->proxyusername.':'.$this->proxypassword);
 		}
-		curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
-		curl_setopt($soap_do, CURLOPT_TIMEOUT,        10);
+		curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 3);
+		curl_setopt($soap_do, CURLOPT_TIMEOUT,        3);
 		curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);

@@ -18,13 +18,39 @@ $IPCameraModule->BaseClass->SettingsFunction = function($modClass) {
 	
 	$onvif = new Ponvif();
 	
+	echo "<script>
+			function testCamera(id, name, val){
+				const camParams = val.split('|');
+				if(camParams.length < 4){
+					asyncAlert(\"Ошибка! Неправильно заполнены параметры камеры\");
+					return false;
+				}
+				
+				const camType = camParams[1];
+				if(camType == \"onvif\"){
+					postAjax('/michome/modules/ipcamera/testonvif.php?ip='+camParams[0]+'&login='+camParams[2]+'&password='+camParams[3], 'POST', '', function(d){
+						camDiv.innerHTML = d;
+						camDialog.showModal();
+					});
+				}
+				else if(camType == \"foscam\"){
+					camDiv.innerHTML = \"<img width='480px' height='320px' src='/michome/modules/ipcamera/foscamproxy.php?cmd=\"+camParams[0]+\"/tmpfs/snap.jpg&login=\"+camParams[2]+\"&password=\"+camParams[3]+\"' />\";
+					camDialog.showModal();
+				}
+			}
+		 </script>";
+	
     echo "Мод добавляет новые функции для работы с ONVIF и FOSCAM IP камерами";
 	
 	echo "<p>Настройка камер:</p><table><tr><td><b>ID камеры</b></td><td><span title='Список параметров, разделенных | . Список параметров: IP камеры и порт, тип камеры (onvif, foscam), логин, пароль'><b>Значение параметра</b></span></td></tr>";
 	foreach($modClass->GetParamsType($this, "ManageCamera") as $tmp){
-		echo "<tr><td class='scenesT'><input id='name".$tmp->ID."' style='width:150px;height:20px;' type='text' value='".$tmp->ParamName."'></td><td class='scenesT'><input id='val".$tmp->ID."' style='width:500px;height:20px;' type='text' value='".$tmp->ParamValue."'></td><td class='scenesT'><input type='button' onclick='saveParam(".$tmp->ID.", name".$tmp->ID.".value, val".$tmp->ID.".value)' value='Сохранить'></td><td class='scenesT'><input onclick='removeParam(".$tmp->ID.")' type='button' value='Удалить'></td></tr>";
+		echo "<tr><td class='scenesT'><input id='name".$tmp->ID."' style='width:150px;height:20px;' type='text' value='".$tmp->ParamName."'></td><td class='scenesT'><input id='val".$tmp->ID."' style='width:500px;height:20px;' type='text' value='".$tmp->ParamValue."'></td><td class='scenesT'><input type='button' onclick='saveParam(".$tmp->ID.", name".$tmp->ID.".value, val".$tmp->ID.".value)' value='Сохранить'></td><td class='scenesT'><input onclick='saveParamSilent(".$tmp->ID.", name".$tmp->ID.".value, val".$tmp->ID.".value); testCamera(".$tmp->ID.", name".$tmp->ID.".value, val".$tmp->ID.".value);' type='button' value='Тест'></td><td class='scenesT'><input onclick='removeParam(".$tmp->ID.")' type='button' value='Удалить'></td></tr>";
 	}
-	echo "<tr><td><input onclick='addParam(\"ManageCamera\")' type='button' value='Добавить камеру'></td></tr></table>";
+	echo "<tr><td></td></tr><tr><td><input class='sb' onclick='addParam(\"ManageCamera\")' type='button' value='Добавить камеру'></td></tr></table>";
+	
+	echo "
+			<dialog class='moduleSetting' style='padding: 16px; margin: auto; background-color: #3d3d3d;' id='camDialog'><div id='camDiv'></div><br /><button class='sb' onclick='camDialog.close();'>Закрыть</button></dialog>
+		 ";
 };
 
 $IPCameraModule->BaseClass->InstallFunction = function($modClass) {
@@ -50,7 +76,12 @@ $IPCameraModule->BaseClass->InitialFunction = function($modClass) {
 			$sources = $onvif->getSources();
 			$profileToken = $sources[0][$stream]['profiletoken'];
 			$mediaUri = $onvif->media_GetSnapshotUri($profileToken);
-			return $mediaUri;		
+			$mediaUri = str_ireplace("_", "--", mediaUri);
+			$mediaUri = str_replace("http://", "", $mediaUri);
+			$mediaUri = str_replace("https://", "", $mediaUri);
+			$mediaUri = str_replace("?", "%3F", $mediaUri);
+			$mediaUri = str_replace("&", "%26", $mediaUri);
+			return "http://".(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $this->Gateway).(!IsStr($_SERVER['HTTP_HOST'], ":") ? ":".$this->portServer : "")."/michome/modules/ipcamera/foscamproxy.php?cmd=".$mediaUri."&login=".$camera[2]."&password=".$camera[3];		
 		   }
 		   elseif($camera[1] == "foscam"){	    
 			return "http://".(isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $this->Gateway).(!IsStr($_SERVER['HTTP_HOST'], ":") ? ":".$this->portServer : "")."/michome/modules/ipcamera/foscamproxy.php?cmd=".$camera[0]."/tmpfs/snap.jpg&login=".$camera[2]."&password=".$camera[3];		

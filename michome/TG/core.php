@@ -87,7 +87,9 @@ if (!empty($data['message']['text'])) {
 				$txt = [];
 				$ret = $tmp["Cmd"];
 				$ret = $API->GetConstant($ret);
-				while(IsStr($ret, "^img")){
+				$attempt = 0;
+				while(IsStr($ret, "^img") && $attempt < MaximumSendIMGAttempts){
+					$attempt++;
 					$expl = substr($ret, stripos($ret, "^img_")+5, (stripos($ret, ";", stripos($ret, "^img_")) - (stripos($ret, "^img_")+5)));     
 					$cap = str_ireplace("--", "_", explode('_', $expl)[0]);
 					$url = str_ireplace("--", "_", explode('_', $expl)[1]);

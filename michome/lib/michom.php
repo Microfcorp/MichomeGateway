@@ -2,6 +2,8 @@
 set_time_limit(5);
 define("ServerPath", __DIR__."/../");
 define("GatewayID", "Gateway");
+define("MaximumSendIMGAttempts", 10);
+define("StandartCountPromPage", 30);
 $MODs = array();
 //require_once("/var/www/html/site/mysql.php");
 require_once("_settings.php");
@@ -855,5 +857,19 @@ function AutoNewLine($text, $fontsize, $width){
 function str_replace_once($search, $replace, $text, $startPos = 0){ 
    $pos = strpos($text, $search, $startPos); 
    return $pos!==false ? substr_replace($text, $replace, $pos, strlen($search)) : $text; 
+}
+
+function ParseParameters($text){
+	$tmpRt = [];
+	
+	$arr = explode(";", $text);
+	foreach($arr as $tmp){
+		$splitParams = explode("=", $tmp);
+		if(count($splitParams) < 2) continue;
+		$na = $splitParams[0];
+		$va = $splitParams[1];
+		$tmpRt[$na] = $va;
+	}
+	return $tmpRt;
 }
 ?>

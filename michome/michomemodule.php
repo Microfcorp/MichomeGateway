@@ -49,6 +49,9 @@ elseif(isset($_GET['remove'])){
 					alert(d);
 				});
 			}
+			function saveParamSilent(id, name, val){
+				postAjax('michomemodule.php?edit=1&id='+ id+"&mod=<?echo $mod;?>&silent=1", "POST", "name="+name.replace( /&/g, "%26" )+"&"+"value="+val.replace( /&/g, "%26" ), function(d){});
+			}
 			function addParam(paramtype){
 				postAjax('michomemodule.php?add=1&paramtype='+ paramtype+"&mod=<?echo $mod;?>", "POST", "", function(d){
 					document.location.reload();

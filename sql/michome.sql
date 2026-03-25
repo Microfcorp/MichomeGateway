@@ -109,7 +109,6 @@ CREATE TABLE `logging` (
   `log` text NOT NULL,
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id_2` (`id`),
   KEY `id` (`id`),
   KEY `date` (`date`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Данные логирования';
