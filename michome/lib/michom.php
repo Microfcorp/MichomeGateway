@@ -24,6 +24,7 @@ class MichomeAPI
 	public $constantAction = array();
 	public $varDefined = array();
 	public $portServer = 80;
+	public $standartCountRequests = 4;
     
     // объявление метода
     public function __construct($Gateway, $link) {
@@ -31,6 +32,7 @@ class MichomeAPI
        $this->Gateway = $Gateway;
        $this->link = $link;
 	   $this->portServer = $this->GetSettingORCreate('ServerPort', '80', 'Порт сервера Michome')->Value;	  
+	   $this->standartCountRequests = $this->GetSettingORCreate('ModulesRequests', '4', 'Ограничение запросов от модулей')->Value;	  
 	   
 	   $this->ConstantON("Переменные", "sv", "^sv_v1_33; - Задает значение локальной переменной", function($expl): string 
 	   {		   
