@@ -579,10 +579,16 @@ class MichomeAPI
             $rd = $this->GetFromEndData(str_ireplace("-", "_", explode('_', $expl)[0]), explode('_', $expl)[2])->SelectFloat(explode('_', $expl)[1]);
 			//$max = max($rd);
 			//$min = min($rd);
-			list($m1, $m2) = array_chunk($rd, ceil(count($rd)/2));
-            //$rd = round($rd[count($rd) - 1] - $rd[0], 2);
-            $rd = round(min($m2) - max($m1), 2);
-            $str = str_ireplace("^rmamp_".$expl.";", $rd, $str);      
+			
+			if(count($rd) > 0){
+				list($m1, $m2) = array_chunk($rd, ceil(count($rd)/2));
+				//$rd = round($rd[count($rd) - 1] - $rd[0], 2);
+				$rd = round(min($m2) - max($m1), 2);
+			}
+			else{
+				$rd = "0";
+			}	
+			$str = str_ireplace("^rmamp_".$expl.";", $rd, $str);
         }
 		//Отправить запрос на модуля
 		//^send_192.168.1.14_meteo;

@@ -76,12 +76,14 @@ function _GetFromEndData($link, $ip, $count){
 	if(count($ret) > 0)
 		return new BDDataCollection($ret);
 
+	//echo "SELECT * FROM logging WHERE ip = '$ip' $sortBD ORDER BY `id` DESC LIMIT 1";
+
     if(is_valid_ip($ip))
-        $results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = (SELECT t.mID FROM modules AS t WHERE t.ip = '$ip' ORDER BY t.id DESC LIMIT 1) ORDER BY `id` DESC LIMIT ".$count);
+        $results = mysqli_query($link, "SELECT * FROM logging WHERE `ip` = (SELECT t.mID FROM modules AS t WHERE t.ip = '$ip' ORDER BY t.id DESC LIMIT 1) $sortBD ORDER BY `id` DESC LIMIT 1");
     else if($ip == '1')
-		$results = mysqli_query($link, "SELECT * FROM logging WHERE 1 ORDER BY `id` DESC LIMIT ".$count);
+		$results = mysqli_query($link, "SELECT * FROM logging WHERE 1 $sortBD ORDER BY `id` DESC LIMIT 1");
 	else
-        $results = mysqli_query($link, "SELECT * FROM logging WHERE ip = '$ip' ORDER BY `id` DESC LIMIT ".$count);
+        $results = mysqli_query($link, "SELECT * FROM logging WHERE ip = '$ip' $sortBD ORDER BY `id` DESC LIMIT 1");
     
     while($row = $results->fetch_assoc()) {
         if($row['id'] != "")
