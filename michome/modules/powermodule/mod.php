@@ -11,6 +11,8 @@ $PowerModuleModule->BaseClass->InitialFunction = function($modClass) {
     {
 	   $unixH = 60*60-600;
 	   $bdData = $this->GetFromEndData(str_ireplace("-", "_", $expl[0]), $expl[1]);
+	   if($bdData->IsNull())
+		   return 0;
 	   $bdV = $bdData->SelectFloat("power");
 	   $bdV1 = [];
 	   $bdD = $bdData->SelectUnixTime();	   
