@@ -266,13 +266,14 @@ if(!$isMods){ //Обработка стандартных модулей
 			$N = $API->GetIFs($API->GetButton($API->GetConstant($na), $ip, $pin, $count), $row['Enable'], $row['ID']);
 			$Name = $N[0];
 			if($N[1] != "0"){ //Если выполнены все условия
-				$data = str_replace("^cbp;", $count, $data);
-				$data = str_replace("^pbp;", $pin, $data);
-				$data = str_replace("^cse;", $row['Timeout'], $data);
-				$data = $API->GetConstant($row['Data']);				
+				$data_alt = $row['Data'];
+				$data_alt = str_replace("^cbp;", $count, $data_alt);
+				$data_alt = str_replace("^pbp;", $pin, $data_alt);
+				$data_alt = str_replace("^cse;", $row['Timeout'], $data_alt);
+				$data_alt = $API->GetConstant($data_alt);				
 				
-				$API->GetNotification($data);
-				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $data.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду
+				$API->GetNotification($data_alt);
+				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $data_alt.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду
 					mysqli_query($link, "UPDATE `scenes` SET `CSE`='".date("H:i")."' WHERE `ID`=".$row['ID']);//Запоминаем время работы
 				}
 			}
@@ -296,13 +297,14 @@ if(!$isMods){ //Обработка стандартных модулей
 			$N = $API->GetIFs($API->GetButton($API->GetConstant($na), $ip, $pin, $state), $row['Enable'], $row['ID']);
 			$Name = $N[0];
 			if($N[1] != "0"){ //Если выполнены все условия
-				$data = str_replace("^spw;", $state, $data);
-				$data = str_replace("^pbp;", $pin, $data);
-				$data = str_replace("^cse;", $row['Timeout'], $data);
-				$data = $API->GetConstant($row['Data']);				
+				$data_alt = $row['Data'];
+				$data_alt = str_replace("^spw;", $state, $data_alt);
+				$data_alt = str_replace("^pbp;", $pin, $data_alt);
+				$data_alt = str_replace("^cse;", $row['Timeout'], $data_alt);
+				$data_alt = $API->GetConstant($data_alt);				
 				
-				$API->GetNotification($data);
-				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $data.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду
+				$API->GetNotification($data_alt);
+				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $data_alt.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду
 					mysqli_query($link, "UPDATE `scenes` SET `CSE`='".date("H:i")."' WHERE `ID`=".$row['ID']);//Запоминаем время работы
 				}
 			}
@@ -310,7 +312,7 @@ if(!$isMods){ //Обработка стандартных модулей
 		
 		$data = $data . "pin".$pin."=".$state;
 		
-		$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `dawlen`, `visota`, `date`) VALUES ('$ip', 'pin_waiter','$data','','','','','$date')"; 
+		$guery = "INSERT INTO `michom`(`ip`, `type`, `data`, `temp`, `humm`, `dawlen`, `visota`, `date`) VALUES ('$ip', 'pin_waiter','$data','0','0','0','0','$date')"; 
 		$result = mysqli_query($link, $guery);
 	}
 	elseif($type == "StudioLight"){	//Модуль освещения

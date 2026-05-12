@@ -727,12 +727,12 @@ class MichomeAPI
         if($enb == '0') return [$Name, $enable];
         while(IsStr($Name, "^if_")){
             $expl = substr($Name, stripos($Name, "^if_")+4, (stripos($Name, ";", stripos($Name, "^if_")) - (stripos($Name, "^if_")+4))); 
-            if(IsStr($expl, "<")){  if(doubleval(preg_replace("/[^-0-9\.]/","",explode('<', $expl)[0])) > doubleval(preg_replace("/[^-0-9\.]/","",explode('<', $expl)[1]))){ $enable = "0"; echo "1>2 ";}}
-            elseif(IsStr($expl, ">")){ if(doubleval(preg_replace("/[^-0-9\.]/","",explode('>', $expl)[0])) < doubleval(preg_replace("/[^-0-9\.]/","",explode('>', $expl)[1]))){ $enable = "0"; echo "1<2 ";}}
-            elseif(IsStr($expl, "<=")){ if(doubleval(preg_replace("/[^-0-9\.]/","",explode('<=', $expl)[0])) >= doubleval(preg_replace("/[^-0-9\.]/","",explode('<=', $expl)[1]))){ $enable = "0"; echo "1>=2 ";}}
-            elseif(IsStr($expl, ">=")){ if(doubleval(preg_replace("/[^-0-9\.]/","",explode('>=', $expl)[0])) <= doubleval(preg_replace("/[^-0-9\.]/","",explode('>=', $expl)[1]))){ $enable = "0"; echo "1<=2 ";}}
-            elseif(IsStr($expl, "==")){ if(doubleval(preg_replace("/[^-0-9\.]/","",explode('==', $expl)[0])) != doubleval(preg_replace("/[^-0-9\.]/","",explode('==', $expl)[1]))){ $enable = "0"; echo "1!=2 ";}}
-            elseif(IsStr($expl, "!=")){ if(doubleval(preg_replace("/[^-0-9\.]/","",explode('!=', $expl)[0])) == doubleval(preg_replace("/[^-0-9\.]/","",explode('!=', $expl)[1]))){ $enable = "0"; echo "1==2 ";}}
+            if(IsStr($expl, "<")){  if(doubleval(preg_replace("/[^-0-9\.]/","",explode('<', $expl)[0])) > doubleval(preg_replace("/[^-0-9\.]/","",explode('<', $expl)[1]))){ $enable = "0"; /* echo "1>2 "; */}}
+            elseif(IsStr($expl, ">")){ if(doubleval(preg_replace("/[^-0-9\.]/","",explode('>', $expl)[0])) < doubleval(preg_replace("/[^-0-9\.]/","",explode('>', $expl)[1]))){ $enable = "0"; /* echo "1<2 "; */}}
+            elseif(IsStr($expl, "<=")){ if(doubleval(preg_replace("/[^-0-9\.]/","",explode('<=', $expl)[0])) >= doubleval(preg_replace("/[^-0-9\.]/","",explode('<=', $expl)[1]))){ $enable = "0"; /* echo "1>=2 "; */}}
+            elseif(IsStr($expl, ">=")){ if(doubleval(preg_replace("/[^-0-9\.]/","",explode('>=', $expl)[0])) <= doubleval(preg_replace("/[^-0-9\.]/","",explode('>=', $expl)[1]))){ $enable = "0"; /* echo "1<=2 "; */}}
+            elseif(IsStr($expl, "==")){ if(doubleval(preg_replace("/[^-0-9\.]/","",explode('==', $expl)[0])) != doubleval(preg_replace("/[^-0-9\.]/","",explode('==', $expl)[1]))){ $enable = "0"; /* echo "1!=2 "; */}}
+            elseif(IsStr($expl, "!=")){ if(doubleval(preg_replace("/[^-0-9\.]/","",explode('!=', $expl)[0])) == doubleval(preg_replace("/[^-0-9\.]/","",explode('!=', $expl)[1]))){ $enable = "0"; /* echo "1==2 "; */}}
             $Name = str_ireplace("^if_".$expl.";", "", $Name);
         }
 		while(IsStr($Name, "^en_")){
