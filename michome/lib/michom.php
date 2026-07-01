@@ -580,7 +580,7 @@ class MichomeAPI
 			//$max = max($rd);
 			//$min = min($rd);
 			
-			if(count($rd) > 0){
+			if(count($rd) > 1){
 				list($m1, $m2) = array_chunk($rd, ceil(count($rd)/2));
 				//$rd = round($rd[count($rd) - 1] - $rd[0], 2);
 				$rd = round(min($m2) - max($m1), 2);
