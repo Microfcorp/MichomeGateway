@@ -44,7 +44,7 @@ $cmd = $_GET['cmd']; //Комманда на получение типа дан�
 $JSONData = Array("name"=>"getdata", "type"=>$cmd, "col"=>0, "device"=>$device, "data"=>Array(), "date"=>Array()); //Основная структура данных
 
 $reqs = $API->GetDataForDay($device, $selDate)->SortType($type);
-if($cmd == "unique"){
+if($cmd == "unique"){	
 	$filter = isset($_GET['filter']) ? $_GET['filter'] : "none";
 	$JSONData['data'] = $reqs->GetTypes($filter);
 }

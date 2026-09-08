@@ -135,9 +135,13 @@ if(count(array_filter($data)) < 1){
 		}
 		elseif($mode == "webp"){
 			header("Content-type: image/webp");	
+			if (!imageistruecolor($im)) {
+				imagepalettetotruecolor($im);
+			}
 			imagewebp($im, $file);
 		}
 		imagedestroy($im);
+		exit();
 	}
 	else
 		exit("Ошибка формирования графика. Данные отсутствуют");

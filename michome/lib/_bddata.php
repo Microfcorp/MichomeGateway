@@ -297,7 +297,7 @@ class BDDataCollection
 		return $tmp;
 	}
 	public function GetTypes($filter = "none"){
-		$rt = ['id', 'ip', 'type', 'data', 'temp', 'humm', 'dawlen', 'visota', 'date'];
+		$rt = ['id', 'ip', 'type', 'data', 'temp', 'humm', 'dawlen', 'visota', 'date'];	
 		foreach($this->Select('data') as $tmp){
 			$arr = explode(";", $tmp);
 			$et = -1;
@@ -307,7 +307,7 @@ class BDDataCollection
 				$na = explode("=", $tmp1)[0];
 				$va = explode("=", $tmp1)[1];
 				$para = mb_strtolower(preg_replace('/[^a-zA-Zа-яА-Я]/ui', '', $na));
-				if(!in_array(mb_strtolower($na), $rt) && (isset($this->SelectFloat($para)[$et]) && $this->SelectFloat($para)[$et] != floatval($va)))
+				if(!in_array(mb_strtolower($na), $rt) && ((isset($this->SelectFloat($para)[$et]) && $this->SelectFloat($para)[$et] != floatval($va)) || !isset($this->SelectFloat($para)[$et])))
 					$rt[] = mb_strtolower($na);				
 			}		
 		}
