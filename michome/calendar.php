@@ -30,9 +30,9 @@
 			const GraphicsWidth = 640;
 			const GraphicsHeight = 425;
 			
-			function GenerateDataType(mID){
+			function GenerateDataType(mID, autoLoadGraphic = false){
 				DateTypem.innerHTML = "";
-				postAjax('api/getdata.php?device='+mID+'&cmd=unique&filter=nonenull&view=json', "GET", "", function(d){
+				postAjax('api/getdata.php?device='+mID+'&date='+vibday.value+'&cmd=unique&filter=nonenull&view=json', "GET", "", function(d){
 					var lines = JSON.parse(d);
 					for(var i = 0; i < lines.data.length; i++){
 						if(lines.data[i] != "id" && lines.data[i] != "ip" && lines.data[i] != "data" && lines.data[i] != "type" && lines.data[i] != "date"){
@@ -41,7 +41,10 @@
 							op.value = lines.data[i];
 							document.getElementById("DateTypem").append(op);
 						}						
-					}								
+					}		
+					if(autoLoadGraphic && DateTypem.value != ""){
+						Graphics('selday', vibday.value);
+					}
 				});
 			}
 			
@@ -168,12 +171,12 @@
 						</tr>
 						<tr>
 							<td class="scenesT">
-								<a href="#" onclick="CloseOpenTable(extData); return false;">Или укажите тип данных вручную</a>
+								<a href="#" onclick="CloseOpenTable(extData); GenerateDataType(DevD.value, true); PresetDat.selectedIndex = -1; return false;">Или укажите тип данных вручную</a>
 							</td>
 						</tr>
 						<tr id='extData' style='display: none;'>
 							<td class="scenesT"><b>Выберите модуль: </b></td>
-							<td class="scenesT"><select class="calendarInput" id="DevD" onchange="GenerateDataType(this.value)"><? echo $modulesOptions; ?></select></td>
+							<td class="scenesT"><select class="calendarInput" id="DevD" onchange="GenerateDataType(this.value, true)"><? echo $modulesOptions; ?></select></td>
 							<td class="scenesT"><b>Выберите тип данные для построения графика: </b></td>
 							<td class="scenesT"><select class="calendarInput" id="DateTypem" onchange="PresetDat.selectedIndex = -1; Graphics('selday', vibday.value)"></select></td>
 						</tr>
