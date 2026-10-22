@@ -56,6 +56,7 @@ if($interval == 1){ //Это для минутного крона
 			            
 			
 			if(($today >= $ST && $today < $ET) && ($CSE+$CSEinterval < $today) && ($enable != "0")){ //Если текущее время больше стартового и меньше конечного
+				//Сюда вызов scene_worker`a
 				$data = str_replace("^cse;", $CSEinterval, $row['Data']);
 				$data = $API->GetConstant($data); //Преобразуем константы
 				$data = $API->GetNotification($data); //Отправляем все уведомления
@@ -68,6 +69,7 @@ if($interval == 1){ //Это для минутного крона
 				}
 			}
 			elseif(!($today >= $ST && $today < $ET) && ($today >= $ST && $today < $ET+$interval) || ($enable == "0")){ //Если текущее время не больше стартового и меньше конечного
+				//Сюда вызов scene_worker`a
 				$ndata = str_replace("^cse;", $CSEinterval, $row['NData']);
 				$ndata = $API->GetConstant($ndata); //Преобразуем константы
 				$ndata = $API->GetNotification($ndata); //Отправляем все увдомления
