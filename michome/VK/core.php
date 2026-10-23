@@ -1,6 +1,6 @@
 <?php include_once("../../site/mysql.php"); ?>
 <?php include_once("func.php"); ?>
-<?php include_once("../lib/SamsungTV.php"); ?>
+<?php //include_once("../lib/SamsungTV.php"); ?>
 <?php include_once("../lib/michom.php"); ?>
 
 <?
@@ -17,7 +17,7 @@ if (!isset($_REQUEST)) {
     return;
 }
 
-$tv = new SamsungTV("192.168.1.31");
+//$tv = new SamsungTV("192.168.1.31");
 
 //Получаем и декодируем уведомление
 $data = json_decode(file_get_contents('php://input'));
@@ -37,12 +37,11 @@ if(strcmp($data->secret, $secretKey) !== 0 && strcmp($data->type, 'confirmation'
         //...получаем id его автора
         $userId = $data->object->message->from_id;
 		$body = $data->object->message->text;
+		if(isset($data->object->message->payload))
+			$body = json_decode($data->object->message->payload, true)['command'];
         
 		if(mb_strtolower($body) == "привет"){
 			MessSend($userId, "Умный дом приветствует тебя",$token);
-		}
-		elseif(mb_strtolower($body) == "место в рейтинге"){
-			MessSend($userId, mymisto(), $token);
 		}
 		elseif(mb_strtolower($body) == "температура на улице" || mb_strtolower($body) == "какая температура на улице"){
 			MessSend($userId, "Сейчас на улице ".$API->GetPosledData("termometr_okno")->Temp."C",$token);
@@ -228,9 +227,37 @@ if(strcmp($data->secret, $secretKey) !== 0 && strcmp($data->type, 'confirmation'
             $tv->ChDown();
 			MessSend($userId, "Переключен на предыдущий канал",$token);
 		}
-        else{
-            MessSend($userId, "Я не понимаю", $token);
-        }
+        else
+		{
+			foreach($API->GetBotCmd() as $tmp)
+			{
+				if($body == "/".$tmp["Name"] && $tmp["Enabled"] == 1)
+				{
+					$img = [];
+					$txt = "";
+					$ret = $tmp["Cmd"];
+					$ret = $API->GetConstant($ret);
+					$attempt = 0;
+					while(IsStr($ret, "^img") && $attempt < MaximumSendIMGAttempts){
+						$attempt++;
+						$expl = substr($ret, stripos($ret, "^img_")+5, (stripos($ret, ";", stripos($ret, "^img_")) - (stripos($ret, "^img_")+5)));     
+						$cap = str_ireplace("--", "_", explode('_', $expl)[0]);
+						$url = str_ireplace("--", "_", explode('_', $expl)[1]);
+						$img[] = $url;					
+						$txt = $txt . "Фото $attempt: " . $cap . "\n";					
+						$ret = str_ireplace("^img_".$expl.";", "", $ret);      
+					}
+					MessSend($userId, $ret, $VKToken);
+					if(count($img) > 1)
+						ImageSendVK($userId, $txt, $img);
+					else if(count($img) > 0)
+						ImageSendVK($userId, $txt, $img[0]);
+				}
+				else if($body == "/".$tmp["Name"] && $tmp["Enabled"] == 0){
+					MessSend($userId, "Данная команда выключена в панели управления Michome", $VKToken);
+				}
+			}
+		}
 	}
  
     // Если это уведомление о вступлении в группу

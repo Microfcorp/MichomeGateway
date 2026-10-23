@@ -26,7 +26,7 @@ if($interval == 1){ //Это для минутного крона
 		$ID = $row['ID']; //Получаем ИД     
 		$typeS = '0'; //Тип селектора выполнения (0 - обычный, 1 - действия с кнопкой, 2 - событие включения/выключения системы, 3 - else по условию выполняется вне периода)
 	  	
-		if(IsStr($Name, "^bt")) { $enable = '0'; $typeS = '1';} //События с кнопкой выполняются в getpost.php
+		if(IsStr($Name, "^bt") || IsStr($Name, "^pw")) { $enable = '0'; $typeS = '1';} //События с кнопкой выполняются в getpost.php
 		if(IsStr($Name, "^sts")) { $enable = '0'; $typeS = '2';} //События при запуске системы выполняются ниже
 		if(IsStr($Name, "^usefalse")) { $typeS = '3';} //Исполнять else условия, как событие вне периода
 
@@ -57,32 +57,13 @@ if($interval == 1){ //Это для минутного крона
 			
 			if(($today >= $ST && $today < $ET) && ($CSE+$CSEinterval < $today) && ($enable != "0")){ //Если текущее время больше стартового и меньше конечного
 				//Сюда вызов scene_worker`a
-				$data = str_replace("^cse;", $CSEinterval, $row['Data']);
-				$data = $API->GetConstant($data); //Преобразуем константы
-				$data = $API->GetNotification($data); //Отправляем все уведомления
-				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $data.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду и проверяем удачность
-					mysqli_query($link, "UPDATE `scenes` SET `CSE`='".date("H:i")."' WHERE `ID`=".$ID); //Записывает время последней отправки
-					echo "Send ON Success <br />";
-				}
-				else{
-					echo "Send ON Error <br />";
-				}
+				shell_exec('php '.__DIR__.'/api/scenes_worker.php '.$ID.' 1 > /dev/null 2>&1 &');
+				echo "Start worker ON <br />";
 			}
 			elseif(!($today >= $ST && $today < $ET) && ($today >= $ST && $today < $ET+$interval) || ($enable == "0")){ //Если текущее время не больше стартового и меньше конечного
 				//Сюда вызов scene_worker`a
-				$ndata = str_replace("^cse;", $CSEinterval, $row['NData']);
-				$ndata = $API->GetConstant($ndata); //Преобразуем константы
-				$ndata = $API->GetNotification($ndata); //Отправляем все увдомления
-				if(($row['Module'] != "" && $API->SendCmd($row['Module'], $ndata.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду и проверяем удачность
-					mysqli_query($link, "UPDATE `scenes` SET `CSE`='".date("H:i")."' WHERE `ID`=".$ID);//Запоминаем время последней отправки
-					if($enable == "0")
-						echo "Send OFF Success from IF Else<br />";
-					else
-						echo "Send OFF Success <br />";
-				}
-				else{
-					echo "Send OFF Error <br />";
-				}
+				shell_exec('php '.__DIR__.'/api/scenes_worker.php '.$ID.' 2 > /dev/null 2>&1 &');
+				echo "Start worker OFF <br />";
 			}
 			else{
 				echo "No Send <br />";

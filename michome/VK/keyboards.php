@@ -1,4 +1,49 @@
 <?php
+
+function Keyboard_VK($link, $peer_id){
+	// --- 1. СБОР ВСЕХ КНОПОК В ПЛОСКИЙ МАССИВ ---
+	$flatButtons = [];
+	$results = mysqli_query($link, "SELECT * FROM `botcmd` WHERE `Enabled` = 1");
+
+	if ($results) {
+		while($row = mysqli_fetch_assoc($results)) {
+			// Замените 'title' и 'command' на реальные названия ваших колонок
+			$buttonTitle = $row['Desc'];   
+			$buttonCommand = '/'. $row['Name']; 
+
+			// Создаем одну кнопку (без лишней вложенности рядов на этом этапе)
+			$flatButtons[] = [
+				'action' => [
+					'type' => 'text',
+					'label' => $buttonTitle,
+					'payload' => json_encode(['command' => $buttonCommand], JSON_UNESCAPED_UNICODE)
+				],
+				'color' => 'default' // primary (синий), default (белый), positive (зеленый), negative (красный)
+			];
+		}
+	}
+
+	// Защита от переполнения: VK меню под полем ввода поддерживает максимум 40 кнопок
+	$flatButtons = array_slice($flatButtons, 0, 40);
+
+	// --- 2. АВТОМАТИЧЕСКАЯ ГРУППИРОВКА В СЕТКУ ---
+	// Разделяем плоский массив на ряды. Цифра 4 означает "4 кнопки в одном ряду"
+	// Если названия кнопок очень длинные, можно поставить 3 или 2
+	$gridButtons = array_chunk($flatButtons, 4);
+
+	// Формируем структуру клавиатуры
+	$keyboard = [
+		'one_time' => false, // Клавиатура не закроется после клика
+		'buttons'  => $gridButtons, // Передаем сгруппированные ряды
+		'inline'   => false  // Клавиатура под полем ввода (поддерживает до 40 кнопок)
+	];
+
+	// Кодируем для отправки в VK
+	$keyboardJson = json_encode($keyboard, JSON_UNESCAPED_UNICODE);
+
+	return $keyboardJson;
+}
+
 function Keyboard_Main(){
     return array(
                     array(

@@ -308,10 +308,10 @@ class MichomeAPI
 				$gr = $gr." AND `Type` = '".$group."'";
 	   }
 			
-       /*$results = mysqli_query($this->link, "SELECT `ID` FROM `UsersVK` WHERE `Enable`=1 AND `Messanger` = 'VK'".$gr);
+       $results = mysqli_query($this->link, "SELECT `ID` FROM `UsersVK` WHERE `Enable`=1 AND `Messanger` = 'VK'".$gr);
        while($row = $results->fetch_assoc()) {
-            MessSend($row['ID'], $text, $token);
-       }*/
+            ImageSendVK($row['ID'], $text, $file);
+       }
 	   $results = mysqli_query($this->link, "SELECT `ID` FROM `UsersVK` WHERE `Enable`=1 AND `Messanger` = 'TG'".$gr);
        while($row = $results->fetch_assoc()) {
             ImageSendTG($row['ID'], $text, $file);
