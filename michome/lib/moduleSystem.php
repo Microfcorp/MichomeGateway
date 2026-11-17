@@ -31,6 +31,10 @@ class MichomeModule
 		file_put_contents(__DIR__."/".$this->Name . "_installed", date("Y-m-d H:i:s"));
 	}
 	
+	public function GetModuleDir(){
+		return $this->BaseClass->PathModule;
+	}
+	
 	public function AddParam($API, $ParamType){
 		$results = mysqli_query($API->link, "INSERT INTO `mods` (`ModName`, `ParamType`) VALUES ('".$this->Name."', '$ParamType');");
 		return $results;
