@@ -29,6 +29,23 @@ function _GetPosledData($link, $ip){
     
     return new BDLogData('0','','','','','', $link);
 }
+//Последние данные с типом
+function _GetPosledDataType($link, $ip, $type){
+    //Сначала получаем из основной базы
+    if(is_valid_ip($ip))
+        $results = mysqli_query($link, "SELECT * FROM michom WHERE `type` = '$type' AND `ip` = '$ip' ORDER BY `id` DESC LIMIT 1");
+    else if($ip == '1')
+		$results = mysqli_query($link, "SELECT * FROM michom WHERE `type` = '$type' AND 1 ORDER BY `id` DESC LIMIT 1");
+	else
+        $results = mysqli_query($link, "SELECT * FROM michom WHERE `type` = '$type' AND michom.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) ORDER BY michom.`id` DESC LIMIT 1");
+    
+    while($row = $results->fetch_assoc()) {
+        if($row['id'] != "" && $row['ip'] != "")
+            return new BDData($row['id'], $row['ip'], $row['type'], $row['data'], $row['temp'], $row['humm'], $row['dawlen'], $row['visota'], $row['date'], $link);
+    }
+    
+	return new BDData(0, 0, 0, 0, 0, 0, 0, 0, 0, $link);
+}
 //Данные с конца по количеству или минутам с приставкой m
 function _GetFromEndData($link, $ip, $count){
 	if(is_numeric($count)){ //Если по количеству измерений
@@ -101,7 +118,7 @@ function _GetDataForDay($link, $ip, $day, $IsLog){
 	else
         $results = mysqli_query($link, "SELECT * FROM michom WHERE michom.ip = (SELECT t.ip FROM modules AS t WHERE t.mID = '$ip' ORDER BY t.id DESC LIMIT 1) AND `date` >= '$day' AND `Date` < ADDDATE('$day', 1)");
     
-    $ret =[];
+    $ret = [];
     
     while($row = $results->fetch_assoc()) {
         if($row['id'] != "")

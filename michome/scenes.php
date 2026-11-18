@@ -105,7 +105,7 @@
 					te = "23:59";
 				}
                 
-                postAjax('api/scenes.php?type='+'Edit'+'&id='+id+'&name='+na+'&ts='+ts+'&td='+te+'&module='+md+'&data='+dt+'&ndata='+nt+'&number='+nu+'&timeout='+tm+'&enable='+en, "POST", "", function(d){if(d != "OK")alert(d); if(nu!=id){document.location = document.location;}});
+                postAjax('api/scenes.php?type='+'Edit'+'&id='+id+'&name='+na+'&ts='+ts+'&td='+te+'&module='+md+'&number='+nu+'&timeout='+tm+'&enable='+en, "POST", 'data='+dt+'&ndata='+nt, function(d){if(d != "OK")alert(d); if(nu!=id){document.location = document.location;}});
             }
             function Delet(id){
                 postAjax('api/scenes.php?type='+'Remove'+'&id='+id, "POST", "", function(d){if(d == "OK") location.reload(); else alert("Ошибка: " + d);});
@@ -159,6 +159,7 @@
                             <p> ^eds; - Конец выполнения по рассвету</p>
                             <p> ^ede; - Конец выполнения по закату</p>
                             <p> ^nos; - Не проверять, были ли отправлены данные</p>
+                            <p> ^mod; - Не обрабатывать ядром Michome, обработчик находится в модуле</p>
                             <p> ^ons; - Выполнить только единожды в сутки</p>
                             <p> ^sts; - Выполнять при запуске системы</p>                                                      
                             <p> ^cs_14; - Если был выполнен сценарий {14}</p>

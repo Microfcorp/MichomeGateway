@@ -255,6 +255,9 @@ class MichomeAPI
     public function GetPosledData($ip){
        return _GetPosledData($this->link, $ip);
     }
+	public function GetPosledDataType($ip, $type){
+       return _GetPosledDataType($this->link, $ip, $type);
+    }
 	public function GetDataForDay($ip, $day, $IsLog = true){
        return _GetDataForDay($this->link, $ip, $day, $IsLog);
     }
@@ -561,6 +564,14 @@ class MichomeAPI
             $rd = str_ireplace("_","-", $rd);
             $str = str_ireplace("^rm_".$expl.";", $rd, $str);      
         }
+		//Чтение данных с модуля с определенным типом
+        //^rmt_192.168.1.11_Temp;
+        while(IsStr($str, "^rmt_")){
+            $expl = substr($str, stripos($str, "^rmt_")+5, (stripos($str, ";", stripos($str, "^rmt_")) - (stripos($str, "^rmt_")+5))); 
+            $rd = $this->GetPosledDataType(str_ireplace("-", "_", explode('_', $expl)[0]), str_ireplace("-", "_", explode('_', $expl)[1]))->GetFromName(explode('_', $expl)[2]);
+            $rd = str_ireplace("_","-", $rd);
+            $str = str_ireplace("^rmt_".$expl.";", $rd, $str);      
+        }
         while(IsStr($str, "^rmavg_")){
             $expl = substr($str, stripos($str, "^rmavg_")+7, (stripos($str, ";", stripos($str, "^rmavg_")) - (stripos($str, "^rmavg_")+7)));  		
             $rd = $this->GetFromEndData(str_ireplace("-", "_", explode('_', $expl)[0]), explode('_', $expl)[2])->BDDatas();
@@ -607,7 +618,10 @@ class MichomeAPI
 		});
 		while(IsStr($str, $tmparr)){			
 			foreach($this->constantAction as $tmp)
-			{			
+			{	
+				if($tmp[4] == 1000)
+					continue; //1000 - для констант, которые необходимо только выводить в справке, но никак не обрабатывать основным обработчиком (они обрабатываются чем то отдельно)
+				
 				$fullName = "^".$tmp[1].($tmp[4] == 0 ? ";" : "_");
 				$countName = strlen($fullName);
 				

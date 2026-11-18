@@ -8,8 +8,8 @@
 	$modulesOptions = "";
 	
 	foreach($API->GetAllModulesBD() as $tmp){
-		$reqs = $API->GetDataForDay($tmp['ip'], date("Y-m-d"))->GetTypes("nonenull");
-		if(count($reqs) > 0)
+		$reqs = $API->GetDataForDay($tmp['ip'], date("Y-m-d"), false)/*->GetTypes("nonenull")*/;
+		if(!$reqs->IsNull())
 			$modulesOptions = $modulesOptions . "<option value='".$tmp['mid']."'>".$tmp['mid']."</option>";
 	}
 	

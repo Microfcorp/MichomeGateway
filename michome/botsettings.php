@@ -12,7 +12,7 @@
 		}
 		$name = $_GET['name'];
 		$desc = $_GET['desc'];
-		$cmd = $_GET['cmd'];
+		$cmd = $_POST['cmd'];
 		$en = $_GET['en'];
 		
 		mysqli_query($link, "UPDATE `botcmd` SET `Name`='$name', `Desc`='$desc', `Cmd`='$cmd', `Enabled`='$en' WHERE `ID`=".$id);
@@ -40,7 +40,7 @@
 				var cmd = document.getElementById("cmd"+id).value.replace( /&/g, "%26" );
 				var en = (document.getElementById("enabled"+id).checked ? "1" : "0");
 				
-				postAjax('?id='+id+"&name="+name+"&desc="+desc+"&cmd="+cmd+"&en="+en, "GET", "", function(d){alert("OK");});
+				postAjax('?id='+id+"&name="+name+"&desc="+desc+"&en="+en, "POST", "cmd="+cmd, function(d){alert("OK");});
 			}
 			
 			function Add(id){			

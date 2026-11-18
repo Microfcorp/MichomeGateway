@@ -28,6 +28,7 @@ if($interval == 1){ //Это для минутного крона
 	  	
 		if(IsStr($Name, "^bt") || IsStr($Name, "^pw")) { $enable = '0'; $typeS = '1';} //События с кнопкой выполняются в getpost.php
 		if(IsStr($Name, "^sts")) { $enable = '0'; $typeS = '2';} //События при запуске системы выполняются ниже
+		if(IsStr($Name, "^mod")) { $enable = '0'; $typeS = '4';} //События при запуске системы выполняются ниже
 		if(IsStr($Name, "^usefalse")) { $typeS = '3';} //Исполнять else условия, как событие вне периода
 
 		$N = $API->GetIFs($Name, $enable, $ID); //Проверяем все условия
@@ -37,6 +38,7 @@ if($interval == 1){ //Это для минутного крона
 		echo $ID . " - ";
 		if($row['Enable'] == "0" && ($typeS == '0' || $typeS == '3')) echo "Disable toggle <br />"; //Выключено тоглом
 		elseif($enable == "0" && $typeS == '0' && $typeS != '3') echo "Disable ifs <br />"; //Выключено условием
+		elseif($enable == "0" && $typeS == '4') echo "Disable mod <br />"; //Выключено условием
 		elseif($typeS == '1') echo "Button disable <br />"; //Выключено, потому что события кнопки выполняются не здесь
 		elseif($typeS == '2') echo "StartStopSystem disable <br />"; //Выключено, потому что события включения/выключения системы выполняются не здесь
 		else{

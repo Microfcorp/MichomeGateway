@@ -1,5 +1,5 @@
-<?php include_once(__DIR__."//../site/mysql.php"); ?>
-<?php include_once(__DIR__."//../site/secur.php"); ?>
+<?php include_once(__DIR__."//..//..//../site/mysql.php"); ?>
+<?php include_once(__DIR__."//..//..//../site/secur.php"); ?>
 <?
 $device = "";
 
@@ -11,101 +11,77 @@ if(isset($_GET['device'])){
 <html>
 <head>
 <title>Управление энергомонитором</title>
-<link rel="stylesheet" type="text/css" href="styles/style.css"/>
+<link rel="stylesheet" type="text/css" href="/michome/styles/style.css"/>
 <script type="text/javascript" src="/site/MicrofLibrary.js"></script>
-<script type="text/javascript" src="libmichome.js"></script>
+<script type="text/javascript" src="/michome/libmichome.js"></script>
 <script type="text/javascript">	
 	var deviceID = "<? echo $device; ?>";
 	
-	function CreateMeteo(id, num){
-		//<tr><td><p>Свет 1: <input type="range" min="0" max="1023" oninput="sizePic(0, this.value)" value="0"><input type="number" min="0" max="1023" oninput="sizePic(0, this.value)" value="0"><input type="button" onclick="sizePic(0, 1023)" value="На всю"><input type="button" onclick="sizePic(0, 0)" value="На 0"></p></tr></td>
+	function CreateBolid(zone, num){
+		
+		if(document.getElementById("bolid_"+num)){
+			let tr = document.getElementById("bolid_"+num);
+			tr.childNodes[0].children[0].children[0].children[0].innerHTML = zone['zone'] + " ";
+			tr.childNodes[0].children[0].children[1].children[0].innerHTML = zone['status_text'] + " ";
+			tr.childNodes[0].children[0].children[2].children[0].innerHTML = zone['adc'] + " ";
+			
+			return;
+		}	
 		let tr = document.createElement('tr');
 		let td = document.createElement('td');
+		let td2 = document.createElement('td');
 		let p = document.createElement('p');
+		
 		let spanText = document.createElement('span');
 		let spanText1 = document.createElement('span');
 		let spanText2 = document.createElement('span');
 		let spanValues = document.createElement('span');
 		let spanValues1 = document.createElement('span');
-		let spanValues2 = document.createElement('span');
-		let DescText = document.createElement('span');		
+		let spanValues2 = document.createElement('span');	
 		
-		spanText.innerHTML = "Напряжение " + num + ": ";
-		spanText1.innerHTML = "Ток " + num + ": ";		
-		spanText2.innerHTML = "Мощность " + num + ": ";		
+		let buttonArm = document.createElement('input');	
+		let buttonDisarm = document.createElement('input');	
+		
+		tr.id = "bolid_"+num;
+		
+		spanText.innerHTML = "Номер ШС: ";
+		spanText1.innerHTML = "Состояние: ";		
+		spanText2.innerHTML = "Значение АЦП: ";	
+
+		spanValues.innerHTML = zone['zone'] + "  ";
+		spanValues1.innerHTML = zone['status_text'] + "  ";
+		spanValues2.innerHTML = zone['adc'] + "  ";
+		
 		spanValues.style.color = "indianred";	
 		spanValues.style.fontWeight = "bold";	
 		spanValues1.style.color = "indianred";	
 		spanValues1.style.fontWeight = "bold";
 		spanValues2.style.color = "indianred";
-		spanValues2.style.fontWeight = "bold";		
-		DescText.style.fontStyle = "italic";
-		DescText.style.color = "aquamarine";
-		
-		postAjax('/michome/api/setcmd.php?device='+moduleAddress+'&cmd=getpminfo%3Fnonehtml=1%26id='+id+'&timeout=5000', "GET", "", function(d){
-			spanText.title = d.replaceAll("<br />", "\n");
-			spanText1.title = d.replaceAll("<br />", "\n");
-			spanText2.title = d.replaceAll("<br />", "\n");
-			DescText.innerHTML = "<br />Описание датчика " + num + " (" + id + "): <br />" + d.replaceAll("\n", "<br />");			
+		spanValues2.style.fontWeight = "bold";
+
+		buttonArm.type = "button";		
+		buttonDisarm.type = "button";
+		buttonArm.value = "Поставить на охрану";		
+		buttonDisarm.value = "Снять с охраны";		
+		buttonArm.classList.add('sb');		
+		buttonDisarm.classList.add('sb');	
+		buttonArm.style.margin = '5px';		
+		buttonDisarm.style.margin = '5px';
+		buttonArm.addEventListener('click', function(event) {
+			armBolid(zone['zone'], 'arm');
+		});
+		buttonDisarm.addEventListener('click', function(event) {
+			armBolid(zone['zone'], 'disarm');
 		});
 		
-		let f = function(){
-			postAjax('api/setcmd.php?device='+ moduleAddress +'&cmd='+ 'getpm%3Fid='+id+"%26nonehtml=1&timeout=2500", "GET", "", function(d)
-			{
-				var dataRead = [false, false, false];
-				var ds = d.split(',');
-				dataRead[0] = ds[0];
-				dataRead[1] = ds[1];
-				dataRead[2] = ds[2];
-				/*for(var i = 0; i < ds.length; i++){
-					if(IsStr(ds[i], "V"))
-						
-					if(IsStr(ds[i], "A"))
-						dataRead[1] = ds[i];
-					if(IsStr(ds[i], "w"))
-						dataRead[2] = ds[i];
-				}*/
-				
-				if(dataRead[0]){
-					spanValues.innerHTML = dataRead[0] + "  ";
-					spanText.style.display = "inline";
-					spanValues.style.display = "inline";
-				}
-				else{
-					spanText.innerHTML = "На данном модуле отсутствуют данные";
-					spanValues.style.display = "none";					
-				}
-				
-				if(dataRead[1]){
-					spanValues1.innerHTML = dataRead[1] + "  ";
-					spanText1.style.display = "inline";
-					spanValues1.style.display = "inline";
-				}
-				else{
-					spanText1.style.display = "none";					
-					spanValues1.style.display = "none";
-				}
-				
-				if(dataRead[2]){
-					spanValues2.innerHTML = dataRead[2] + "  ";
-					spanText2.style.display = "inline";
-					spanValues2.style.display = "inline";
-				}	
-				else{
-					spanText2.style.display = "none";
-					spanValues2.style.display = "none";
-				}				
-			});
-		};
-		window.setInterval(f, 6000);
-		f();
-		
 		tr.append(td);
+		tr.append(td2);
+		td2.append(buttonArm);
+		td2.append(buttonDisarm);
 		td.append(p);
 		p.append(spanText);
 		p.append(spanText1);
 		p.append(spanText2);
-		p.append(DescText);
 		spanText.append(spanValues);
 		spanText1.append(spanValues1);
 		spanText2.append(spanValues2);
@@ -113,35 +89,39 @@ if(isset($_GET['device'])){
 		//changeBR.append(tr);
 		document.getElementById("changeBR").append(tr);
 	}
-
-	function initD(){
-		var Did = document.getElementById("selectInit").value;
-		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=initpm%3Fid='+Did+'&timeout=5000', "GET", "", function(d){
-			if(d == "Init Error"){
-				alert("Ошибка инициализации");
-			}
-			else if(d == "Init OK"){
-				alert("Успешная инициализация");
+	
+	function armBolid(zoneID, type){
+		document.body.style.cursor = 'wait';
+		postAjax('api/request_bolid.php?device='+deviceID+'&action='+type+'&zone='+zoneID, "GET", "", function(d){
+			document.body.style.cursor = 'default';
+			var resp = JSON.parse(d);
+			const status = resp['command_ack'];
+			if(status == true){
+				FromLoadPage();
 			}
 			else{
-				alert("Неизвестная ошибка");
-			}				
+				alert("Ошибка выполнения команды");
+			}	
 		});
 	}
 	
-	function resetD(){
-		var Did = document.getElementById("selectInit").value;
-		postAjax('api/setcmd.php?device='+moduleAddress+'&cmd=resetpm%3Fid='+Did+'&timeout=5000', "GET", "", function(d){
-			if(d == "Reset Error"){
-				alert("Ошибка сброса");
-			}
-			else if(d == "Reset OK"){
-				alert("Успешный сброс");
-			}
-			else{
-				alert("Неизвестная ошибка");
-			}				
-		});
+	function updateTamper(resp){
+		document.getElementById('tamperState').innerHTML = resp['tamper']['status_text'];
+	}
+	
+	function updateVoltage(resp){
+		document.getElementById('uMain').innerHTML = resp['voltage']['main'];
+		document.getElementById('u1').innerHTML = resp['voltage']['u1'];
+		document.getElementById('u2').innerHTML = resp['voltage']['u2'];
+	}
+	
+	function loadDeviceInfo(resp){
+		document.getElementById('addrDevice').innerHTML = resp['device_addr'];
+		document.getElementById('typeDevice').innerHTML = resp['device']['device_name'];
+		document.getElementById('verDevice').innerHTML = resp['device']['device_version'];
+		document.getElementById('verEth').innerHTML = resp['version_software'];
+		document.getElementById('shCount').innerHTML = resp['device']['device_shielf'];
+		document.getElementById('rlCount').innerHTML = resp['device']['device_relays'];
 	}
 	
 	function FromLoadPage(){
@@ -149,27 +129,17 @@ if(isset($_GET['device'])){
 			alert("Не указан модуль");
 			return;
 		}
-		//alert(GetFirmwareVersionModule(moduleAddress));
-		//if(GetFirmwareVersionModule(moduleAddress) >= 1.63){
-			postAjax('api/request_bolid.php?device='+deviceID, "GET", "", function(d){
-				var resp = JSON.parse(d);
-				for(var i = 0; i < ids.length; i++){								
-					CreateBolid(ids[i], i);	
-
-					let op = document.createElement('option');
-					op.innerHTML = "Датчик " + i + " (" + ids[i] + ")";
-					op.value = ids[i];
-					document.getElementById("selectInit").append(op);	
-					let op1 = document.createElement('option');
-					op1.innerHTML = "Датчик " + i + " (" + ids[i] + ")";
-					op1.value = ids[i];					
-					document.getElementById("selectReset").append(op1);	
-				}			
-			});
-		/*}
-		else{
-			alert("Для использования данного функционала, пожалуйста, обновите модуль до версии 1.63 или выше");
-		}*/
+		document.body.style.cursor = 'wait';
+		postAjax('api/request_bolid.php?device='+deviceID, "GET", "", function(d){
+			const resp = JSON.parse(d);
+			loadDeviceInfo(resp);
+			updateTamper(resp);
+			updateVoltage(resp);
+			for(var i = 0; i < resp['zones'].length; i++){								
+				CreateBolid(resp['zones'][i], i);	
+			}
+			document.body.style.cursor = 'default';			
+		});
 	}	
 	window.setTimeout("FromLoadPage()", 1);
   </script>
@@ -182,10 +152,32 @@ if(isset($_GET['device'])){
                 <div style="width: 100%; height: auto; text-align: left;" class = "components">
 					<div class = "components_alfa">
 						<div style="width: 100%" class = "components_text">
+							<div>
+								<p style='color: aliceblue;'>Адрес прибора: <span style='color: burlywood;' id='addrDevice'>0</span></p>
+								<p style='color: aliceblue;'>Тип прибора: <span style='color: burlywood;' id='typeDevice'>Не известен</span></p>
+								<p style='color: aliceblue;'>Версия прибора: <span style='color: burlywood;' id='verDevice'>0</span></p>
+								<p style='color: aliceblue;'>Версия Ethernet-мастера: <span style='color: burlywood;' id='verEth'>0</span></p>
+								<p style='color: aliceblue;'>Доступно шлейфов: <span style='color: burlywood;' id='shCount'>0</span></p>
+								<p style='color: aliceblue;'>Доступно реле: <span style='color: burlywood;' id='rlCount'>0</span></p>
+							</div>
+							<br />
+							<div>
+								<p><span style='color: aliceblue;'>Датчик вскрытия корпуса: </span><span id='tamperState' style="color: indianred; font-weight: bold;">Нет данных</span></p>
+							</div>
+							<br />
+							<div>
+								<p><span style='color: aliceblue;'>Напряжение питания: </span><span id='uMain' style="color: indianred; font-weight: bold;">0</span>В</p>
+								<p><span style='color: aliceblue;'>Напряжение питания U1: </span><span id='u1' style="color: indianred; font-weight: bold;">0</span>В</p>
+								<p><span style='color: aliceblue;'>Напряжение питания U2: </span><span id='u2' style="color: indianred; font-weight: bold;">0</span>В</p>
+							</div>
+							<br />
 							<table id="changeBR" style="width: 100%; text-align: start; padding: 0; margin: 0; font-size: large; display: inline-block; color: aliceblue;">
-								<tbody>
-								</tbody>
 							</table>
+							<br />
+							<div>
+								<p><input class='sb' type='button' onclick='FromLoadPage(); return false;' value='Обновить инофрмацию' /></p>
+								<p><input class='sb' type='button' onclick='armBolid(1, "reset"); return false;' value='Сброс тревог' /></p>
+							</div>
 							<br />
                         </div>
 					</div>
@@ -193,7 +185,7 @@ if(isset($_GET['device'])){
 			</div>
 		</div>
         
-		<?php require_once(__DIR__."//../site/verhn.php");?>        
+		<?php require_once(__DIR__."//..//..//../site/verhn.php");?>        
 </body>
 
 </html>

@@ -15,8 +15,8 @@ if($type=="Edit"){
     $TStart=(mysqli_real_escape_string($link, $_GET['ts']));
     $TEnd=(mysqli_real_escape_string($link, $_GET['td']));
     $Module=(mysqli_real_escape_string($link, $_GET['module']));
-    $Data=(mysqli_real_escape_string($link, $_GET['data']));
-    $NData=(mysqli_real_escape_string($link, $_GET['ndata']));    
+    $Data=(mysqli_real_escape_string($link, $_POST['data']));
+    $NData=(mysqli_real_escape_string($link, $_POST['ndata']));    
     $Number=intval(mysqli_real_escape_string($link, $_GET['number']));
     $Timeout=intval(mysqli_real_escape_string($link, $_GET['timeout']));
     $Enable=(mysqli_real_escape_string($link, $_GET['enable']=="true"?"1":"0"));

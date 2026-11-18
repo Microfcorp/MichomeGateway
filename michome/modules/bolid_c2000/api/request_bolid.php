@@ -8,6 +8,8 @@ header("Michome-Page: API-Service");
 header("Michome-API: GETData");
 
 $deviceID = intval($_GET['device']);
+$action = $_GET['action'] ?? NULL;
+$zoneID = intval($_GET['zone'] ?? -1);
 
 $gateways = $MODs["BolidC2000"]->GetSettingORCreate($API, 'EthernetAddress', '192.168.0.0', '')->Value;
 $gateways_key = "";
@@ -17,7 +19,10 @@ foreach(explode(',', $gateways) as $tmp){
 
 $binPath = ServerPath . "/modules/bolid_c2000/bolid_reader";
 
-$bolid_resp = shell_exec($binPath . " " . $gateways_key . " -d $deviceID -j");
+if($action == NULL)
+	$bolid_resp = shell_exec($binPath . " " . $gateways_key . " -d $deviceID -j");
+else
+	$bolid_resp = shell_exec($binPath . " " . $gateways_key . " -d $deviceID -j -a $action -z $zoneID");
 
 echo($bolid_resp);
 ?>
