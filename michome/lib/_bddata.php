@@ -48,33 +48,35 @@ function _GetPosledDataType($link, $ip, $type){
 }
 //Данные с конца по количеству или минутам с приставкой m
 function _GetFromEndData($link, $ip, $count){
-	if(is_numeric($count)){ //Если по количеству измерений
-		$sortBD = "ORDER BY `id` DESC LIMIT ".intval($count);
-	}
-	else{ //Если по времени
-		if(substr($count, -1) == "m")
-			$p = "MINUTE";
-		elseif(substr($count, -1) == "h")
-			$p = "HOUR";
-		elseif(substr($count, -1) == "d")
-			$p = "DAY";
-		elseif(substr($count, -1) == "s")
-			$p = "SECOND";
-		elseif(substr($count, -1) == "c")
-			$p = "MONTH";
-		elseif(substr($count, -1) == "i"){
-			$p = "HOUR";
-			$count = date("i");
-		}
-		elseif(substr($count, -1) == "v"){
-			$p = "DAY";
-			$count = date("d");
-		}
-		else
-			$p = "MINUTE";
-		
-		$sortBD = "AND `date` >= DATE_SUB(NOW(), INTERVAL ".intval($count)." ".$p.")";
-	}
+	$isNumeric = is_numeric($count);
+	
+	if ($isNumeric) {
+        $limitSql = "ORDER BY `id` DESC LIMIT " . intval($count);
+    } else {
+        $unitMap = [
+            'm' => 'MINUTE',
+            'h' => 'HOUR',
+            'd' => 'DAY',
+            's' => 'SECOND',
+            'c' => 'MONTH',
+        ];
+        $suffix = substr($count, -1);
+        
+        if ($suffix === 'i') {
+            $p = 'HOUR';
+            $val = (int)date('i');
+        } elseif ($suffix === 'v') {
+            $p = 'DAY';
+            $val = (int)date('d');
+        } else {
+            $p = $unitMap[$suffix] ?? 'MINUTE';
+            $val = intval($count);
+        }
+        
+        // Вычисляем точную дату старта в PHP для лучшей работы индексов
+        $startTime = date('Y-m-d H:i:s', strtotime("-{$val} {$p}"));
+        $sortBD = "AND `date` >= '$startTime'";
+    }
 	
     if(is_valid_ip($ip))
         $results = mysqli_query($link, "SELECT * FROM michom WHERE `ip` = '$ip' ".$sortBD);
@@ -276,6 +278,11 @@ class BDDataCollection
 	public function SortType($type){
 		return new BDDataCollection(array_values(array_filter($this->BDData, function($v, $k) use($type) : string {
 			return $v->Type == $type || $type == '1';
+		}, ARRAY_FILTER_USE_BOTH)));
+	}
+	public function SortValue($skey){
+		return new BDDataCollection(array_values(array_filter($this->BDData, function($v, $k) use($skey) : string {
+			return $v->GetFromName($skey) != NULL;
 		}, ARRAY_FILTER_USE_BOTH)));
 	}
 	public function SortByID(){

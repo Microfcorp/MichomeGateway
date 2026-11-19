@@ -20,8 +20,8 @@ if($interval == 1){ //Это для минутного крона
 
 	$results = mysqli_query($link, "SELECT * FROM `scenes`");//Жестко качаем все из БД
 	while($row = $results->fetch_assoc()) {
-		$Name = str_replace("^cse;", $row['Timeout'], $row['Name']);
-		$Name = $API->GetConstant($Name); //Получаем имя, сразу отпарсив константы
+		$Name = str_replace("^cse;", $row['Timeout'], $row['Name']);	
+		$Name = $API->GetConstant($Name); //Получаем имя, сразу отпарсив константы		
 		$enable = $row['Enable']; //Получаем состояние тогла включения      
 		$ID = $row['ID']; //Получаем ИД     
 		$typeS = '0'; //Тип селектора выполнения (0 - обычный, 1 - действия с кнопкой, 2 - событие включения/выключения системы, 3 - else по условию выполняется вне периода)
@@ -38,7 +38,7 @@ if($interval == 1){ //Это для минутного крона
 		echo $ID . " - ";
 		if($row['Enable'] == "0" && ($typeS == '0' || $typeS == '3')) echo "Disable toggle <br />"; //Выключено тоглом
 		elseif($enable == "0" && $typeS == '0' && $typeS != '3') echo "Disable ifs <br />"; //Выключено условием
-		elseif($enable == "0" && $typeS == '4') echo "Disable mod <br />"; //Выключено условием
+		elseif($enable == "0" && $typeS == '4') echo "Disable mod <br />"; //Выключено модом
 		elseif($typeS == '1') echo "Button disable <br />"; //Выключено, потому что события кнопки выполняются не здесь
 		elseif($typeS == '2') echo "StartStopSystem disable <br />"; //Выключено, потому что события включения/выключения системы выполняются не здесь
 		else{

@@ -178,6 +178,49 @@ if($type == "BolidMaster"){//BolidMaster
 			}
 		}
 	}
+	
+	$devTr = $obj->{'c2000_adctrigger'}; //Измененные ADC на линии
+	$results = mysqli_query($link, "SELECT * FROM `scenes` WHERE `Enable`=1 AND `Name` LIKE '%^ba%%".$ip."%'");//Жестко качаем все, где есть кнопка из БД
+	while($row = $results->fetch_assoc()) {
+		for($i = 0; $i < count($devTr); $i++){
+			$devAdr = $devTr[$i]->{'deviceAddress'};
+			for($a = 0; $a < count($devTr[$i]->{'zones'}); $a++){
+				$zone = $devTr[$i]->{'zones'}[$a];
+				$zoneID = $zone->{'zone_id'};
+				$status = $zone->{'status'};
+				$status_text = $zone->{'status_text'};
+				$adc = $zone->{'adc'};
+				$adcDiff = $zone->{'adc_diff'};
+				
+				$na = $row['Name'];
+				$na = str_replace("^bld;", $devAdr, $na);
+				$na = str_replace("^blz;", $zoneID, $na);
+				$na = str_replace("^bls;", $status, $na);
+				$na = str_replace("^bla;", $adc, $na);
+				$na = str_replace("^blst;", $status_text, $na);
+				$na = str_replace("^blad;", $adcDiff, $na);
+				
+				$N = $API->GetIFs(GetButtonBL($API->GetConstant($na), $ip, $devAdr, $zoneID), $row['Enable'], $row['ID']);
+				$Name = $N[0];
+				if($N[1] != "0"){ //Если выполнены все условия
+					$data_alt = $row['Data'];
+					$data_alt = str_replace("^bld;", $devAdr, $data_alt);
+					$data_alt = str_replace("^blz;", $zoneID, $data_alt);
+					$data_alt = str_replace("^bls;", $status, $data_alt);
+					$data_alt = str_replace("^bla;", $adc, $data_alt);
+					$data_alt = str_replace("^blst;", $status_text, $data_alt);
+					$data_alt = str_replace("^blad;", $adcDiff, $data_alt);
+					
+					$data_alt = $API->GetConstant($data_alt);				
+					
+					$API->GetNotification($data_alt);
+					if(($row['Module'] != "" && $API->SendCmd($row['Module'], $data_alt.'&m=cron', true) === TRUE) || (IsStr($Name, "^nos;") || $row['Module'] == "")){ //Отправляем команду
+						mysqli_query($link, "UPDATE `scenes` SET `CSE`='".date("H:i")."' WHERE `ID`=".$row['ID']);//Запоминаем время работы
+					}
+				}
+			}
+		}
+	}
 }
 
 function GetButtonBL($strl, $m, $d, $z){
@@ -195,6 +238,20 @@ function GetButtonBL($strl, $m, $d, $z){
 		$rd = "^if_".$rd."==1;";       
 		
 		$str = str_ireplace("^bl_".$expl.";", $rd, $str);      
+	}
+	//^ba_192.168.1.53_1_2;
+	while(IsStr($str, "^ba")){
+		$expl = substr($str, stripos($str, "^ba")+4, (stripos($str, ";", stripos($str, "^ba")) - (stripos($str, "^ba")+4)));
+				   
+		$md = explode('_', $expl)[0];                                   
+				   
+		$dv = explode('_', $expl)[1];
+		$zn = explode('_', $expl)[2];           
+		if($md == $m && $dv == $d && $zn == $z) $rd = '1';
+		else $rd = '0';                   
+		$rd = "^if_".$rd."==1;";       
+		
+		$str = str_ireplace("^ba_".$expl.";", $rd, $str);      
 	}
 	return $str;
 }

@@ -105,6 +105,7 @@ $BolidModuleModule->BaseClass->InitialFunction = function($modClass) {
 	$this->ConstantON("Bolid", "bls", "^bls; - Возвращает код статус триггера (Только для триггера в условии)", function($expl) use($modClass): string {}, 1000);
 	$this->ConstantON("Bolid", "bld", "^bla; - Возвращает значение АЦП триггера (Только для триггера в условии)", function($expl) use($modClass): string {}, 1000);
 	$this->ConstantON("Bolid", "bld", "^blss; - Возвращает текстовое представление статуса триггера (Только для триггера в условии)", function($expl) use($modClass): string {}, 1000);
+	$this->ConstantON("Bolid", "blad", "^blad; - Возвращает разницу значение ADC (Только для триггера ADC в условии)", function($expl) use($modClass): string {}, 1000);
 };
 
 $BolidModuleModule->BaseClass->POSTFunction = function($arrayData) {

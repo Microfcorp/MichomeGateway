@@ -43,7 +43,7 @@ class MichomeAPI
 	   {
 			if(isset($this->varDefined[$expl[0]]))
 				return $this->varDefined[$expl[0]];
-			$this->AddLog(GatewayID, "Incorrect var constant", "0", "Var ".$expl[0]." is not defined");
+			//$this->AddLog(GatewayID, "Incorrect var constant", "0", "Var ".$expl[0]." is not defined");
 		    return null;
 	   }, 1);
 	   $this->ConstantON("Временные", "unix", "^unix_2023-05-12 11:01:12; - преобразует время в UNIXTime", function($expl): string {return strtotime($expl[0]);}, 1);
@@ -538,6 +538,12 @@ class MichomeAPI
 			return "Ошибка преобразования констант";
 		}
 		
+		//Приостановить выполнение скрипта и вернуть полученное значение
+		//^ds;
+		while(IsStr($str, "^errorCMD")){
+            $str = str_ireplace("^errorCMD;", "", $str);
+			return $str;
+        }
 		//Начало рассвета
 		//^ds;
 		while(IsStr($str, "^ds")){
@@ -613,15 +619,15 @@ class MichomeAPI
 				
 		$at = 0;
 		$tmparr = $this->constantAction;
-		$nstr = array_walk($tmparr, function (&$value, $key) {
-			$value = "^".$value[1];
+		array_walk($tmparr, function (&$value, $key) {
+			$value = ($value[4] != 1000 ? "^".$value[1] : "^errorCMD;");
 		});
 		while(IsStr($str, $tmparr)){			
 			foreach($this->constantAction as $tmp)
 			{	
-				if($tmp[4] == 1000)
+				if($tmp[4] == 1000){
 					continue; //1000 - для констант, которые необходимо только выводить в справке, но никак не обрабатывать основным обработчиком (они обрабатываются чем то отдельно)
-				
+				}
 				$fullName = "^".$tmp[1].($tmp[4] == 0 ? ";" : "_");
 				$countName = strlen($fullName);
 				
@@ -646,7 +652,7 @@ class MichomeAPI
 						$str = str_ireplace($fullName.$expl.";", $rd, $str); 
 				}
 			}
-			if($at++ > 3) {$this->AddLog(GatewayID, "Incorrect constant", "0", "Incorrecting constant on: " . $str); break;}
+			if($at++ > 4) {$this->AddLog(GatewayID, "Incorrect constant", "0", "Incorrecting constant (cycle) on: " . $str); break;}
 		}
 		
 		//Удалить перенос строки тут

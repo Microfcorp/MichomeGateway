@@ -9,24 +9,47 @@ $PowerModuleModule->BaseClass->InstallFunction = function($modClass) {
 $PowerModuleModule->BaseClass->InitialFunction = function($modClass) {
     $this->ConstantON("Электроэнергия", "power", "^power_192.168.1.0_5h; - Возвращает количество потребленных Ватт за последние 5 часов", function($expl) use($modClass): string 
     {
-	   $unixH = 60*60-600;
-	   $bdData = $this->GetFromEndData(str_ireplace("-", "_", $expl[0]), $expl[1]);
-	   if($bdData->IsNull())
-		   return 0;
-	   $bdV = $bdData->SelectFloat("power");
-	   $bdV1 = [];
-	   $bdD = $bdData->SelectUnixTime();	   
-	   for($i = 1, $a = $bdD[0], $b = [$bdV[0]]; $i < count($bdD); $i++){
-		   if($bdD[$i] - $a >= $unixH){
-			   $a = $bdD[$i];		   
-			   $bdV1[] = round(array_sum($b) / count($b), 2);  
-			   $b = [$bdV[$i]];
-		   }
-		   else{
-			   $b[] = $bdV[$i];
-		   }
-	   }
-	   return array_sum($bdV1);
+		$maxGapSeconds = 3600;
+	    $unixH = 60*60-600;
+	    $bdData = $this->GetFromEndData(str_ireplace("-", "_", $expl[0]), $expl[1]);
+	    if($bdData->IsNull())
+		    return 0;
+
+		$bdData = $bdData->SortValue("power");
+	    $powers = array_values($bdData->SelectFloat("power"));
+		$times = array_values($bdData->SelectUnixTime());
+
+		$count = count($powers);
+
+		// Для расчета интервала нужно минимум 2 точки
+		if ($count < 2 || $count !== count($times)) {
+			return 0.0;
+		}
+
+		// При выборке с конца (ORDER BY id DESC) данные идут от новых к старым.
+		// Сортируем по возрастанию времени, чтобы корректно считать разницу.
+		array_multisort($times, SORT_ASC, $powers);
+
+		$totalWattSeconds = 0.0;
+
+		for ($i = 1; $i < $count; $i++) {
+			$dt = $times[$i] - $times[$i - 1]; // Прошедшее время в секундах
+
+			// Пропускаем некорректные интервалы и слишком долгие простои датчика
+			if ($dt <= 0 || $dt > $maxGapSeconds) {
+				continue;
+			}
+
+			// Средняя мощность на отрезке (метод трапеций)
+			$avgPower = ($powers[$i] + $powers[$i - 1]) / 2.0;
+			
+			// Накапливаем энергию в Ватт-секундах (Джоулях)
+			$totalWattSeconds += $avgPower * $dt;
+		}
+
+		// Переводим Ватт-секунды в ватт-часы:
+		// 1 кВт·ч = 1000 Вт * 3600 секунд = 3 600 000 Вт·с
+		return round($totalWattSeconds / 3600, 4);
     }, 3);
 	
 	 $this->ConstantON("Электроэнергия", "powercount", "^powercount; - Возвращает стоимость эектроэнергии за 1квт", function($expl) use($modClass): string 

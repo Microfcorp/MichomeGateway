@@ -10,7 +10,7 @@ if(isset($_GET['device'])){
 ?>
 <html>
 <head>
-<title>Управление энергомонитором</title>
+<title>Управление приборами Bolid C2000</title>
 <link rel="stylesheet" type="text/css" href="/michome/styles/style.css"/>
 <script type="text/javascript" src="/site/MicrofLibrary.js"></script>
 <script type="text/javascript" src="/michome/libmichome.js"></script>
@@ -147,7 +147,7 @@ if(isset($_GET['device'])){
 <body>
 		<div class = "body_alfa"></div>
 		<div class = "body">
-			<div class = "title_menu">Управление Michome. Управление модулей Bolid C2000</div>
+			<div class = "title_menu">Управление Michome. Управление приборами Bolid C2000</div>
 			<div style="text-align: left;" class = "com">
                 <div style="width: 100%; height: auto; text-align: left;" class = "components">
 					<div class = "components_alfa">
